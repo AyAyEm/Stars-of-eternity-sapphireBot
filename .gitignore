@@ -1,0 +1,24 @@
+# Ignore a blackhole and the folder for development
+node_modules/
+.vscode/
+
+# Ignore source files
+src/
+
+# Ignore log files
+*.log
+
+# Ignore package locks
+package-lock.json
+yarn.lock
+
+# Ignore env
+.env
+
+# Ignore eslint
+.eslintignore
+.eslintrc.json
+
+# Typescript files
+tsconfig.json
+tsconfig.tsbuildinfo
