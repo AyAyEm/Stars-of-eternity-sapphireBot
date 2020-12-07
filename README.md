@@ -2,8 +2,8 @@
 
 # Stars-of-eternity-bot
 [![GitHub](https://img.shields.io/github/license/sapphire-project/framework)](https://github.com/WarNote/Stars-of-eternity-bot/LICENSE)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/WarNote/Stars-of-eternity-bot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/WarNote/Stars-of-eternity-bot/context:javascript)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/WarNote/Stars-of-eternity-bot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/WarNote/Stars-of-eternity-bot/alerts/)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/WarNote/Stars-of-eternity-sapphireBot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/WarNote/Stars-of-eternity-sapphireBot/context:javascript)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/WarNote/Stars-of-eternity-sapphireBot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/WarNote/Stars-of-eternity-sapphireBot/alerts/)
 
 ## Introduction
 
