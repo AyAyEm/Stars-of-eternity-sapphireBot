@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ESNEXT",
+    "lib": [],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "composite": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "useDefineForClassFields": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@root/*": ["./*"],
+      "@config": ["./config"],
+      "@lib": ["./lib"],
+      "@lib/*": ["./lib/*"],
+      "@utils": ["./lib/utils"],
+      "@utils/*": ["./lib/utils/*"],
+      "@embeds": ["./lib/embeds"],
+      "@embeds/*": ["./lib/embeds/*"],
+      "@providers": ["./lib/providers"],
+      "@providers/*": ["./lib/providers/*"]
+    }
+  },
+  "include": [
+    "src",
+    "src/languages/**/*.json"
+  ]
+}

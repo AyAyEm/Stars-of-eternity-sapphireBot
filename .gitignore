@@ -1,0 +1,24 @@
+# black hole of files
+node_modules/
+
+# test files
+*teste.ts
+
+# build files
+dist/
+tsconfig.tsbuildinfo
+
+# sensitive data
+.env
+src/config.ts
+
+# generated data
+data/
+audios/
+
+# lock files
+pacakge-lock.json
+yarn.lock
+
+# error files
+yarn-error.log

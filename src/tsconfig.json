@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig",
+  "compilerOptions": {
+    "lib": ["ES2019"],
+    "esModuleInterop": true,
+    "outDir": "../dist",
+    "rootDir": ".",
+    "baseUrl": "./"
+  }
+}
