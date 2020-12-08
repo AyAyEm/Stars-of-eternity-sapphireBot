@@ -7,4 +7,6 @@ read MONGO_CONNECTION_STRING
 echo "DISCORD_TOKEN=$DISCORD_TOKEN" >> .env
 echo "MONGO_CONNECTION_STRING=$MONGO_CONNECTION_STRING" >> .env
 
+npm install -g pm2
 npm install --production
+pm2 start
