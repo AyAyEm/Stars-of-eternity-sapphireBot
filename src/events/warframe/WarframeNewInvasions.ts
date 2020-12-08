@@ -1,7 +1,7 @@
 import { EternityEvent } from '@lib';
 import { ApplyOptions } from '@sapphire/decorators';
 import { MessageEmbed } from 'discord.js';
-import { Warframe } from '@utils/constants';
+import { Warframe } from '@utils/Constants';
 import async from 'async';
 
 import type { TextChannel } from 'discord.js';
