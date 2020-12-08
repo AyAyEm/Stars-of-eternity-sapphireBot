@@ -10,7 +10,7 @@ import type { Awaited } from '@sapphire/framework';
 import Root from 'app-root-path';
 
 export class Items {
-  public readonly dir = path.join(Root.path, 'data\\warframe-items');
+  public readonly dir = path.join(Root.path, 'data/warframe-items');
 
   public readonly source = 'https://raw.githubusercontent.com/WFCD/warframe-items/development/data/json/All.json';
 
