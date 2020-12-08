@@ -1,6 +1,7 @@
 # Ignore a blackhole and the folder for development
 node_modules/
 .vscode/
+data/
 
 # Ignore source files
 src/
