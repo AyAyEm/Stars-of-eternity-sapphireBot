@@ -6,8 +6,8 @@ import type { VoiceConnection, VoiceChannel, GuildMember } from 'discord.js';
 import type { WriteStream } from 'fs';
 
 import type { EternityClient } from '@lib';
-import { SilenceStream } from './silenceStream';
-import { audioDate } from './audioDate';
+import { SilenceStream } from './SilenceStream';
+import { audioDate } from './AudioDate';
 
 ffmpeg.setFfmpegPath(require('@ffmpeg-installer/ffmpeg').path);
 ffmpeg.setFfprobePath(require('@ffprobe-installer/ffprobe').path);

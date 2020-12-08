@@ -1,4 +1,4 @@
-import '@lib/extenders';
+import './Extenders';
 
 import { SapphireClient } from '@sapphire/framework';
 import { mergeDefault } from '@sapphire/utilities';

@@ -1,10 +1,10 @@
 import { EternityEvent } from '@lib';
 import { ApplyOptions } from '@sapphire/decorators';
-import { Guilds } from '@providers/mongoose/Models';
-import { fissuresEmbed } from '@embeds/warframe/fissureTracker';
+import { Guilds } from '@providers/mongoose/models';
+import { fissuresEmbed } from '@embeds/warframe/FissureTracker';
 import async from 'async';
 
-import type { RelicTracker } from '@providers/mongoose/Models';
+import type { RelicTracker } from '@providers/mongoose/models';
 import type { EventOptions } from '@sapphire/framework';
 import type { Fissure, RelicTiers } from '@lib/types/Warframe';
 import type { EternityMessageEmbed } from '@lib';
