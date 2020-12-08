@@ -1,6 +1,6 @@
 import type { DocumentType } from '@typegoose/typegoose';
 
-import { models } from './Models';
+import { models } from './models';
 
 import type { Query } from './Mongoose';
 import type { ModelsKeys } from './models';
