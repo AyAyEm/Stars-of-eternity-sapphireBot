@@ -24,7 +24,7 @@ function isAuthorFilter(author: User | GuildMember) {
 export default class extends EternityCommand {
   public items = this.client.warframe.items;
 
-  public itemNames = Promise.resolve(this.items.uniqueNameDict).then(Object.keys);
+  public itemNames = Promise.resolve(this.items.getUniqueNameDict()).then(Object.keys);
 
   public fuzzySet = this.itemNames.then(FuzzySet);
 

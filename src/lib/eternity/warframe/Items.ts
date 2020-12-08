@@ -7,7 +7,7 @@ import path from 'path';
 import type { Item } from 'warframe-items';
 import type { Awaited } from '@sapphire/framework';
 
-import Root = require('app-root-path');
+import Root from 'app-root-path';
 
 export class Items {
   public readonly dir = path.join(Root.path, 'data\\warframe-items');
@@ -18,11 +18,15 @@ export class Items {
 
   public latestUpdate?: Date;
 
-  get uniqueNameDict(): Awaited<Record<string, string>> {
+  public getUniqueNameDict(): Awaited<Record<string, string>> {
     if (!this._uniqueNameDict) {
-      const result = import(`${this.dir}.json`);
+      const result = import(`${this.dir}.json`)
+        .catch(() => this.create())
+        .then(() => import(`${this.dir}.json`))
+        .catch(console.error);
+
       result.then((uniqueNameDict: Record<string, string>) => {
-        this._uniqueNameDict = uniqueNameDict;
+        if (uniqueNameDict) this._uniqueNameDict = uniqueNameDict;
       });
 
       return result;
@@ -42,14 +46,17 @@ export class Items {
     const operations = data.map((item) => async () => (
       fse.outputJson(path.join(this.dir, `${item.uniqueName}.json`), item)));
 
-    async.parallelLimit(operations, 64);
-    this.latestUpdate = new Date();
+    return new Promise((resolve, reject) => {
+      async.parallelLimit(operations, 64, (error) => {
+        if (error) reject(error);
+        else resolve(undefined);
+      });
+      this.latestUpdate = new Date();
+    });
   }
 
-  public async get(name: string, createIfNotExists = false): Promise<Item | null> {
-    const uniqueNameDict = await this.uniqueNameDict;
-    if (!this.uniqueNameDict && createIfNotExists) await this.create();
-    else if (!uniqueNameDict && !createIfNotExists) return null;
+  public async get(name: string): Promise<Item | null> {
+    const uniqueNameDict = await this.getUniqueNameDict();
 
     return import(path.join(this.dir, uniqueNameDict[name.toLowerCase()]));
   }
