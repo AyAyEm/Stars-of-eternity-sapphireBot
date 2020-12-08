@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _lib_1 = require("@lib");
 const decorators_1 = require("@sapphire/decorators");
 const discord_js_1 = require("discord.js");
-const constants_1 = require("@utils/constants");
+const Constants_1 = require("@utils/Constants");
 const async_1 = __importDefault(require("async"));
 let default_1 = class extends _lib_1.EternityEvent {
     async run(invasions) {
@@ -37,7 +37,7 @@ let default_1 = class extends _lib_1.EternityEvent {
     }
     makeEmbeds(invasion, matchedItems) {
         function embedMaker([reward, defendingFaction, attackingFaction]) {
-            const { factionsStyle } = constants_1.Warframe;
+            const { factionsStyle } = Constants_1.Warframe;
             return new discord_js_1.MessageEmbed()
                 .setTitle(`${reward.itemString}`)
                 .setThumbnail(reward.thumbnail)
