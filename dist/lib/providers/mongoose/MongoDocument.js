@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateMongoDocument = void 0;
-const Models_1 = require("./Models");
+const models_1 = require("./models");
 function generateMongoDocument(modelKey) {
-    const model = Models_1.models[modelKey];
+    const model = models_1.models[modelKey];
     return class MongoDocument {
         document;
         query;

@@ -13,7 +13,7 @@ export declare class Mongoose extends Provider {
         new (query: string | {
             id: string | Record<string, any>;
         }): {
-            document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Utils, {}>>;
+            document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Utils, {}>>;
             query: Query;
             load: Promise<any>;
             reload(): Promise<any>;
@@ -25,7 +25,7 @@ export declare class Mongoose extends Provider {
         new (query: string | {
             id: string | Record<string, any>;
         }): {
-            document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Utils, {}>>;
+            document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Utils, {}>>;
             query: Query;
             load: Promise<any>;
             reload(): Promise<any>;
@@ -37,7 +37,7 @@ export declare class Mongoose extends Provider {
         new (query: string | {
             id: string | Record<string, any>;
         }): {
-            document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Utils, {}>>;
+            document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Utils, {}>>;
             query: Query;
             load: Promise<any>;
             reload(): Promise<any>;
@@ -49,7 +49,7 @@ export declare class Mongoose extends Provider {
         new (query: string | {
             id: string | Record<string, any>;
         }): {
-            document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Utils, {}>>;
+            document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Utils, {}>>;
             query: Query;
             load: Promise<any>;
             reload(): Promise<any>;
@@ -58,10 +58,10 @@ export declare class Mongoose extends Provider {
         };
     };
     models: {
-        Guilds: import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Guilds, {}>;
-        Trackers: import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Trackers, {}>;
-        Users: import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Users, {}>;
-        Utils: import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Utils, {}>;
+        Guilds: import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Guilds, {}>;
+        Trackers: import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Trackers, {}>;
+        Users: import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Users, {}>;
+        Utils: import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Utils, {}>;
     };
     connection: Promise<this>;
     constructor(connectionString?: string);

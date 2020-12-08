@@ -3,7 +3,7 @@ import type { EternityMessage } from '@lib';
 import type { Args } from '@sapphire/framework';
 export default class extends EternityCommandWSC {
     document(guildId: string): Promise<{
-        document: import("@typegoose/typegoose").DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("../../lib/providers/mongoose/Models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("../../lib/providers/mongoose/Models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("../../lib/providers/mongoose/Models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("../../lib/providers/mongoose/Models").Utils, {}>>;
+        document: import("@typegoose/typegoose").DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("../../lib/providers/mongoose/models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("../../lib/providers/mongoose/models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("../../lib/providers/mongoose/models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("../../lib/providers/mongoose/models").Utils, {}>>;
         query: import("../../lib/providers").Query;
         load: Promise<any>;
         reload(): Promise<any>;

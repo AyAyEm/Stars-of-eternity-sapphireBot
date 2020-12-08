@@ -5,7 +5,7 @@ export declare function generateMongoDocument(modelKey: ModelsKeys): {
     new (query: {
         id: Query['id'];
     } | string): {
-        document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./Models").Utils, {}>>;
+        document: DocumentType<import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Guilds, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Trackers, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Users, {}> | import("@typegoose/typegoose").ReturnModelType<typeof import("./models").Utils, {}>>;
         query: Query;
         load: Promise<any>;
         reload(): Promise<any>;
