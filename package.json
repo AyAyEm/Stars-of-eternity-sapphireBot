@@ -5,8 +5,9 @@
   "main": "dist/eternity.js",
   "scripts": {
     "build": "tsc -b src",
+    "build:watch": "tsc -b src -w",
     "start": "npm run build && node .",
-    "dev": "npm run build && concurrently -k \"tsc -b src -w\" \"nodemon --watch dist --delay 2 dist/eternity.js\"",
+    "dev": "npm run build && concurrently -k \"npm run build:watch\" \"nodemon --watch dist --delay 2 dist/eternity.js\"",
     "clean": "tsc -b src --clean",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
