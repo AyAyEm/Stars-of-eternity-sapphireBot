@@ -11,11 +11,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const _lib_1 = require("@lib");
 const decorators_1 = require("@sapphire/decorators");
-const fissureTracker_1 = require("@embeds/warframe/fissureTracker");
+const FissureTracker_1 = require("@embeds/warframe/FissureTracker");
 const async_1 = __importDefault(require("async"));
 let default_1 = class extends _lib_1.EternityEvent {
     async run(fissures) {
-        const fissuresEmbeds = fissureTracker_1.fissuresEmbed(fissures);
+        const fissuresEmbeds = FissureTracker_1.fissuresEmbed(fissures);
         this.client.provider.models.Guilds.find({}).cursor()
             .on('data', async ({ channels, id: guildId }) => {
             if (!channels)

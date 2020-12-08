@@ -7,8 +7,8 @@ exports.AudioRecorder = void 0;
 const audio_mixer_1 = __importDefault(require("audio-mixer"));
 const fluent_ffmpeg_1 = __importDefault(require("fluent-ffmpeg"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
-const silenceStream_1 = require("./silenceStream");
-const audioDate_1 = require("./audioDate");
+const SilenceStream_1 = require("./SilenceStream");
+const AudioDate_1 = require("./AudioDate");
 fluent_ffmpeg_1.default.setFfmpegPath(require('@ffmpeg-installer/ffmpeg').path);
 fluent_ffmpeg_1.default.setFfprobePath(require('@ffprobe-installer/ffprobe').path);
 class AudioRecorder {
@@ -21,7 +21,7 @@ class AudioRecorder {
     client;
     pcmMixer = new audio_mixer_1.default.Mixer(this.voiceInputOptions);
     channel;
-    audioDateObject = audioDate_1.audioDate();
+    audioDateObject = AudioDate_1.audioDate();
     basePath = './audios/';
     audioPath = `${this.basePath}${this.audioDateObject.startDate}.ogg`;
     logPath = `${this.basePath}${this.audioDateObject.startDate}.txt`;
@@ -47,7 +47,7 @@ class AudioRecorder {
         await this.channelLogger();
         this.isRecording = true;
         this.outputAudioStream = fs_extra_1.default.createWriteStream(this.audioPath);
-        this.voiceConnection.play(new silenceStream_1.SilenceStream(), { type: 'opus' });
+        this.voiceConnection.play(new SilenceStream_1.SilenceStream(), { type: 'opus' });
         this.channel.members.array().forEach(async (member, i) => {
             const voiceStream = this.voiceConnection.receiver.createStream(member.user, { mode: 'pcm', end: 'manual' });
             if (i === 0) {

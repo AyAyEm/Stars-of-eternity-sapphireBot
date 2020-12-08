@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EternityClient = void 0;
-require("@lib/extenders");
+require("./Extenders");
 const framework_1 = require("@sapphire/framework");
 const utilities_1 = require("@sapphire/utilities");
 const I18n_1 = require("@utils/I18n");

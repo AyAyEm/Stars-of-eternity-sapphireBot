@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import '@lib/extenders';
+import './Extenders';
 import { SapphireClient } from '@sapphire/framework';
 import { ClientOptions } from 'discord.js';
 import { Mongoose } from './providers';

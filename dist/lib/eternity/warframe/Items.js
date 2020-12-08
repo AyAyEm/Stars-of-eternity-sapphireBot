@@ -30,7 +30,7 @@ const fs_extra_1 = __importDefault(require("fs-extra"));
 const path_1 = __importDefault(require("path"));
 const app_root_path_1 = __importDefault(require("app-root-path"));
 class Items {
-    dir = path_1.default.join(app_root_path_1.default.path, 'data\\warframe-items');
+    dir = path_1.default.join(app_root_path_1.default.path, 'data/warframe-items');
     source = 'https://raw.githubusercontent.com/WFCD/warframe-items/development/data/json/All.json';
     _uniqueNameDict;
     latestUpdate;
