@@ -23,7 +23,7 @@ function isAuthorFilter(author) {
 }
 let default_1 = class extends _lib_1.EternityCommand {
     items = this.client.warframe.items;
-    itemNames = Promise.resolve(this.items.uniqueNameDict).then(Object.keys);
+    itemNames = Promise.resolve(this.items.getUniqueNameDict()).then(Object.keys);
     fuzzySet = this.itemNames.then(fuzzyset_js_1.default);
     async run(msg, args) {
         const itemName = await args.rest('string');

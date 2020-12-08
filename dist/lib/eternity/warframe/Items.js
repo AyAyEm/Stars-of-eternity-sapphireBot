@@ -28,17 +28,20 @@ const lodash_1 = __importDefault(require("lodash"));
 const async_1 = __importDefault(require("async"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const path_1 = __importDefault(require("path"));
-const Root = require("app-root-path");
+const app_root_path_1 = __importDefault(require("app-root-path"));
 class Items {
-    dir = path_1.default.join(Root.path, 'data\\warframe-items');
+    dir = path_1.default.join(app_root_path_1.default.path, 'data\\warframe-items');
     source = 'https://raw.githubusercontent.com/WFCD/warframe-items/development/data/json/All.json';
     _uniqueNameDict;
     latestUpdate;
-    get uniqueNameDict() {
+    getUniqueNameDict() {
         if (!this._uniqueNameDict) {
-            const result = Promise.resolve().then(() => __importStar(require(`${this.dir}.json`)));
+            const result = Promise.resolve().then(() => __importStar(require(`${this.dir}.json`))).catch(() => this.create())
+                .then(() => Promise.resolve().then(() => __importStar(require(`${this.dir}.json`))))
+                .catch(console.error);
             result.then((uniqueNameDict) => {
-                this._uniqueNameDict = uniqueNameDict;
+                if (uniqueNameDict)
+                    this._uniqueNameDict = uniqueNameDict;
             });
             return result;
         }
@@ -50,15 +53,18 @@ class Items {
         this._uniqueNameDict = dataDict;
         fs_extra_1.default.outputJson(`${this.dir}.json`, dataDict);
         const operations = data.map((item) => async () => (fs_extra_1.default.outputJson(path_1.default.join(this.dir, `${item.uniqueName}.json`), item)));
-        async_1.default.parallelLimit(operations, 64);
-        this.latestUpdate = new Date();
+        return new Promise((resolve, reject) => {
+            async_1.default.parallelLimit(operations, 64, (error) => {
+                if (error)
+                    reject(error);
+                else
+                    resolve(undefined);
+            });
+            this.latestUpdate = new Date();
+        });
     }
-    async get(name, createIfNotExists = false) {
-        const uniqueNameDict = await this.uniqueNameDict;
-        if (!this.uniqueNameDict && createIfNotExists)
-            await this.create();
-        else if (!uniqueNameDict && !createIfNotExists)
-            return null;
+    async get(name) {
+        const uniqueNameDict = await this.getUniqueNameDict();
         return Promise.resolve().then(() => __importStar(require(path_1.default.join(this.dir, uniqueNameDict[name.toLowerCase()]))));
     }
 }
