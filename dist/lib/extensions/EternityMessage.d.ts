@@ -1,6 +1,6 @@
-/// <reference types="@sapphire/framework/dist/lib/sapphireclient" />
-/// <reference types="@sapphire/framework/dist/lib/types/events" />
-/// <reference types="@scp/in17n/dist/lib/in17n" />
+/// <reference types="@sapphire/framework/dist/lib/SapphireClient" />
+/// <reference types="@sapphire/framework/dist/lib/types/Events" />
+/// <reference types="@scp/in17n/dist/lib/In17n" />
 import { SapphireMessage } from '@sapphire/framework';
 import type { EmojiResolvable, MessageReaction, MessageOptions, MessageAdditions, SplitOptions } from 'discord.js';
 import type { IterableCollection } from 'async';
