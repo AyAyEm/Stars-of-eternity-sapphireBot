@@ -1,5 +1,5 @@
 import { EternityMessageEmbed } from '@lib';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import type { Item } from 'warframe-items';
 
@@ -55,6 +55,7 @@ class ModEmbed {
           { ...EternityMessageEmbed.blankField, inline: true },
         ];
       });
+
       embedPage.addFields(statsFields.flat());
     }
     return embedPage;
@@ -76,6 +77,7 @@ class ModEmbed {
           ]
         ), ['', '']);
         const translatedGroup = groupsDictionary.get(group) || group;
+
         embedPage.addFields([
           { name: translatedGroup, value: locationsString, inline: true },
           { name: 'chance', value: percentagesString, inline: true },
@@ -83,15 +85,17 @@ class ModEmbed {
         ]);
       });
     }
+
     return embedPage;
   }
 }
 
 export function mod(modItem: Item) {
-  const modEmbed = new ModEmbed(modItem);
-  const { mainInfoPage, dropsPage } = modEmbed;
-  const embedMap = new Map();
-  embedMap.set('📋', mainInfoPage);
+  const { mainInfoPage, dropsPage } = new ModEmbed(modItem);
+
+  const embedMap = new Map()
+    .set('📋', mainInfoPage);
+
   if (dropsPage) embedMap.set('♻', dropsPage);
 
   return embedMap;

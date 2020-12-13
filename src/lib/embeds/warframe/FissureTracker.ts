@@ -34,7 +34,9 @@ function getMissionsFields(missionFissures: Fissure[]) {
     const expiration = moment.tz(expiry, timezone).format('HH:mm');
     return `${expirations}*${expiration}*\n`;
   }, '');
+
   const enemyFactions = missionFissures.reduce((factions, { enemy }) => `${factions}${enemy}\n`, '');
+
   return [{
     name: `${missionFissures[0].missionType}`,
     value: missionFissuresToString(missionFissures),
@@ -59,7 +61,9 @@ export function fissuresEmbed(fissures: Fissure[]): Map<RelicTiers, EternityMess
         return B - A;
       }),
   );
+
   const embedsMap = new Map();
+
   fissuresMap.forEach((tierFissures, tier) => {
     const { icon } = fissureTiers.get(tier) || {};
 
@@ -79,6 +83,7 @@ export function fissuresEmbed(fissures: Fissure[]): Map<RelicTiers, EternityMess
       .setTimestamp()
       .setFooter('Horário de São Paulo')
       .addFields(...fields);
+
     embedsMap.set(tier, embed);
   });
   return embedsMap;

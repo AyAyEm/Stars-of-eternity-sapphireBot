@@ -8,18 +8,14 @@ import { blueprintSource, dropToNameAndChance } from '../utils';
 import specialItems from '../SpecialItems';
 
 class WeaponEmbed extends BaseWeapon {
-  get bpSource() {
-    return blueprintSource(this.weapon);
-  }
+  public bpSource = blueprintSource(this.weapon);
 
   get mainInfoPage() {
     const { baseEmbed: embed } = this;
     const { name: weaponName } = this.weapon;
     const specialAdjustment = specialItems.get(weaponName);
 
-    if (specialAdjustment) {
-      return specialAdjustment(embed);
-    }
+    if (specialAdjustment) return specialAdjustment(embed);
 
     const components = this.weapon.components || [];
     const [resources, componentItems] = biFilter(components.filter(
@@ -47,6 +43,7 @@ class WeaponEmbed extends BaseWeapon {
       const resourcesString = resourcesNames.join('\n');
       embed.addField('Recursos', resourcesString, false);
     }
+
     return embed;
   }
 
@@ -54,27 +51,33 @@ class WeaponEmbed extends BaseWeapon {
     const { baseEmbed } = this;
     const { components } = this.weapon;
 
-    if (!('location' in this.bpSource) || this.bpSource.location !== 'Drop') return null;
-    if (!components) return null;
+    if (!('location' in this.bpSource) || this.bpSource.location !== 'Drop' || !components) {
+      return null;
+    }
 
     const [resources, componentItems] = biFilter(components, ({ uniqueName }: Component) => (
       uniqueName.includes('Items')));
+
     const componentsFields = componentItems.map(({ drops, name }: Component) => {
       const nameAndChance = _.uniqBy(drops, 'location')
         .map((drop) => dropToNameAndChance(drop))
         .sort(({ chance: A }, { chance: B }) => B - A)
         .slice(0, 3);
+
       const dataString = nameAndChance
         .map(({ name: enemyName, chance }) => `${enemyName} **${Math.round(chance * 100) / 100}%**`)
         .join('\n');
+
       return { name, value: dataString, inline: false };
     });
+
     baseEmbed.addFields(componentsFields);
 
     if (resources.length > 0) {
       const resourcesString = resources
         .map(({ name, itemCount }: Component) => `${name} **${itemCount}**`)
         .join('\n');
+
       baseEmbed.addField('Recursos', resourcesString, false);
     }
 
@@ -83,11 +86,13 @@ class WeaponEmbed extends BaseWeapon {
 }
 
 export function weapon(item: Item) {
-  const weaponEmbed = new WeaponEmbed(item);
-  const { mainInfoPage, componentsPage, baseStatusEmbed } = weaponEmbed;
+  const { mainInfoPage, componentsPage, baseStatusEmbed } = new WeaponEmbed(item);
+
   const embedMap = new Map();
+
   embedMap.set('📋', mainInfoPage);
   if (componentsPage) embedMap.set('♻', componentsPage);
   embedMap.set('🃏', baseStatusEmbed);
+
   return embedMap;
 }
