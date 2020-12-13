@@ -5,6 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "composite": true,
+    "sourceMap": true,
     "declaration": true,
     "esModuleInterop": true,
     "useDefineForClassFields": true,
