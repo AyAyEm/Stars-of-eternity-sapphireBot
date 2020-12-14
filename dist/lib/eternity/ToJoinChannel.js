@@ -35,3 +35,4 @@ function toJoinChannel(channel) {
     executing = false;
 }
 exports.toJoinChannel = toJoinChannel;
+//# sourceMappingURL=ToJoinChannel.js.map

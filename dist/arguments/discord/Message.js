@@ -15,3 +15,4 @@ class Message extends framework_1.Argument {
     }
 }
 exports.Message = Message;
+//# sourceMappingURL=Message.js.map

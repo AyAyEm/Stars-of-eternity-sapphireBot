@@ -51,3 +51,4 @@ class Mongoose extends Provider_1.Provider {
     }
 }
 exports.Mongoose = Mongoose;
+//# sourceMappingURL=Mongoose.js.map

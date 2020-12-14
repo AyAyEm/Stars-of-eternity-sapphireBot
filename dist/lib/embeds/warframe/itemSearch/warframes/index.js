@@ -12,3 +12,4 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./Warframe"), exports);
 __exportStar(require("./WarframePrime"), exports);
+//# sourceMappingURL=index.js.map

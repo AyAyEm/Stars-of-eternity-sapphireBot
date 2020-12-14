@@ -28,3 +28,4 @@ exports.config = {
     token: env.DISCORD_TOKEN || '',
     mongoConnectionString: env.MONGO_CONNECTION_STRING || '',
 };
+//# sourceMappingURL=config.js.map

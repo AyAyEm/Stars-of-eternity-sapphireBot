@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const discord_js_1 = require("discord.js");
+const _lib_1 = require("@lib");
 const Constants_1 = require("@utils/Constants");
 class BaseWeapon {
     weapon;
@@ -9,26 +9,18 @@ class BaseWeapon {
     }
     get baseEmbed() {
         const { name, type, imageName, category, masteryReq, disposition = 1, } = this.weapon;
-        const embed = new discord_js_1.MessageEmbed();
         const fields = [{ name: 'Categoria', value: category, inline: true }];
         if (type)
             fields.push({ name: 'Tipo', value: type, inline: true });
-        embed
+        return new _lib_1.EternityMessageEmbed()
             .setTitle(`${name} ${Constants_1.rivenDisposition[disposition - 1]}`)
             .addFields(fields)
             .setThumbnail(`https://cdn.warframestat.us/img/${imageName}`)
             .setFooter(`Maestria ${masteryReq}`, Constants_1.masteryRankImgs[masteryReq || 0]);
-        return embed;
     }
     get baseStatusEmbed() {
-        const { baseEmbed, weapon } = this;
-        const { 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        criticalChance, criticalMultiplier, procChance, fireRate, accuracy, 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        noise, trigger, magazineSize, reloadTime, ammo, damage, // multishot,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        damageTypes = {}, totalDamage, flight, projectile, secondary, areaAttack, category, } = weapon;
+        const { baseEmbed: embed, weapon } = this;
+        const { criticalChance, criticalMultiplier, procChance, fireRate, accuracy, trigger, magazineSize, reloadTime, ammo, damageTypes = {}, totalDamage, projectile, category, } = weapon;
         const embedStrings = {
             chance: `Chance: ${Math.round((criticalChance || 0) * 100)}%\nMultiplicador: ${criticalMultiplier}x`,
             status: `Chance: ${Math.round((procChance || 0) * 100)}%`,
@@ -48,8 +40,9 @@ class BaseWeapon {
         ];
         if (ammo)
             fields.push({ name: 'Munição', value: embedStrings.munition, inline: true });
-        baseEmbed.addFields(fields);
-        return baseEmbed;
+        embed.addFields(fields);
+        return embed;
     }
 }
 exports.default = BaseWeapon;
+//# sourceMappingURL=BaseWeapon.js.map

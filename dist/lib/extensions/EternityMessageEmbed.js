@@ -10,3 +10,4 @@ class EternityMessageEmbed extends discord_js_1.MessageEmbed {
     }
 }
 exports.EternityMessageEmbed = EternityMessageEmbed;
+//# sourceMappingURL=EternityMessageEmbed.js.map

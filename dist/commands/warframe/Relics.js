@@ -32,3 +32,4 @@ default_1 = __decorate([
     })
 ], default_1);
 exports.default = default_1;
+//# sourceMappingURL=Relics.js.map

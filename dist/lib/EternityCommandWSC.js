@@ -87,3 +87,4 @@ class EternityCommandWSC extends framework_1.Command {
     }
 }
 exports.EternityCommandWSC = EternityCommandWSC;
+//# sourceMappingURL=EternityCommandWSC.js.map

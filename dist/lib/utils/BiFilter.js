@@ -26,3 +26,4 @@ function biFilter(array, callbackFn, thisArg) {
     return [trueElements, falseElements];
 }
 exports.biFilter = biFilter;
+//# sourceMappingURL=BiFilter.js.map

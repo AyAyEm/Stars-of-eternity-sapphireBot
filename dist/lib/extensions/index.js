@@ -15,3 +15,4 @@ __exportStar(require("./EternityMessage"), exports);
 __exportStar(require("./EternityVoiceChannel"), exports);
 __exportStar(require("./EternityTextChannel"), exports);
 __exportStar(require("./EternityMessageEmbed"), exports);
+//# sourceMappingURL=index.js.map

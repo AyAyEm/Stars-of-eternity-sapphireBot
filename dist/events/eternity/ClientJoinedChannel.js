@@ -26,3 +26,4 @@ default_1 = __decorate([
     decorators_1.ApplyOptions({ event: 'clientJoinedChannel' })
 ], default_1);
 exports.default = default_1;
+//# sourceMappingURL=ClientJoinedChannel.js.map

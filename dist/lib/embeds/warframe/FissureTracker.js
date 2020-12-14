@@ -76,3 +76,4 @@ function fissuresEmbed(fissures) {
 }
 exports.fissuresEmbed = fissuresEmbed;
 exports.default = fissuresEmbed;
+//# sourceMappingURL=FissureTracker.js.map

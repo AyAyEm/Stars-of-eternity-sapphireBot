@@ -9,3 +9,4 @@ class TaskStore extends framework_1.BaseStore {
     }
 }
 exports.TaskStore = TaskStore;
+//# sourceMappingURL=TaskStore.js.map

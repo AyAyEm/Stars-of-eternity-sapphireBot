@@ -8,3 +8,4 @@ class EternityVoiceChannel extends discord_js_1.Structures.get('VoiceChannel') {
     }
 }
 exports.EternityVoiceChannel = EternityVoiceChannel;
+//# sourceMappingURL=EternityVoiceChannel.js.map

@@ -30,3 +30,4 @@ async function mapToEmbed(guild, rolesEmoji, title) {
 exports.mapToEmbed = mapToEmbed;
 exports.firstEmbed = new discord_js_1.MessageEmbed()
     .setTitle('Adicione seus cargos com o comando /roleReaction add');
+//# sourceMappingURL=RoleReaction.js.map

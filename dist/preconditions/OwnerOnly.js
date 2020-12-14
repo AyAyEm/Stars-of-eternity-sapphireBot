@@ -11,3 +11,4 @@ class ClientPrecondition extends framework_1.Precondition {
     }
 }
 exports.ClientPrecondition = ClientPrecondition;
+//# sourceMappingURL=OwnerOnly.js.map

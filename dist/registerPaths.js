@@ -13,3 +13,4 @@ module_alias_1.addAliases({
     '@embeds': path_1.default.join(__dirname, '/lib/embeds'),
     '@providers': path_1.default.join(__dirname, '/lib/providers'),
 });
+//# sourceMappingURL=registerPaths.js.map

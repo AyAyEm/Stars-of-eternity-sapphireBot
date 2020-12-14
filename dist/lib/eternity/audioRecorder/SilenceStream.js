@@ -9,3 +9,4 @@ class SilenceStream extends stream_1.Readable {
     }
 }
 exports.SilenceStream = SilenceStream;
+//# sourceMappingURL=SilenceStream.js.map

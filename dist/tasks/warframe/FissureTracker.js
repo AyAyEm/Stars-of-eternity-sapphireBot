@@ -40,3 +40,4 @@ default_1 = __decorate([
     decorators_1.ApplyOptions({ time: 10000 })
 ], default_1);
 exports.default = default_1;
+//# sourceMappingURL=FissureTracker.js.map

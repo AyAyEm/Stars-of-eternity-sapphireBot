@@ -27,3 +27,4 @@ class Emoji extends framework_1.Argument {
     }
 }
 exports.Emoji = Emoji;
+//# sourceMappingURL=Emoji.js.map

@@ -40,3 +40,4 @@ Trackers = __decorate([
     typegoose_1.ModelOptions({ options: { allowMixed: 0, customName: 'Trackers' } })
 ], Trackers);
 exports.Trackers = Trackers;
+//# sourceMappingURL=Trackers.js.map

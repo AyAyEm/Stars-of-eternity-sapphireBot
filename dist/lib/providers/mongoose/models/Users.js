@@ -47,3 +47,4 @@ Users = __decorate([
     typegoose_1.ModelOptions({ options: { customName: 'Users' } })
 ], Users);
 exports.Users = Users;
+//# sourceMappingURL=Users.js.map

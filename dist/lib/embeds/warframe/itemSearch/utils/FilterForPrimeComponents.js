@@ -6,3 +6,4 @@ function filterForPrimeComponents(components) {
         .filter(({ drops = [] }) => drops[0]?.location?.toLowerCase().includes('relic'));
 }
 exports.filterForPrimeComponents = filterForPrimeComponents;
+//# sourceMappingURL=FilterForPrimeComponents.js.map

@@ -18,3 +18,4 @@ default_1 = __decorate([
     decorators_1.ApplyOptions({ event: 'memberJoinedChannel', enabled: false })
 ], default_1);
 exports.default = default_1;
+//# sourceMappingURL=MemberJoinedChannel.js.map

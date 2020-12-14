@@ -29,16 +29,13 @@ const BaseWeapon_1 = __importDefault(require("./BaseWeapon"));
 const utils_1 = require("../utils");
 const SpecialItems_1 = __importDefault(require("../SpecialItems"));
 class WeaponEmbed extends BaseWeapon_1.default {
-    get bpSource() {
-        return utils_1.blueprintSource(this.weapon);
-    }
+    bpSource = utils_1.blueprintSource(this.weapon);
     get mainInfoPage() {
         const { baseEmbed: embed } = this;
         const { name: weaponName } = this.weapon;
         const specialAdjustment = SpecialItems_1.default.get(weaponName);
-        if (specialAdjustment) {
+        if (specialAdjustment)
             return specialAdjustment(embed);
-        }
         const components = this.weapon.components || [];
         const [resources, componentItems] = BiFilter_1.biFilter(components.filter(({ name }) => name !== 'Blueprint'), ({ uniqueName }) => (uniqueName.includes('Items')));
         if ('id' in this.bpSource && 'location' in this.bpSource) {
@@ -63,10 +60,9 @@ class WeaponEmbed extends BaseWeapon_1.default {
     get componentsPage() {
         const { baseEmbed } = this;
         const { components } = this.weapon;
-        if (!('location' in this.bpSource) || this.bpSource.location !== 'Drop')
+        if (!('location' in this.bpSource) || this.bpSource.location !== 'Drop' || !components) {
             return null;
-        if (!components)
-            return null;
+        }
         const [resources, componentItems] = BiFilter_1.biFilter(components, ({ uniqueName }) => (uniqueName.includes('Items')));
         const componentsFields = componentItems.map(({ drops, name }) => {
             const nameAndChance = _.uniqBy(drops, 'location')
@@ -89,8 +85,7 @@ class WeaponEmbed extends BaseWeapon_1.default {
     }
 }
 function weapon(item) {
-    const weaponEmbed = new WeaponEmbed(item);
-    const { mainInfoPage, componentsPage, baseStatusEmbed } = weaponEmbed;
+    const { mainInfoPage, componentsPage, baseStatusEmbed } = new WeaponEmbed(item);
     const embedMap = new Map();
     embedMap.set('📋', mainInfoPage);
     if (componentsPage)
@@ -99,3 +94,4 @@ function weapon(item) {
     return embedMap;
 }
 exports.weapon = weapon;
+//# sourceMappingURL=Weapon.js.map

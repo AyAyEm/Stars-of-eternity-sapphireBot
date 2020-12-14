@@ -25,3 +25,4 @@ default_1 = __decorate([
     decorators_1.ApplyOptions({ event: framework_1.Events.EventError })
 ], default_1);
 exports.default = default_1;
+//# sourceMappingURL=EventError.js.map

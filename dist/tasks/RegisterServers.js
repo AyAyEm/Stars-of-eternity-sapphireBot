@@ -24,3 +24,4 @@ default_1 = __decorate([
     decorators_1.ApplyOptions({ time: 10000, once: true })
 ], default_1);
 exports.default = default_1;
+//# sourceMappingURL=RegisterServers.js.map

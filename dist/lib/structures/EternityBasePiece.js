@@ -8,3 +8,4 @@ class EternityBasePiece extends framework_1.BasePiece {
     }
 }
 exports.EternityBasePiece = EternityBasePiece;
+//# sourceMappingURL=EternityBasePiece.js.map

@@ -9,3 +9,4 @@ class EternityTextChannel extends discord_js_1.Structures.get('TextChannel') {
     }
 }
 exports.EternityTextChannel = EternityTextChannel;
+//# sourceMappingURL=EternityTextChannel.js.map

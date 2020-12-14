@@ -20,3 +20,4 @@ class EternityGuild extends discord_js_1.Structures.get('Guild') {
     }
 }
 exports.EternityGuild = EternityGuild;
+//# sourceMappingURL=EternityGuild.js.map

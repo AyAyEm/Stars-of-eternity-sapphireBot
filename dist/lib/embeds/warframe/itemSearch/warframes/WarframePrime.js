@@ -5,10 +5,6 @@ const _lib_1 = require("@lib");
 const BaseWarframe_1 = require("./BaseWarframe");
 const utils_1 = require("../utils");
 class WarframePrimeEmbed extends BaseWarframe_1.BaseWarframe {
-    constructor(warframe) {
-        super(warframe);
-        this.warframe = warframe;
-    }
     get componentsPage() {
         const { warframe: weapon, baseEmbed: embed } = this;
         const { components = [] } = weapon;
@@ -24,11 +20,11 @@ class WarframePrimeEmbed extends BaseWarframe_1.BaseWarframe {
     }
 }
 function warframePrime(item) {
-    const warframeEmbed = new WarframePrimeEmbed(item);
-    const { mainInfoPage, componentsPage } = warframeEmbed;
+    const { mainInfoPage, componentsPage } = new WarframePrimeEmbed(item);
     const embedMap = new Map();
     embedMap.set('📋', mainInfoPage);
     embedMap.set('♻', componentsPage);
     return embedMap;
 }
 exports.warframePrime = warframePrime;
+//# sourceMappingURL=WarframePrime.js.map

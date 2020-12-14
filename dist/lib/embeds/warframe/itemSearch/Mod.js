@@ -1,27 +1,11 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mod = void 0;
 const _lib_1 = require("@lib");
-const _ = __importStar(require("lodash"));
+const lodash_1 = __importDefault(require("lodash"));
 const groupsDictionary = new Map([
     ['Enemy Mod Tables', 'Inimigos'],
     ['Mission Rewards', 'Recompensa de missão'],
@@ -72,8 +56,8 @@ class ModEmbed {
         const { getBaseEmbed, modItem: { drops } } = this;
         const embedPage = drops ? getBaseEmbed() : null;
         if (embedPage) {
-            const dropsGroups = _.groupBy(drops, 'type');
-            _.forEach(dropsGroups, (dropsList, group) => {
+            const dropsGroups = lodash_1.default.groupBy(drops, 'type');
+            lodash_1.default.forEach(dropsGroups, (dropsList, group) => {
                 const [locationsString, percentagesString,] = dropsList.reduce(([locations, percentages], { location, chance }) => ([
                     `${locations}${location}\n`,
                     `${percentages}${((chance || 0) * 100).toFixed(2)}%\n`,
@@ -90,12 +74,12 @@ class ModEmbed {
     }
 }
 function mod(modItem) {
-    const modEmbed = new ModEmbed(modItem);
-    const { mainInfoPage, dropsPage } = modEmbed;
-    const embedMap = new Map();
-    embedMap.set('📋', mainInfoPage);
+    const { mainInfoPage, dropsPage } = new ModEmbed(modItem);
+    const embedMap = new Map()
+        .set('📋', mainInfoPage);
     if (dropsPage)
         embedMap.set('♻', dropsPage);
     return embedMap;
 }
 exports.mod = mod;
+//# sourceMappingURL=Mod.js.map

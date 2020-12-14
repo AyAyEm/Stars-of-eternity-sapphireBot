@@ -43,3 +43,4 @@ InvasionTracker = __decorate([
     decorators_1.ApplyOptions({ time: 10000 })
 ], InvasionTracker);
 exports.default = InvasionTracker;
+//# sourceMappingURL=InvasionTracker.js.map

@@ -32,3 +32,4 @@ exports.models = {
     Users: typegoose_1.getModelForClass(Users_1.Users),
     Utils: typegoose_1.getModelForClass(Utils_1.Utils),
 };
+//# sourceMappingURL=index.js.map

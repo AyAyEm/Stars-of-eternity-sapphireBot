@@ -34,3 +34,4 @@ class CIMap extends Map {
     }
 }
 exports.CIMap = CIMap;
+//# sourceMappingURL=CaseInsensitiveMap.js.map

@@ -36,3 +36,4 @@ function generateMongoDocument(modelKey) {
     };
 }
 exports.generateMongoDocument = generateMongoDocument;
+//# sourceMappingURL=MongoDocument.js.map

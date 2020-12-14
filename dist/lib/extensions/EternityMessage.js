@@ -42,3 +42,4 @@ class EternityMessage extends framework_1.SapphireMessage {
     }
 }
 exports.EternityMessage = EternityMessage;
+//# sourceMappingURL=EternityMessage.js.map

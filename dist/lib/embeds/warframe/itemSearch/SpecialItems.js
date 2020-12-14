@@ -14,3 +14,4 @@ exports.default = new Map([
     ['Zenith', acquisitionField(loginWeapon)],
     ['Sigma & Octantis', acquisitionField(sigmaWeapon)],
 ]);
+//# sourceMappingURL=SpecialItems.js.map

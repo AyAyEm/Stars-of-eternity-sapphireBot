@@ -30,3 +30,4 @@ class Task extends EternityBasePiece_1.EternityBasePiece {
     }
 }
 exports.Task = Task;
+//# sourceMappingURL=Task.js.map

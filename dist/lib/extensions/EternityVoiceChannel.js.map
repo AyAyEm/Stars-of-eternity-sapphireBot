@@ -1,0 +1,1 @@
+{"version":3,"file":"EternityVoiceChannel.js","sourceRoot":"","sources":["../../../src/lib/extensions/EternityVoiceChannel.ts"],"names":[],"mappings":";;;AAAA,2CAAwC;AAQxC,MAAa,oBAAqB,SAAQ,uBAAU,CAAC,GAAG,CAAC,cAAc,CAAC;IACtE,IAAI,WAAW;QACb,OAAO,IAAI,CAAC,OAAO,CAAC,MAAM,CAAC,CAAC,WAAW,EAAE,EAAE,CAAC,CAAC,WAAW,CAAC,IAAI,CAAC,GAAG,CAAC,CAAC;IACrE,CAAC;CACF;AAJD,oDAIC"}

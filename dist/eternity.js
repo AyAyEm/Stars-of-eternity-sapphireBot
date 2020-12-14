@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("./registerPaths");
+require("./development");
 const _lib_1 = require("@lib");
 const config_1 = require("./config");
 const client = new _lib_1.EternityClient();
@@ -8,3 +9,4 @@ const client = new _lib_1.EternityClient();
     client.login(config_1.config.token);
     client.once('ready', () => console.log('Ready'));
 }());
+//# sourceMappingURL=eternity.js.map

@@ -1,26 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseWarframe = void 0;
-const discord_js_1 = require("discord.js");
 const _utils_1 = require("@utils");
+const _lib_1 = require("@lib");
 const utils_1 = require("../utils");
 class BaseWarframe {
     warframe;
+    bpSource;
     constructor(warframe) {
         this.warframe = warframe;
+        this.bpSource = utils_1.blueprintSource(warframe);
     }
     get baseEmbed() {
-        const { name, imageName, masteryReq, category, } = this.warframe;
-        const embed = new discord_js_1.MessageEmbed();
-        embed
+        const { name, imageName, masteryReq, category } = this.warframe;
+        return new _lib_1.EternityMessageEmbed()
             .setTitle(`${name}`)
             .setThumbnail(`https://cdn.warframestat.us/img/${imageName}`)
             .addField('Categoria', category, false)
             .setFooter(`Maestria ${masteryReq}`, _utils_1.masteryRankImgs[masteryReq || 0]);
-        return embed;
-    }
-    get bpSource() {
-        return utils_1.blueprintSource(this.warframe);
     }
     get mainInfoPage() {
         const { warframe, bpSource } = this;
@@ -48,15 +45,7 @@ class BaseWarframe {
         }
         return embed;
     }
-    buildPages() {
-        const pageNames = Object.keys(this).filter((key) => key.includes('Page'));
-        const pages = {};
-        const thisPages = this;
-        pageNames.forEach((page) => {
-            pages[page] = thisPages[page]();
-        });
-        return pages;
-    }
 }
 exports.BaseWarframe = BaseWarframe;
 exports.default = BaseWarframe;
+//# sourceMappingURL=BaseWarframe.js.map

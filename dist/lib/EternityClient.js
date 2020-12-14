@@ -35,3 +35,4 @@ class EternityClient extends framework_1.SapphireClient {
     }
 }
 exports.EternityClient = EternityClient;
+//# sourceMappingURL=EternityClient.js.map

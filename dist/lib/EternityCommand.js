@@ -33,3 +33,4 @@ class EternityCommand extends framework_1.Command {
     }
 }
 exports.EternityCommand = EternityCommand;
+//# sourceMappingURL=EternityCommand.js.map

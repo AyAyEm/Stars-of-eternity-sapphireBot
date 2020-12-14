@@ -8,11 +8,6 @@ const _lib_1 = require("@lib");
 const utils_1 = require("../utils");
 const BaseWeapon_1 = __importDefault(require("./BaseWeapon"));
 class WeaponEmbed extends BaseWeapon_1.default {
-    weapon;
-    constructor(weapon) {
-        super(weapon);
-        this.weapon = weapon;
-    }
     get mainInfoPage() {
         const { weapon, baseEmbed: embed } = this;
         const { components = [] } = weapon;
@@ -43,8 +38,7 @@ class WeaponEmbed extends BaseWeapon_1.default {
     }
 }
 function primeWeapon(item) {
-    const weaponEmbed = new WeaponEmbed(item);
-    const { mainInfoPage, componentsPage, baseStatusEmbed } = weaponEmbed;
+    const { mainInfoPage, componentsPage, baseStatusEmbed } = new WeaponEmbed(item);
     const embedMap = new Map();
     embedMap.set('📋', mainInfoPage);
     if (componentsPage)
@@ -53,3 +47,4 @@ function primeWeapon(item) {
     return embedMap;
 }
 exports.primeWeapon = primeWeapon;
+//# sourceMappingURL=PrimeWeapon.js.map

@@ -113,3 +113,4 @@ __decorate([
     __metadata("design:type", Map)
 ], Guilds.prototype, "channels", void 0);
 exports.Guilds = Guilds;
+//# sourceMappingURL=Guilds.js.map

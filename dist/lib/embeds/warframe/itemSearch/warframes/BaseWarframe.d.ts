@@ -1,11 +1,11 @@
-import { MessageEmbed } from 'discord.js';
+import { EternityMessageEmbed } from '@lib';
 import type { Item } from 'warframe-items';
-export declare class BaseWarframe {
+import { blueprintSource } from '../utils';
+export declare abstract class BaseWarframe {
     warframe: Item;
+    bpSource: ReturnType<typeof blueprintSource>;
     constructor(warframe: Item);
-    get baseEmbed(): MessageEmbed;
-    private get bpSource();
-    get mainInfoPage(): MessageEmbed;
-    buildPages(): any;
+    get baseEmbed(): EternityMessageEmbed;
+    get mainInfoPage(): EternityMessageEmbed;
 }
 export default BaseWarframe;

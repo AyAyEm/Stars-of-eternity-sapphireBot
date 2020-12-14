@@ -17,3 +17,4 @@ __exportStar(require("./EternityEvent"), exports);
 __exportStar(require("./EternityArgument"), exports);
 __exportStar(require("./extensions"), exports);
 __exportStar(require("./errors"), exports);
+//# sourceMappingURL=index.js.map

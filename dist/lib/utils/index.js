@@ -17,3 +17,4 @@ __exportStar(require("./LanguageFunctions"), exports);
 __exportStar(require("./MultiEntryMap"), exports);
 __exportStar(require("./CaseInsensitiveMap"), exports);
 __exportStar(require("./Regexes"), exports);
+//# sourceMappingURL=index.js.map

@@ -20,3 +20,4 @@ exports.default = (item) => {
     const typeFunction = typeFunctions.get(type);
     return typeFunction ? typeFunction(item) : null;
 };
+//# sourceMappingURL=index.js.map

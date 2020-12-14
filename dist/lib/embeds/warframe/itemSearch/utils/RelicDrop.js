@@ -36,3 +36,4 @@ function dropsString(drops = []) {
     }, '');
 }
 exports.dropsString = dropsString;
+//# sourceMappingURL=RelicDrop.js.map

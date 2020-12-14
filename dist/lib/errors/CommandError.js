@@ -8,3 +8,4 @@ class CommandError extends framework_1.UserError {
     payload;
 }
 exports.CommandError = CommandError;
+//# sourceMappingURL=CommandError.js.map

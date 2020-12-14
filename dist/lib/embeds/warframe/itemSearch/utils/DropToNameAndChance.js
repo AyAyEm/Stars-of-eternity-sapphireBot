@@ -9,3 +9,4 @@ function dropToNameAndChance(enemy) {
     return { name, chance: actualChance };
 }
 exports.dropToNameAndChance = dropToNameAndChance;
+//# sourceMappingURL=DropToNameAndChance.js.map

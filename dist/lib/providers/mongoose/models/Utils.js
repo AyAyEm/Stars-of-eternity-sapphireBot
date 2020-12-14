@@ -41,3 +41,4 @@ Utils = __decorate([
     typegoose_1.ModelOptions({ options: { customName: 'Utils' } })
 ], Utils);
 exports.Utils = Utils;
+//# sourceMappingURL=Utils.js.map

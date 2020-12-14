@@ -8,3 +8,4 @@ class EternityEvent extends framework_1.Event {
     }
 }
 exports.EternityEvent = EternityEvent;
+//# sourceMappingURL=EternityEvent.js.map

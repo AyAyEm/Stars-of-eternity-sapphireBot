@@ -8,3 +8,4 @@ class EternityArgument extends framework_1.Argument {
     }
 }
 exports.EternityArgument = EternityArgument;
+//# sourceMappingURL=EternityArgument.js.map

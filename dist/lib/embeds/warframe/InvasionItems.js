@@ -15,3 +15,4 @@ const fields = [
 exports.default = new discord_js_1.MessageEmbed()
     .addFields(fields)
     .setTitle('Possíveis opções de items para a invasão:');
+//# sourceMappingURL=InvasionItems.js.map

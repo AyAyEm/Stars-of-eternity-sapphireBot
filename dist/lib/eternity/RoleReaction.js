@@ -21,3 +21,4 @@ async function roleReactionManager(messageReaction, user, action) {
         member.roles.remove(role);
 }
 exports.roleReactionManager = roleReactionManager;
+//# sourceMappingURL=RoleReaction.js.map
