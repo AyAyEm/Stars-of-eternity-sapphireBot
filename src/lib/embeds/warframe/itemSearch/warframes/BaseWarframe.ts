@@ -64,16 +64,6 @@ export class BaseWarframe {
     }
     return embed;
   }
-
-  public buildPages() {
-    const pageNames: string[] = Object.keys(this).filter((key) => key.includes('Page'));
-    const pages: any = {};
-    const thisPages: any = this;
-    pageNames.forEach((page: string) => {
-      pages[page] = thisPages[page]();
-    });
-    return pages;
-  }
 }
 
 export default BaseWarframe;
