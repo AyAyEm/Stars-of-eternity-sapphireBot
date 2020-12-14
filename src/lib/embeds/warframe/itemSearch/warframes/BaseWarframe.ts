@@ -1,29 +1,26 @@
-import { MessageEmbed } from 'discord.js';
 import { masteryRankImgs, biFilter } from '@utils';
+import { EternityMessageEmbed } from '@lib';
 
 import type { Item } from 'warframe-items';
 import { blueprintSource } from '../utils';
 
 type Component = Extract<Item['components'], Object>[0];
 
-export class BaseWarframe {
-  constructor(public warframe: Item) { }
+export abstract class BaseWarframe {
+  public bpSource: ReturnType<typeof blueprintSource>;
 
-  public get baseEmbed() {
-    const {
-      name, imageName, masteryReq, category,
-    } = this.warframe;
-    const embed = new MessageEmbed();
-    embed
+  constructor(public warframe: Item) {
+    this.bpSource = blueprintSource(warframe);
+  }
+
+  public get baseEmbed(): EternityMessageEmbed {
+    const { name, imageName, masteryReq, category } = this.warframe;
+
+    return new EternityMessageEmbed()
       .setTitle(`${name}`)
       .setThumbnail(`https://cdn.warframestat.us/img/${imageName}`)
       .addField('Categoria', category, false)
       .setFooter(`Maestria ${masteryReq}`, masteryRankImgs[masteryReq || 0]);
-    return embed;
-  }
-
-  private get bpSource() {
-    return blueprintSource(this.warframe);
   }
 
   public get mainInfoPage() {

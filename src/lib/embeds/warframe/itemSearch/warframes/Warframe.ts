@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { biFilter } from '@utils';
 import { EternityMessageEmbed } from '@lib';
 
