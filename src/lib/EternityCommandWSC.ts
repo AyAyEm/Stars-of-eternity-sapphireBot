@@ -11,7 +11,7 @@ import type { EternityClient } from './EternityClient';
 type CommandRun = (message: EternityMessage, args: Args) => Awaited<void>;
 
 export interface EternityCommandWSCOptions extends CommandOptions {
-  requiredArgs?: [string, Array<keyof ArgType>][];
+  requiredArgs?: [string, (keyof ArgType)[]][];
   defaultCommand?: string;
   enableDefault?: boolean;
   caseInsensitive?: boolean;
@@ -19,7 +19,7 @@ export interface EternityCommandWSCOptions extends CommandOptions {
 }
 
 export abstract class EternityCommandWSC extends Command {
-  public requiredArgs: Map<string, Array<keyof ArgType>>;
+  public requiredArgs: Map<string, (keyof ArgType)[]>;
 
   public subAliases: Map<string, Array<string>>;
 
