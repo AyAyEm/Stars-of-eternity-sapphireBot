@@ -10,7 +10,6 @@ tsconfig.tsbuildinfo
 
 # sensitive data
 .env
-src/config.ts
 
 # generated data
 data/
