@@ -5,9 +5,9 @@
     "es2021": true
   },
   "settings": {
-    "import/extensions": [".js", ".jsx", ".ts", ".tsx", ".d.ts"],
+    "import/extensions": [".js", ".ts", ".d.ts"],
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"]
+      "@typescript-eslint/parser": [".ts"]
     },
     "import/resolver": {
       "typescript": {
