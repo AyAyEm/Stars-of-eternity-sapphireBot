@@ -1,7 +1,6 @@
 /// <reference types="discord.js" />
-/// <reference types="@sapphire/framework/dist/lib/SapphireClient" />
-/// <reference types="@sapphire/framework/dist/lib/types/Events" />
-/// <reference types="@scp/in17n/dist/lib/In17n" />
+/// <reference types="@sapphire/framework" />
+/// <reference types="@sapphire/plugin-i18next/dist/register-discordjs" />
 import type { EternityGuild } from './EternityGuild';
 export interface EternityVoiceChannel {
     guild: EternityGuild;

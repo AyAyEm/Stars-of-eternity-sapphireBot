@@ -16,11 +16,15 @@ class Item extends framework_1.Argument {
         'reactor', 'catalyst', 'forma', 'synthula', 'exilus', 'riven', 'kavatGene',
         'kubrowegg', 'traces', 'other', 'credits',
     ]);
-    async run(argument) {
-        const item = argument.toLowerCase();
+    async run(parameter) {
+        const item = parameter.toLowerCase();
         if (this.possibleItems.has(item))
             return this.ok(item);
-        return this.error(argument, 'ArgumentInvalidItem', 'Argument passed cannot be resolved to a warframe item');
+        return this.error({
+            parameter,
+            identifier: 'ArgumentInvalidItem',
+            message: 'Argument passed cannot be resolved to a warframe item',
+        });
     }
 }
 exports.Item = Item;

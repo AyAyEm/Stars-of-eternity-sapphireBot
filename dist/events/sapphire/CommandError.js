@@ -12,10 +12,10 @@ const framework_1 = require("@sapphire/framework");
 let default_1 = class extends _lib_1.EternityEvent {
     run(error, { message, piece }) {
         if (error instanceof _lib_1.CommandError) {
-            message.sendTranslated(`commands/${piece.name}:${error.identifier}`);
+            message.channel.sendTranslated(`commands/${piece.name}:${error.identifier}`);
         }
         else if (error instanceof framework_1.UserError) {
-            message.sendTranslated(error.identifier);
+            message.channel.sendTranslated(error.identifier);
         }
         else {
             this.client.console.error(error);

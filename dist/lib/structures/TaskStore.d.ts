@@ -1,6 +1,5 @@
-import { BaseStore } from '@sapphire/framework';
-import type { EternityClient } from '@lib';
+import { Store } from '@sapphire/framework';
 import { Task } from './Task';
-export declare class TaskStore extends BaseStore<Task> {
-    constructor(client: EternityClient);
+export declare class TaskStore extends Store<Task> {
+    constructor();
 }

@@ -11,7 +11,7 @@ class Emoji extends framework_1.Argument {
     async run(argument, context) {
         const unicodeEmoji = argument.match(this.unicodeEmojiRegex)?.[0];
         if (unicodeEmoji) {
-            return this.ok(new discord_js_1.Emoji(this.client, {
+            return this.ok(new discord_js_1.Emoji(this.context.client, {
                 name: unicodeEmoji,
                 identifier: unicodeEmoji,
                 id: null,
@@ -22,8 +22,11 @@ class Emoji extends framework_1.Argument {
         const guildEmoji = context.message.guild.emojis.resolve(id) || null;
         if (guildEmoji)
             return this.ok(guildEmoji);
-        const defaultErrorMessage = 'Argument passed cannot resolve to a valid emoji';
-        return this.error(argument, 'ArgumentInvalidEmoji', defaultErrorMessage);
+        return this.error({
+            parameter: argument,
+            identifier: 'ArgumentInvalidEmoji',
+            message: 'Argument passed cannot resolve to a valid emoji',
+        });
     }
 }
 exports.Emoji = Emoji;

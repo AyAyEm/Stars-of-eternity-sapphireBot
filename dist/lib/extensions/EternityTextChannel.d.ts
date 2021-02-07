@@ -1,12 +1,11 @@
-/// <reference types="discord.js" />
-/// <reference types="@sapphire/framework/dist/lib/SapphireClient" />
-/// <reference types="@sapphire/framework/dist/lib/types/Events" />
-/// <reference types="@scp/in17n/dist/lib/In17n" />
+/// <reference types="@sapphire/framework" />
+/// <reference types="@sapphire/plugin-i18next/dist/register-discordjs" />
+import type { TextChannel } from 'discord.js';
 import type { EternityGuild } from './EternityGuild';
-export interface EternityTextChannel {
+export interface EternityTextChannel extends TextChannel {
     guild: EternityGuild;
 }
-declare const EternityTextChannel_base: typeof import("discord.js").TextChannel;
+declare const EternityTextChannel_base: typeof TextChannel;
 export declare class EternityTextChannel extends EternityTextChannel_base {
     sendAndDelete(content: string, options?: {
         timeout?: number;

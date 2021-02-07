@@ -4,7 +4,7 @@ exports.EternityArgument = void 0;
 const framework_1 = require("@sapphire/framework");
 class EternityArgument extends framework_1.Argument {
     get client() {
-        return super.client;
+        return super.context.client;
     }
 }
 exports.EternityArgument = EternityArgument;

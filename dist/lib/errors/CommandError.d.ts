@@ -5,7 +5,7 @@ export interface EternityCommandErrorPayload extends CommandErrorPayload {
     message: EternityMessage;
 }
 export declare class CommandError extends UserError {
-    readonly name = "CommandError";
     readonly command: EternityCommand;
     readonly payload: CommandErrorPayload;
+    get name(): string;
 }

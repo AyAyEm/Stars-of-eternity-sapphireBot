@@ -21,7 +21,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], RelicTracker.prototype, "enabled", void 0);
 __decorate([
-    typegoose_1.prop({ _id: false, type: String }),
+    typegoose_1.prop({ _id: false }),
     __metadata("design:type", Map)
 ], RelicTracker.prototype, "messages", void 0);
 exports.RelicTracker = RelicTracker;

@@ -37,10 +37,16 @@ let default_1 = class extends _lib_1.EternityEvent {
                     }
                     else {
                         const messageId = messages.get(tier);
-                        const oldMessage = await channel.messages.fetch(messageId)
+                        channel.messages.fetch(messageId)
+                            .then((oldMessage) => {
+                            if (!oldMessage) {
+                                oldMessage.edit(embed);
+                            }
+                            else {
+                                undefinedMessage(embed, tier);
+                            }
+                        })
                             .catch(() => undefinedMessage(embed, tier));
-                        if (oldMessage)
-                            await oldMessage.edit(embed);
                     }
                 });
                 await guildDocument.set(messagesPath, messages);

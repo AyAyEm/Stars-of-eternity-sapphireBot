@@ -70,7 +70,7 @@ let default_1 = class extends _lib_1.EternityCommand {
         const { author } = msg;
         const embedsMap = itemSearch_1.default(item);
         if (!embedsMap) {
-            msg.sendTranslated('commands/WFSearch:invalidQuery', [{ item }]);
+            msg.channel.sendTranslated('commands/WFSearch:invalidQuery', [{ item }]);
             return;
         }
         const sentMessage = previousSentMessage

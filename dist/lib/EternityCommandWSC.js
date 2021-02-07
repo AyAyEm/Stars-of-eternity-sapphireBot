@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EternityCommandWSC = void 0;
+const async_1 = __importDefault(require("async"));
 const framework_1 = require("@sapphire/framework");
 const LanguageFunctions_1 = require("@utils/LanguageFunctions");
 const errors_1 = require("@lib/errors");
 const _utils_1 = require("@utils");
-const async_1 = __importDefault(require("async"));
 class EternityCommandWSC extends framework_1.Command {
     requiredArgs;
     subAliases;
@@ -32,7 +32,7 @@ class EternityCommandWSC extends framework_1.Command {
         });
     }
     get client() {
-        return super.client;
+        return super.context.client;
     }
     get subCommandsList() {
         const commandsList = Object.keys(this.subCommands);
@@ -58,12 +58,12 @@ class EternityCommandWSC extends framework_1.Command {
             await this.subCommands[subCommand](message, args);
         }
         catch (e) {
-            throw e;
+            console.error(e);
         }
     }
-    error = (type, message) => new errors_1.CommandError(type, message);
-    async preParse(message, parameters) {
-        const args = await super.preParse(message, parameters);
+    error = (identifier, message) => new errors_1.CommandError({ identifier, message });
+    async preParse(message, parameters, context) {
+        const args = await super.preParse(message, parameters, context);
         if (this.requiredArgs.size > 0)
             await this.verifyArgs(args, message);
         return args.start();
@@ -75,12 +75,12 @@ class EternityCommandWSC extends framework_1.Command {
             const requiredArgs = this.requiredArgs.get(subCommand) ?? [];
             const missingArguments = await async_1.default.filterSeries(requiredArgs, async (arg) => (!(await args.pickResult(arg)).success));
             if (missingArguments.length > 0) {
-                message.sendTranslated('missingArgument', [{ args: missingArguments }]);
+                message.channel.sendTranslated('missingArgument', [{ args: missingArguments }]);
                 throw this.error('missingArgument', `The argument(s) ${LanguageFunctions_1.list(missingArguments, 'and')} was missing.`);
             }
         }
         else {
-            message.sendTranslated('missingSubCommand', [{ args: this.subCommandsList }]);
+            message.channel.sendTranslated('missingSubCommand', [{ args: this.subCommandsList }]);
             throw this.error('missingSubCommand', `The subcommand ${LanguageFunctions_1.list(this.subCommandsList, 'or')} was missing.`);
         }
         return args.start();

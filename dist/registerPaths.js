@@ -9,8 +9,8 @@ module_alias_1.addAliases({
     '@root': __dirname,
     '@lib': path_1.default.join(__dirname, 'lib'),
     '@config': path_1.default.join(__dirname, 'config'),
-    '@utils': path_1.default.join(__dirname, 'lib/utils'),
-    '@embeds': path_1.default.join(__dirname, '/lib/embeds'),
-    '@providers': path_1.default.join(__dirname, '/lib/providers'),
+    '@utils': path_1.default.join(__dirname, 'lib', 'utils'),
+    '@embeds': path_1.default.join(__dirname, 'lib', 'embeds'),
+    '@providers': path_1.default.join(__dirname, 'lib', 'providers'),
 });
 //# sourceMappingURL=registerPaths.js.map

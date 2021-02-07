@@ -1,11 +1,11 @@
 import { Command, CommandOptions } from '@sapphire/framework';
 import { CommandError } from '@lib/errors';
-import type { Args, Awaited, PieceContext, ArgType } from '@sapphire/framework';
+import type { Args, Awaited, PieceContext, ArgType, CommandContext } from '@sapphire/framework';
 import type { EternityMessage } from '@lib';
 import type { EternityClient } from './EternityClient';
 declare type CommandRun = (message: EternityMessage, args: Args) => Awaited<void>;
 export interface EternityCommandWSCOptions extends CommandOptions {
-    requiredArgs?: [string, Array<keyof ArgType>][];
+    requiredArgs?: [string, (keyof ArgType)[]][];
     defaultCommand?: string;
     enableDefault?: boolean;
     caseInsensitive?: boolean;
@@ -13,7 +13,7 @@ export interface EternityCommandWSCOptions extends CommandOptions {
 }
 export declare abstract class EternityCommandWSC extends Command {
     #private;
-    requiredArgs: Map<string, Array<keyof ArgType>>;
+    requiredArgs: Map<string, (keyof ArgType)[]>;
     subAliases: Map<string, Array<string>>;
     defaultCommand: EternityCommandWSCOptions['defaultCommand'];
     enableDefault: EternityCommandWSCOptions['enableDefault'];
@@ -26,8 +26,8 @@ export declare abstract class EternityCommandWSC extends Command {
     protected get subCommandsList(): string[];
     onLoad(): Promise<void>;
     run(message: EternityMessage, args: Args): Promise<void>;
-    error: (type: string, message: string) => CommandError;
-    preParse(message: EternityMessage, parameters: string): Promise<Args>;
+    error: (identifier: string, message: string) => CommandError;
+    preParse(message: EternityMessage, parameters: string, context: CommandContext): Promise<Args>;
     verifyArgs(args: Args, message: EternityMessage): Promise<Args>;
 }
 export {};

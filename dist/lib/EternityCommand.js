@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EternityCommand = void 0;
 const framework_1 = require("@sapphire/framework");
-const LanguageFunctions_1 = require("@root/lib/utils/LanguageFunctions");
 const async_1 = __importDefault(require("async"));
+const LanguageFunctions_1 = require("@root/lib/utils/LanguageFunctions");
 const errors_1 = require("./errors");
 class EternityCommand extends framework_1.Command {
     requiredArgs;
@@ -15,18 +15,18 @@ class EternityCommand extends framework_1.Command {
         this.requiredArgs = options.requiredArgs ?? [];
     }
     get client() {
-        return super.client;
+        return super.context.client;
     }
-    error = (type, message) => new errors_1.CommandError(type, message);
+    error = (identifier, message) => new errors_1.CommandError({ identifier, message });
     async verifyArgs(args, message) {
         const missingArguments = await async_1.default.filter(this.requiredArgs, async (arg) => (!(await args.pickResult(arg)).success));
         if (missingArguments.length > 0) {
-            message.sendTranslated('missingArgument', [{ args: missingArguments }]);
+            message.channel.sendTranslated('missingArgument', [{ args: missingArguments }]);
             throw this.error('missingArgument', `The argument(s) ${LanguageFunctions_1.list(missingArguments, 'and')} was missing.`);
         }
     }
-    async preParse(message, parameters) {
-        const args = await super.preParse(message, parameters);
+    async preParse(message, parameters, context) {
+        const args = await super.preParse(message, parameters, context);
         if (this.requiredArgs.length > 0)
             await this.verifyArgs(args, message);
         return args.start();

@@ -1,10 +1,10 @@
 /// <reference types="node" />
-import './Extenders';
 import { SapphireClient } from '@sapphire/framework';
 import { ClientOptions } from 'discord.js';
 import { Mongoose } from './providers';
 import { TaskStore } from './structures';
 import { Items } from './eternity/warframe';
+import './Extenders';
 export declare class EternityClient extends SapphireClient {
     tasks: TaskStore;
     provider: Mongoose;

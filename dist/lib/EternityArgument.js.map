@@ -1,1 +1,1 @@
-{"version":3,"file":"EternityArgument.js","sourceRoot":"","sources":["../../src/lib/EternityArgument.ts"],"names":[],"mappings":";;;AAAA,mDAAgE;AAShE,MAAsB,gBAAiB,SAAQ,oBAAQ;IACrD,IAAW,MAAM;QACf,OAAO,KAAK,CAAC,MAAwB,CAAC;IACxC,CAAC;CACF;AAJD,4CAIC"}
+{"version":3,"file":"EternityArgument.js","sourceRoot":"","sources":["../../src/lib/EternityArgument.ts"],"names":[],"mappings":";;;AAAA,mDAAgE;AAShE,MAAsB,gBAAiB,SAAQ,oBAAQ;IACrD,IAAW,MAAM;QACf,OAAO,KAAK,CAAC,OAAO,CAAC,MAAwB,CAAC;IAChD,CAAC;CACF;AAJD,4CAIC"}

@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.clientOptions = void 0;
-require("@scp/in17n/register");
+require("@sapphire/plugin-i18next/register-discordjs");
 const i18next_1 = __importDefault(require("i18next"));
 const LanguageFunctions_1 = require("./LanguageFunctions");
 exports.clientOptions = {

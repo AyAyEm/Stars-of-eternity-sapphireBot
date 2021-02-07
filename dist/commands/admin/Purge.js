@@ -16,7 +16,7 @@ let default_1 = class extends _lib_1.EternityCommand {
         }
         else {
             msg.channel.bulkDelete(Number(ammount) + 1)
-                .catch((err) => msg.sendTranslated('commands/purge:error', [{ err: err.message }]));
+                .catch((err) => msg.channel.sendTranslated('commands/purge:error', [{ err: err.message }]));
         }
     }
 };

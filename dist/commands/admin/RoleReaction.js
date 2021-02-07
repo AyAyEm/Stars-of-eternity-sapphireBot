@@ -61,7 +61,10 @@ let default_1 = class extends _lib_1.EternityCommandWSC {
                 if (result.success && messages.has(result.value.id)) {
                     return result.value;
                 }
-                throw new framework_1.UserError('commands/RoleReaction:delete:invalidRoleReactionMessage', 'invalidRoleReactionMessage');
+                throw new framework_1.UserError({
+                    identifier: 'invalidRoleReactionMessage',
+                    message: 'commands/RoleReaction:delete:invalidRoleReactionMessage',
+                });
             });
             messages.delete(roleReactionMessage.id);
             document.set(messagesPath, messages);

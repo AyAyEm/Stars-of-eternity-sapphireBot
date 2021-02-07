@@ -4,7 +4,7 @@ exports.EternityEvent = void 0;
 const framework_1 = require("@sapphire/framework");
 class EternityEvent extends framework_1.Event {
     get client() {
-        return super.client;
+        return super.context.client;
     }
 }
 exports.EternityEvent = EternityEvent;

@@ -5,22 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EternityMessage = void 0;
 const async_1 = __importDefault(require("async"));
-const framework_1 = require("@sapphire/framework");
-class EternityMessage extends framework_1.SapphireMessage {
-    async replyTranslated(key, valuesOrOptions, rawOptions) {
-        const [values, options] = (typeof valuesOrOptions === 'undefined' || Array.isArray(valuesOrOptions))
-            ? [valuesOrOptions ?? [], rawOptions ?? {}]
-            : [[], valuesOrOptions];
-        const content = await this.fetchLanguageKey(key, ...values);
-        return this.reply(content, options);
-    }
-    async replyAndDelete(content, options) {
-        const { timeout = 10000, reason = '', delSource = false } = options;
-        const reply = await this.reply(content);
-        if (delSource)
-            this.delete({ timeout, reason });
-        return reply.delete({ timeout, reason });
-    }
+const discord_js_1 = require("discord.js");
+class EternityMessage extends discord_js_1.Structures.get('Message') {
     /**
      * Reacts with a list of emojis sequentially.
      * @param emojis A list of emojis.

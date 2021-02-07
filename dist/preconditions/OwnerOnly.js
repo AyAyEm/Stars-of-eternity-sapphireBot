@@ -7,7 +7,10 @@ class ClientPrecondition extends framework_1.Precondition {
     run(message) {
         if (config_1.config.ownersIds.includes(message.author.id))
             return this.ok();
-        return framework_1.err(new framework_1.UserError('ownerOnly', 'Only the owner is allowed to execute this command.'));
+        return framework_1.err(new framework_1.UserError({
+            identifier: 'ownerOnly',
+            message: 'Only the owner is allowed to execute this command.',
+        }));
     }
 }
 exports.ClientPrecondition = ClientPrecondition;
