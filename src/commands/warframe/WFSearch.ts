@@ -82,7 +82,7 @@ export default class extends EternityCommand {
     const { author } = msg;
     const embedsMap = itemToEmbed(item);
     if (!embedsMap) {
-      msg.sendTranslated('commands/WFSearch:invalidQuery', [{ item }]);
+      msg.channel.sendTranslated('commands/WFSearch:invalidQuery', [{ item }]);
       return;
     }
 

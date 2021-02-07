@@ -1,5 +1,3 @@
-import './Extenders';
-
 import { SapphireClient } from '@sapphire/framework';
 import { mergeDefault } from '@sapphire/utilities';
 import { ClientOptions } from 'discord.js';
@@ -9,8 +7,10 @@ import { Mongoose } from './providers';
 import { TaskStore } from './structures';
 import { Items } from './eternity/warframe';
 
+import './Extenders';
+
 export class EternityClient extends SapphireClient {
-  public tasks = new TaskStore(this);
+  public tasks = new TaskStore();
 
   public provider: Mongoose = new Mongoose();
 
@@ -33,7 +33,7 @@ export class EternityClient extends SapphireClient {
     // @ts-expect-error Type instantiation is excessively deep and possibly infinite. ts(2589)
     super(mergeDefault(clientOptions, { ...options, caseInsensitiveCommands: true }));
 
-    this.registerStore(this.tasks)
+    this.stores.register(this.tasks)
       .registerUserDirectories();
   }
 

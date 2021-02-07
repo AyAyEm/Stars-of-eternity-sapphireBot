@@ -9,6 +9,6 @@ export interface EternityArgumentContext extends ArgumentContext {
 
 export abstract class EternityArgument extends Argument {
   public get client(): EternityClient {
-    return super.client as EternityClient;
+    return super.context.client as EternityClient;
   }
 }

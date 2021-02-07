@@ -1,10 +1,13 @@
 import {
-  Command, PieceContext, CommandOptions,
+  Command,
+  PieceContext,
+  CommandOptions,
 } from '@sapphire/framework';
-import { list } from '@root/lib/utils/LanguageFunctions';
-import async from 'async';
 
-import type { Args, ArgType } from '@sapphire/framework';
+import async from 'async';
+import { list } from '@root/lib/utils/LanguageFunctions';
+
+import type { Args, ArgType, CommandContext } from '@sapphire/framework';
 import type { EternityMessage } from '@lib';
 import type { EternityClient } from './EternityClient';
 
@@ -23,24 +26,24 @@ export abstract class EternityCommand extends Command {
   }
 
   public get client(): EternityClient {
-    return super.client as EternityClient;
+    return super.context.client as EternityClient;
   }
 
-  public error = (type: string, message: string) => new CommandError(type, message);
+  public error = (identifier: string, message: string) => new CommandError({ identifier, message });
 
   public async verifyArgs(args: Args, message: EternityMessage) {
     const missingArguments = await async.filter(this.requiredArgs, async (arg) => (
       !(await args.pickResult(arg)).success));
 
     if (missingArguments.length > 0) {
-      message.sendTranslated('missingArgument', [{ args: missingArguments }]);
+      message.channel.sendTranslated('missingArgument', [{ args: missingArguments }]);
       throw this.error('missingArgument',
         `The argument(s) ${list(missingArguments, 'and')} was missing.`);
     }
   }
 
-  public async preParse(message: EternityMessage, parameters: string) {
-    const args = await super.preParse(message, parameters);
+  public async preParse(message: EternityMessage, parameters: string, context: CommandContext) {
+    const args = await super.preParse(message, parameters, context);
     if (this.requiredArgs.length > 0) await this.verifyArgs(args, message);
     return args.start();
   }

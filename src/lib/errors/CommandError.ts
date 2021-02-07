@@ -8,9 +8,9 @@ export interface EternityCommandErrorPayload extends CommandErrorPayload {
 }
 
 export class CommandError extends UserError {
-  public readonly name = 'CommandError';
-
   public readonly command: EternityCommand;
 
   public readonly payload: CommandErrorPayload;
+
+  public get name() { return 'CommandError'; }
 }

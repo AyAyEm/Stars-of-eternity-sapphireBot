@@ -82,10 +82,10 @@ export default class extends EternityCommandWSC {
           if (result.success && messages.has(result.value.id)) {
             return result.value;
           }
-          throw new UserError(
-            'commands/RoleReaction:delete:invalidRoleReactionMessage',
-            'invalidRoleReactionMessage',
-          );
+          throw new UserError({
+            identifier: 'invalidRoleReactionMessage',
+            message: 'commands/RoleReaction:delete:invalidRoleReactionMessage',
+          });
         });
 
       messages.delete(roleReactionMessage.id);

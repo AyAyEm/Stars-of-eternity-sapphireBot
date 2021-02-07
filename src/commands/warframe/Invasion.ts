@@ -27,42 +27,42 @@ export default class extends EternityCommandWSC {
   public possibleItemsEmbed = new EternityMessageEmbed()
     .addFields(
       {
-        name: i18n.t('commands/invasion:listItems:commonResources'),
+        name: i18n.t('commands/Invasion:listItems:commonResources'),
         value: itemNames.commonItems.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/invasion:listItems:uncommonResources'),
+        name: i18n.t('commands/Invasion:listItems:uncommonResources'),
         value: itemNames.uncommonItems.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/invasion:listItems:rareResources'),
+        name: i18n.t('commands/Invasion:listItems:rareResources'),
         value: itemNames.rareItems.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/invasion:listItems:weapons'),
+        name: i18n.t('commands/Invasion:listItems:weapons'),
         value: itemNames.weapons.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/invasion:listItems:bestItems'),
+        name: i18n.t('commands/Invasion:listItems:bestItems'),
         value: itemNames.goodOnes.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/invasion:listItems:factionItems'),
+        name: i18n.t('commands/Invasion:listItems:factionItems'),
         value: itemNames.faction.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/invasion:listItems:others'),
+        name: i18n.t('commands/Invasion:listItems:others'),
         value: itemNames.others.join(' | '),
         inline: false,
       },
     )
-    .setTitle(i18n.t('commands/invasion:listItems:title'));
+    .setTitle(i18n.t('commands/Invasion:listItems:title'));
 
   public items = {
     dictionary: new Map(itemNames.all.map((item) => [item.toLowerCase(), item])),
@@ -71,11 +71,16 @@ export default class extends EternityCommandWSC {
   public subCommands = {
     items: async (msg: EternityMessage) => {
       const document = await this.document(msg.guild.id);
+
       const items = await document.get<string[]>(`channels.${msg.channel.id}.invasionItems.items`, []);
       if (items.length === 0) {
-        throw new UserError('commands/invasion:items:notFound', 'No invasion items were found');
+        throw new UserError({
+          identifier: 'commands/Invasion:items:notFound',
+          message: 'No invasion items were found',
+        });
       }
-      msg.sendTranslated('commands/invasion:items:found', [{ items }]);
+
+      msg.channel.sendTranslated('commands/Invasion:items:found', [{ items }]);
     },
 
     listItems: async (msg: EternityMessage) => {
@@ -85,24 +90,30 @@ export default class extends EternityCommandWSC {
     disable: async (msg: EternityMessage) => {
       const document = await this.document(msg.guild.id);
       const invasionItems = await document.get<InvasionItems>(`channels.${msg.channel.id}.invasionItems`, {});
+
       if (!invasionItems.enabled) {
-        const errorMessage = 'Invasions are already disabled in this channel';
-        throw new UserError('commands/invasion:disable:alreadyDisabled', errorMessage);
+        throw new UserError({
+          identifier: 'commands/Invasion:disable:alreadyDisabled',
+          message: 'Invasions are already disabled in this channel',
+        });
       } else {
         await document.set<InvasionItems['enabled']>(`channels.${msg.channel.id}.invasionItems.enabled`, false);
-        (await msg.replyTranslated('commands/invasion:disable:success')).delete({ timeout: 10000 });
+        (await msg.replyTranslated('commands/Invasion:disable:success')).delete({ timeout: 10000 });
       }
     },
 
     enable: async (msg: EternityMessage) => {
       const document = await this.document(msg.guild.id);
       const invasionItems = await document.get<InvasionItems>(`channels.${msg.channel.id}.invasionItems`, {});
+
       if (invasionItems.enabled) {
-        const errorMessage = 'Invasions are already disabled in this channel';
-        throw new UserError('commands/invasion:enable:alreadyEnabled', errorMessage);
+        throw new UserError({
+          identifier: 'commands/Invasion:enable:alreadyEnabled',
+          message: 'Invasions are already disabled in this channel',
+        });
       } else {
         await document.set<InvasionItems['enabled']>(`channels.${msg.channel.id}.invasionItems.enabled`, true);
-        (await msg.replyTranslated('commands/invasion:enable:success')).delete({ timeout: 10000 });
+        (await msg.replyTranslated('commands/Invasion:enable:success')).delete({ timeout: 10000 });
       }
     },
 
@@ -113,13 +124,16 @@ export default class extends EternityCommandWSC {
 
       if (!invasionItems) {
         const defaultMessage = 'This channel was not configured for invasions!';
-        throw new UserError('commands/invasion:add:channelNotConfigured', defaultMessage);
+        throw new UserError({
+          identifier: 'commands/Invasion:add:channelNotConfigured',
+          message: defaultMessage,
+        });
       } else {
         const newItems = await args.repeat('warframeItem');
         const parsedNewItems = newItems.map((item) => this.items.dictionary.get(item));
         const itemsData = new Set([...invasionItems.items, ...parsedNewItems]);
         await document.set<InvasionItems['items']>(`${invasionItemsPath}.items`, [...itemsData.values()]);
-        msg.replyTranslated('commands/invasion:add:success', [{ items: newItems }]);
+        msg.replyTranslated('commands/Invasion:add:success', [{ items: newItems }]);
       }
     },
 
@@ -127,7 +141,7 @@ export default class extends EternityCommandWSC {
       const document = await this.document(msg.guild.id);
       const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
       await document.set<InvasionItems['items']>(`${invasionItemsPath}.items`, itemNames.all);
-      msg.replyTranslated('commands/invasion:addAll:success');
+      msg.replyTranslated('commands/Invasion:addAll:success');
     },
 
     delete: async (msg: EternityMessage, args: Args) => {
@@ -137,13 +151,16 @@ export default class extends EternityCommandWSC {
 
       if (!invasionItems) {
         const defaultMessage = 'This channel was not configured for invasions!';
-        throw new UserError('commands/invasion:delete:channelNotConfigured', defaultMessage);
+        throw new UserError({
+          identifier: 'commands/Invasion:delete:channelNotConfigured',
+          message: defaultMessage,
+        });
       } else {
         const newItems = await args.repeat('warframeItem');
         const parsedNewItems = newItems.map((item) => this.items.dictionary.get(item));
         const itemsData = invasionItems.items.filter((item) => parsedNewItems.includes(item));
         await document.set<InvasionItems['items']>(`${invasionItemsPath}.items`, [...itemsData.values()]);
-        msg.replyTranslated('commands/invasion:delete:success', [{ items: newItems }]);
+        msg.replyTranslated('commands/Invasion:delete:success', [{ items: newItems }]);
       }
     },
 
@@ -151,7 +168,7 @@ export default class extends EternityCommandWSC {
       const document = await this.document(msg.guild.id);
       const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
       await document.set<InvasionItems['items']>(`${invasionItemsPath}.items`, []);
-      msg.replyTranslated('commands/invasion:deleteAll:success');
+      msg.replyTranslated('commands/Invasion:deleteAll:success');
     },
   };
 }

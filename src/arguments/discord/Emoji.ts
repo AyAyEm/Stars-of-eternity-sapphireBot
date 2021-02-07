@@ -12,7 +12,7 @@ export class Emoji extends Argument<DiscordEmoji> {
     const unicodeEmoji = argument.match(this.unicodeEmojiRegex)?.[0];
 
     if (unicodeEmoji) {
-      return this.ok(new DiscordEmoji(this.client, {
+      return this.ok(new DiscordEmoji(this.context.client, {
         name: unicodeEmoji,
         identifier: unicodeEmoji,
         id: null,
@@ -23,7 +23,10 @@ export class Emoji extends Argument<DiscordEmoji> {
     const id = argument.match(/\d+/)?.[0];
     const guildEmoji = context.message.guild.emojis.resolve(id) || null;
     if (guildEmoji) return this.ok(guildEmoji);
-    const defaultErrorMessage = 'Argument passed cannot resolve to a valid emoji';
-    return this.error(argument, 'ArgumentInvalidEmoji', defaultErrorMessage);
+    return this.error({
+      parameter: argument,
+      identifier: 'ArgumentInvalidEmoji',
+      message: 'Argument passed cannot resolve to a valid emoji',
+    });
   }
 }

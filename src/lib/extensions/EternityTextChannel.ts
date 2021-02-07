@@ -1,8 +1,9 @@
 import { Structures } from 'discord.js';
 
+import type { TextChannel } from 'discord.js';
 import type { EternityGuild } from './EternityGuild';
 
-export interface EternityTextChannel {
+export interface EternityTextChannel extends TextChannel {
   guild: EternityGuild;
 }
 

@@ -14,7 +14,7 @@ export default class extends EternityCommand {
       msg.replyTranslated('commands/purge:exceededLimit');
     } else {
       msg.channel.bulkDelete(Number(ammount) + 1)
-        .catch((err: Error) => msg.sendTranslated('commands/purge:error', [{ err: err.message }]));
+        .catch((err: Error) => msg.channel.sendTranslated('commands/purge:error', [{ err: err.message }]));
     }
   }
 }

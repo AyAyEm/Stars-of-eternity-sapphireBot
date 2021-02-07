@@ -13,7 +13,7 @@ export default class extends EternityCommandWSC {
       const path = `channels.${channel.id}.relicTracker.enabled`;
       const document = await new this.client.provider.Guilds({ id: { id: guild.id } }).load;
       await document.set(path, true);
-      msg.sendTranslated('commands/relics:succesfullEnabled');
+      msg.channel.sendTranslated('commands/Relics:succesfullEnabled');
     },
 
     disable: async (msg: EternityMessage) => {
@@ -21,7 +21,7 @@ export default class extends EternityCommandWSC {
       const path = `channels.${channel.id}.relicTracker.enabled`;
       const document = await new this.client.provider.Guilds({ id: { id: guild.id } }).load;
       await document.set(path, false);
-      msg.sendTranslated('commands/relics:succesfullDisabled');
+      msg.channel.sendTranslated('commands/Relics:succesfullDisabled');
     },
   };
 }

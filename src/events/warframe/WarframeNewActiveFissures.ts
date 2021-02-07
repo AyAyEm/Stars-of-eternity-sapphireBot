@@ -28,18 +28,23 @@ export default class extends EternityEvent<'warframeNewActiveFissures'> {
             const sentMessage = await channel.send(embed);
             messages.set(tier, sentMessage.id);
           };
-          type FissureEmbedKeyValue = [RelicTiers, EternityMessageEmbed];
-          await async.eachOfSeries<FissureEmbedKeyValue>(
+
+          await async.eachOfSeries<[RelicTiers, EternityMessageEmbed]>(
             [...fissuresEmbeds.entries()],
             async ([tier, embed]) => {
               if (!messages.has(tier)) {
                 await undefinedMessage(embed, tier);
               } else {
                 const messageId = messages.get(tier);
-                const oldMessage = await channel.messages.fetch(messageId)
+                channel.messages.fetch(messageId)
+                  .then((oldMessage) => {
+                    if (!oldMessage) {
+                      oldMessage.edit(embed);
+                    } else {
+                      undefinedMessage(embed, tier);
+                    }
+                  })
                   .catch(() => undefinedMessage(embed, tier));
-
-                if (oldMessage) await oldMessage.edit(embed);
               }
             },
           );

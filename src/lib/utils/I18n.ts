@@ -1,13 +1,11 @@
-import '@scp/in17n/register';
+import '@sapphire/plugin-i18next/register-discordjs';
 
 import i18next from 'i18next';
-
-import type { ClientOptions } from 'discord.js';
 
 import { list } from './LanguageFunctions';
 import { EternityFormatters } from './Enums';
 
-export const clientOptions: ClientOptions = {
+export const clientOptions = {
   i18n: {
     defaultName: 'pt-BR',
     i18next: {
