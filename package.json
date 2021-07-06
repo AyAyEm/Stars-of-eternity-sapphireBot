@@ -4,12 +4,15 @@
   "description": "",
   "main": "dist/eternity.js",
   "scripts": {
-    "build": "tsc -b src",
-    "build:watch": "tsc -b src -w",
-    "start": "npm run build && node .",
-    "dev": "npm run build && concurrently -k \"npm run build:watch\" \"node-dev dist/eternity.js\"",
-    "clean": "tsc -b src --clean",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node .",
+    "dev": "ts-node-dev --compiler ttypescript --project ./src/tsconfig.json ./src/main.ts",
+    "build": "ttsc -b src",
+    "build:start": "npm run build && npm run start",
+    "build:clean": "ttsc -b src --clean && npm run build",
+    "build:watch": "ttsc -b src -w",
+    "lint": "eslint src",
+    "test": "jest ./tests",
+    "test:watch": "jest ./tests --watch"
   },
   "keywords": [],
   "author": "",
