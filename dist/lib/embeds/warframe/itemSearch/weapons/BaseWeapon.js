@@ -20,7 +20,9 @@ class BaseWeapon {
     }
     get baseStatusEmbed() {
         const { baseEmbed: embed, weapon } = this;
-        const { criticalChance, criticalMultiplier, procChance, fireRate, accuracy, trigger, magazineSize, reloadTime, ammo, damageTypes = {}, totalDamage, projectile, category, } = weapon;
+        const { criticalChance, criticalMultiplier, procChance, fireRate, accuracy, trigger, magazineSize, reloadTime, ammo, damageTypes = {}, totalDamage, projectile, category,
+        // flight,secondary,areaAttack, damage, multishot, noise,
+         } = weapon;
         const embedStrings = {
             chance: `Chance: ${Math.round((criticalChance || 0) * 100)}%\nMultiplicador: ${criticalMultiplier}x`,
             status: `Chance: ${Math.round((procChance || 0) * 100)}%`,

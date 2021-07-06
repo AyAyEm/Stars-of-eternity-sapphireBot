@@ -13,9 +13,9 @@ export declare const schemas: {
     Utils: typeof Utils;
 };
 export declare const models: {
-    Guilds: import("@typegoose/typegoose").ReturnModelType<typeof Guilds, {}>;
-    Trackers: import("@typegoose/typegoose").ReturnModelType<typeof Trackers, {}>;
-    Users: import("@typegoose/typegoose").ReturnModelType<typeof Users, {}>;
-    Utils: import("@typegoose/typegoose").ReturnModelType<typeof Utils, {}>;
+    Guilds: any;
+    Trackers: any;
+    Users: any;
+    Utils: any;
 };
 export declare type ModelsKeys = keyof typeof models;

@@ -16,9 +16,6 @@ class EternityCommandWSC extends framework_1.Command {
     enableDefault;
     caseInsensitive;
     #dictionary;
-    subCommands = {
-        default() { },
-    };
     constructor(context, options) {
         super(context, options);
         this.requiredArgs = new Map(options.requiredArgs ?? []);
