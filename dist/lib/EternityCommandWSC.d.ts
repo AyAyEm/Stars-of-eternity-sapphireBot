@@ -1,7 +1,7 @@
 import { Command, CommandOptions } from '@sapphire/framework';
-import { CommandError } from '@lib/errors';
+import { CommandError } from "./errors";
 import type { Args, Awaited, PieceContext, ArgType, CommandContext } from '@sapphire/framework';
-import type { EternityMessage } from '@lib';
+import type { EternityMessage } from "./";
 import type { EternityClient } from './EternityClient';
 declare type CommandRun = (message: EternityMessage, args: Args) => Awaited<void>;
 export interface EternityCommandWSCOptions extends CommandOptions {

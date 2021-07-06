@@ -1,12 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AudioRecorder = void 0;
-const audio_mixer_1 = __importDefault(require("audio-mixer"));
-const fluent_ffmpeg_1 = __importDefault(require("fluent-ffmpeg"));
-const fs_extra_1 = __importDefault(require("fs-extra"));
+const tslib_1 = require("tslib");
+const audio_mixer_1 = tslib_1.__importDefault(require("audio-mixer"));
+const fluent_ffmpeg_1 = tslib_1.__importDefault(require("fluent-ffmpeg"));
+const fs_extra_1 = tslib_1.__importDefault(require("fs-extra"));
 const SilenceStream_1 = require("./SilenceStream");
 const AudioDate_1 = require("./AudioDate");
 fluent_ffmpeg_1.default.setFfmpegPath(require('@ffmpeg-installer/ffmpeg').path);

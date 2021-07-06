@@ -1,6 +1,6 @@
 import { Command, PieceContext, CommandOptions } from '@sapphire/framework';
 import type { Args, ArgType, CommandContext } from '@sapphire/framework';
-import type { EternityMessage } from '@lib';
+import type { EternityMessage } from "./";
 import type { EternityClient } from './EternityClient';
 import { CommandError } from './errors';
 export interface EternityCommandOptions extends CommandOptions {

@@ -1,4 +1,4 @@
-import { Task } from '@lib/structures';
+import { Task } from "../../lib/structures";
 export default class InvasionTracker extends Task {
     document: {
         document: any;

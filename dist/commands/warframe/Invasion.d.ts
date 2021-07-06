@@ -1,5 +1,5 @@
-import { EternityCommandWSC, EternityMessageEmbed } from '@lib';
-import type { EternityMessage } from '@lib';
+import { EternityCommandWSC, EternityMessageEmbed } from "../../lib";
+import type { EternityMessage } from "../../lib";
 import type { Args } from '@sapphire/framework';
 export default class extends EternityCommandWSC {
     document(guildId: string): Promise<{

@@ -1,2 +1,1 @@
-import './registerPaths';
 import './development';

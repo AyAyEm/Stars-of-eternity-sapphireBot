@@ -1,2 +1,2 @@
-import type { EternityVoiceChannel } from '@lib';
+import type { EternityVoiceChannel } from "..";
 export declare function toJoinChannel(channel: EternityVoiceChannel): void;

@@ -1,4 +1,4 @@
-import { EternityCommand, EternityMessage } from '@lib';
+import { EternityCommand, EternityMessage } from "../../lib";
 import { Args } from '@sapphire/framework';
 import FuzzySet from 'fuzzyset.js';
 import type { Item } from 'warframe-items';

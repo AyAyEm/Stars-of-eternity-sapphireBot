@@ -1,21 +1,13 @@
 "use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
 const decorators_1 = require("@sapphire/decorators");
-const _lib_1 = require("@lib");
+const _lib_1 = require("../../lib");
 const discord_js_1 = require("discord.js");
-const async_1 = __importDefault(require("async"));
-const fuzzyset_js_1 = __importDefault(require("fuzzyset.js"));
-const itemSearch_1 = __importDefault(require("@embeds/warframe/itemSearch"));
-const Constants_1 = require("@utils/Constants");
+const async_1 = tslib_1.__importDefault(require("async"));
+const fuzzyset_js_1 = tslib_1.__importDefault(require("fuzzyset.js"));
+const itemSearch_1 = tslib_1.__importDefault(require("../../lib/embeds/warframe/itemSearch"));
+const Constants_1 = require("../../lib/utils/Constants");
 function isAuthorFilter(author) {
     return function checkIfUserIsAuthor(_, user) {
         return author.id === user.id;
@@ -97,7 +89,7 @@ let default_1 = class extends _lib_1.EternityCommand {
         sentMessage.multiReact([...(embedsMap?.keys() || []), '❌']);
     }
 };
-default_1 = __decorate([
+default_1 = tslib_1.__decorate([
     decorators_1.ApplyOptions({
         aliases: ['wfs'],
         preconditions: ['GuildOnly'],

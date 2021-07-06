@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.warframePrime = void 0;
-const _lib_1 = require("@lib");
+const _lib_1 = require("../../../..");
 const BaseWarframe_1 = require("./BaseWarframe");
 const utils_1 = require("../utils");
 class WarframePrimeEmbed extends BaseWarframe_1.BaseWarframe {

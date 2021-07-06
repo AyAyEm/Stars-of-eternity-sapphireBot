@@ -1,18 +1,9 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./EternityGuild"), exports);
-__exportStar(require("./EternityMessage"), exports);
-__exportStar(require("./EternityVoiceChannel"), exports);
-__exportStar(require("./EternityTextChannel"), exports);
-__exportStar(require("./EternityMessageEmbed"), exports);
+const tslib_1 = require("tslib");
+tslib_1.__exportStar(require("./EternityGuild"), exports);
+tslib_1.__exportStar(require("./EternityMessage"), exports);
+tslib_1.__exportStar(require("./EternityVoiceChannel"), exports);
+tslib_1.__exportStar(require("./EternityTextChannel"), exports);
+tslib_1.__exportStar(require("./EternityMessageEmbed"), exports);
 //# sourceMappingURL=index.js.map

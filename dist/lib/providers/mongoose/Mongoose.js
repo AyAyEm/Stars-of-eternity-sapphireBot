@@ -1,11 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Mongoose = void 0;
-const mongoose_1 = __importDefault(require("mongoose"));
-const config_1 = require("@root/config");
+const tslib_1 = require("tslib");
+const mongoose_1 = tslib_1.__importDefault(require("mongoose"));
+const config_1 = require("../../../config");
 const MongoDocument_1 = require("./MongoDocument");
 const Provider_1 = require("../Provider");
 const models_1 = require("./models");

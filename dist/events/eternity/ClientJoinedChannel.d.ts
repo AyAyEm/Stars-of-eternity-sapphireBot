@@ -1,5 +1,5 @@
-import { EternityEvent } from '@lib';
-import { AudioRecorder } from '@lib/eternity';
+import { EternityEvent } from "../../lib";
+import { AudioRecorder } from "../../lib/eternity";
 import type { Channel, VoiceState } from 'discord.js';
 export default class extends EternityEvent<'clientJoinedChannel'> {
     recorders: Map<string, AudioRecorder>;

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
-const Constants_1 = require("@lib/utils/Constants");
+const Constants_1 = require("../../utils/Constants");
 const { commonItems, uncommonItems, rareItems, weapons, goodOnes, faction, others, } = Constants_1.itemNames;
 const fields = [
     { name: 'Recursos comums', value: commonItems.join(' | '), inline: false },

@@ -2,7 +2,7 @@
 import AudioMixer from 'audio-mixer';
 import type { VoiceConnection, VoiceChannel, GuildMember } from 'discord.js';
 import type { WriteStream } from 'fs';
-import type { EternityClient } from '@lib';
+import type { EternityClient } from "../..";
 export declare class AudioRecorder {
     voiceConnection: VoiceConnection;
     protected voiceInputOptions: {

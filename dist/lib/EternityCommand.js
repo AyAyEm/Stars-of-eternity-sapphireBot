@@ -1,12 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EternityCommand = void 0;
+const tslib_1 = require("tslib");
 const framework_1 = require("@sapphire/framework");
-const async_1 = __importDefault(require("async"));
-const LanguageFunctions_1 = require("@root/lib/utils/LanguageFunctions");
+const async_1 = tslib_1.__importDefault(require("async"));
+const LanguageFunctions_1 = require("./utils/LanguageFunctions");
 const errors_1 = require("./errors");
 class EternityCommand extends framework_1.Command {
     requiredArgs;

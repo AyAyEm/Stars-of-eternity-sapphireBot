@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-require("./registerPaths");
 require("./development");
-const _lib_1 = require("@lib");
+const _lib_1 = require("./lib");
 const config_1 = require("./config");
 const client = new _lib_1.EternityClient();
 (async function main() {

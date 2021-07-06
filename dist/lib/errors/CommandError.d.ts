@@ -1,5 +1,5 @@
 import { UserError, CommandErrorPayload } from '@sapphire/framework';
-import type { EternityCommand, EternityMessage } from '@lib';
+import type { EternityCommand, EternityMessage } from "..";
 export interface EternityCommandErrorPayload extends CommandErrorPayload {
     piece: EternityCommand;
     message: EternityMessage;

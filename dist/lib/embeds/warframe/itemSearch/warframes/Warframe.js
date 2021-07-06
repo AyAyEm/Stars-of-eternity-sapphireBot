@@ -1,11 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.warframe = void 0;
-const lodash_1 = __importDefault(require("lodash"));
-const _utils_1 = require("@utils");
+const tslib_1 = require("tslib");
+const lodash_1 = tslib_1.__importDefault(require("lodash"));
+const _utils_1 = require("../../../../utils");
 const BaseWarframe_1 = require("./BaseWarframe");
 const utils_1 = require("../utils");
 class WeaponEmbed extends BaseWarframe_1.BaseWarframe {

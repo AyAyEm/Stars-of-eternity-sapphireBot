@@ -1,6 +1,6 @@
-import { EternityCommandWSC } from '@lib';
+import { EternityCommandWSC } from "../../lib";
 import type { Args } from '@sapphire/framework';
-import type { EternityMessage } from '@lib';
+import type { EternityMessage } from "../../lib";
 export default class extends EternityCommandWSC {
     private document;
     private mapToEmbed;

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EternityClient = void 0;
 const framework_1 = require("@sapphire/framework");
 const utilities_1 = require("@sapphire/utilities");
-const I18n_1 = require("@utils/I18n");
+const I18n_1 = require("./utils/I18n");
 const providers_1 = require("./providers");
 const structures_1 = require("./structures");
 const warframe_1 = require("./eternity/warframe");

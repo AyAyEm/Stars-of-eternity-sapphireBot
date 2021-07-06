@@ -1,4 +1,4 @@
-import { EternityMessageEmbed } from '@lib';
+import { EternityMessageEmbed } from "../../../..";
 import type { Item } from 'warframe-items';
 export default class BaseWeapon {
     weapon: Item;

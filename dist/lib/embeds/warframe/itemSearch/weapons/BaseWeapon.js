@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const _lib_1 = require("@lib");
-const Constants_1 = require("@utils/Constants");
+const _lib_1 = require("../../../..");
+const Constants_1 = require("../../../../utils/Constants");
 class BaseWeapon {
     weapon;
     constructor(weapon) {

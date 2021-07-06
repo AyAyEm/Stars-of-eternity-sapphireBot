@@ -1,11 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mod = void 0;
-const _lib_1 = require("@lib");
-const lodash_1 = __importDefault(require("lodash"));
+const tslib_1 = require("tslib");
+const _lib_1 = require("../../..");
+const lodash_1 = tslib_1.__importDefault(require("lodash"));
 const groupsDictionary = new Map([
     ['Enemy Mod Tables', 'Inimigos'],
     ['Mission Rewards', 'Recompensa de missão'],

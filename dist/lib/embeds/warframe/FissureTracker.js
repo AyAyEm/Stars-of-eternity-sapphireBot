@@ -1,13 +1,11 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fissuresEmbed = void 0;
+const tslib_1 = require("tslib");
 const discord_js_1 = require("discord.js");
-const config_1 = require("@root/config");
-const moment_timezone_1 = __importDefault(require("moment-timezone"));
-const lodash_1 = __importDefault(require("lodash"));
+const config_1 = require("../../../config");
+const moment_timezone_1 = tslib_1.__importDefault(require("moment-timezone"));
+const lodash_1 = tslib_1.__importDefault(require("lodash"));
 // Fissures: Lith, Meso, Neo, Axi and Requiem
 const fissureIcons = [
     'https://i.imgur.com/ZSxJCTI.png',

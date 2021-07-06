@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const _utils_1 = require("@utils");
+const _utils_1 = require("../../../utils");
 const weapons_1 = require("./weapons");
 const warframes_1 = require("./warframes");
 const Mod_1 = require("./Mod");

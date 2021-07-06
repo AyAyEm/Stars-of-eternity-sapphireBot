@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientPrecondition = void 0;
 const framework_1 = require("@sapphire/framework");
-const config_1 = require("@root/config");
+const config_1 = require("../config");
 class ClientPrecondition extends framework_1.Precondition {
     run(message) {
         if (config_1.config.ownersIds.includes(message.author.id))

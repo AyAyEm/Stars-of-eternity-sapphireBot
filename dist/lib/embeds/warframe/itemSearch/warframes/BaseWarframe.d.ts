@@ -1,4 +1,4 @@
-import { EternityMessageEmbed } from '@lib';
+import { EternityMessageEmbed } from "../../../..";
 import type { Item } from 'warframe-items';
 import { blueprintSource } from '../utils';
 export declare abstract class BaseWarframe {

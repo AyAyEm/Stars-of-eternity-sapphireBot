@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseWarframe = void 0;
-const _utils_1 = require("@utils");
-const _lib_1 = require("@lib");
+const _utils_1 = require("../../../../utils");
+const _lib_1 = require("../../../..");
 const utils_1 = require("../utils");
 class BaseWarframe {
     warframe;
