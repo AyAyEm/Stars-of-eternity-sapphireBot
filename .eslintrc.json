@@ -34,6 +34,7 @@
         "consistent": true
       }
     ],
+    "import/extensions": "never",
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
     "import/prefer-default-export": "off",
