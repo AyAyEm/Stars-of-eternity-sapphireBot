@@ -11,10 +11,10 @@ export default class extends EternityCommand {
     const ammount = await args.pick('number');
 
     if (ammount >= 100) {
-      msg.replyTranslated('commands/purge:exceededLimit');
+      msg.replyTranslated('commands/Purge:exceededLimit');
     } else {
       msg.channel.bulkDelete(Number(ammount) + 1)
-        .catch((err: Error) => msg.channel.sendTranslated('commands/purge:error', [{ err: err.message }]));
+        .catch((err: Error) => msg.channel.sendTranslated('commands/Purge:error', [{ err: err.message }]));
     }
   }
 }

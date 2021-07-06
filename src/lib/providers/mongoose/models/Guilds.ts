@@ -1,11 +1,12 @@
 /* eslint-disable max-classes-per-file */
 import { prop } from '@typegoose/typegoose';
+import { Schema } from 'mongoose';
 
 export class RelicTracker {
   @prop()
   enabled: boolean;
 
-  @prop({ _id: false })
+  @prop({ _id: false, type: Schema.Types.Map })
   messages: Map<string, string>;
 }
 
