@@ -1,6 +1,5 @@
 {
   "env": {
-    "browser": true,
     "commonjs": true,
     "es2021": true
   },
@@ -35,6 +34,7 @@
         "consistent": true
       }
     ],
+    "import/extensions": "never",
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
     "import/prefer-default-export": "off",

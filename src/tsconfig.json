@@ -5,6 +5,19 @@
     "esModuleInterop": true,
     "outDir": "../dist",
     "rootDir": ".",
-    "baseUrl": "./"
-  }
+    "baseUrl": "./",
+    "paths": {
+      "@root/*": ["./*"],
+      "@config": ["./config"],
+      "@lib": ["./lib"],
+      "@lib/*": ["./lib/*"],
+      "@utils": ["./lib/utils"],
+      "@utils/*": ["./lib/utils/*"],
+      "@embeds": ["./lib/embeds"],
+      "@embeds/*": ["./lib/embeds/*"],
+      "@providers": ["./lib/providers"],
+      "@providers/*": ["./lib/providers/*"]
+    }
+  },
+  "include": ["./", "./languages/**/*.json"]
 }

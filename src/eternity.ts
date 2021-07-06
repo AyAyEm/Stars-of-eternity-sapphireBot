@@ -1,4 +1,3 @@
-import './registerPaths';
 import './development';
 
 import { EternityClient } from '@lib';

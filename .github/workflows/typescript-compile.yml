@@ -73,5 +73,5 @@ jobs:
           git push origin $TARGET_BRANCH
         env:
           GITHUB_TOKEN: ${{ secrets.ETERNITY_TOKEN }}
-          GITHUB_ACTOR: WarNote
-          GITHUB_EMAIL: andre_20113meira@hotmail.com
+          GITHUB_ACTOR: ${{ secrets.ACTOR }}
+          GITHUB_EMAIL: ${{ secrets.EMAIL }}
