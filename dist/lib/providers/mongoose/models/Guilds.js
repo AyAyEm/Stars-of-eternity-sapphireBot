@@ -4,6 +4,7 @@ exports.Guilds = exports.Member = exports.Channel = exports.Message = exports.Em
 const tslib_1 = require("tslib");
 /* eslint-disable max-classes-per-file */
 const typegoose_1 = require("@typegoose/typegoose");
+const mongoose_1 = require("mongoose");
 class RelicTracker {
     enabled;
     messages;
@@ -13,7 +14,7 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:type", Boolean)
 ], RelicTracker.prototype, "enabled", void 0);
 tslib_1.__decorate([
-    typegoose_1.prop({ _id: false }),
+    typegoose_1.prop({ _id: false, type: mongoose_1.Schema.Types.Map }),
     tslib_1.__metadata("design:type", Map)
 ], RelicTracker.prototype, "messages", void 0);
 exports.RelicTracker = RelicTracker;

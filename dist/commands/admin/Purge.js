@@ -7,11 +7,11 @@ let default_1 = class extends _lib_1.EternityCommand {
     async run(msg, args) {
         const ammount = await args.pick('number');
         if (ammount >= 100) {
-            msg.replyTranslated('commands/purge:exceededLimit');
+            msg.replyTranslated('commands/Purge:exceededLimit');
         }
         else {
             msg.channel.bulkDelete(Number(ammount) + 1)
-                .catch((err) => msg.channel.sendTranslated('commands/purge:error', [{ err: err.message }]));
+                .catch((err) => msg.channel.sendTranslated('commands/Purge:error', [{ err: err.message }]));
         }
     }
 };

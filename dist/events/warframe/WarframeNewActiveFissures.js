@@ -4,7 +4,7 @@ const tslib_1 = require("tslib");
 const _lib_1 = require("../../lib");
 const decorators_1 = require("@sapphire/decorators");
 const FissureTracker_1 = require("../../lib/embeds/warframe/FissureTracker");
-const async_1 = tslib_1.__importDefault(require("async"));
+const mongoose_1 = require("mongoose");
 let default_1 = class extends _lib_1.EternityEvent {
     async run(fissures) {
         const fissuresEmbeds = FissureTracker_1.fissuresEmbed(fissures);
@@ -17,30 +17,33 @@ let default_1 = class extends _lib_1.EternityEvent {
                 if (!relicTracker || !relicTracker.enabled)
                     return;
                 const messagesPath = `channels.${channelId}.relicTracker.messages`;
-                const messages = await guildDocument.get(messagesPath, Map);
+                const messages = await guildDocument.get(messagesPath, mongoose_1.Schema.Types.Map);
                 const channel = await this.client.channels.fetch(channelId);
                 const undefinedMessage = async (embed, tier) => {
                     const sentMessage = await channel.send(embed);
                     messages.set(tier, sentMessage.id);
                 };
-                await async_1.default.eachOfSeries([...fissuresEmbeds.entries()], async ([tier, embed]) => {
+                for await (const [tier, embed] of fissuresEmbeds) {
                     if (!messages.has(tier)) {
                         await undefinedMessage(embed, tier);
                     }
                     else {
                         const messageId = messages.get(tier);
-                        channel.messages.fetch(messageId)
-                            .then((oldMessage) => {
-                            if (!oldMessage) {
-                                oldMessage.edit(embed);
+                        await channel.messages.fetch(messageId)
+                            .then(async (oldMessage) => {
+                            if (oldMessage) {
+                                await (oldMessage.first().edit(embed));
                             }
                             else {
-                                undefinedMessage(embed, tier);
+                                await undefinedMessage(embed, tier);
                             }
                         })
-                            .catch(() => undefinedMessage(embed, tier));
+                            .catch((e) => {
+                            console.error(e);
+                            undefinedMessage(embed, tier);
+                        });
                     }
-                });
+                }
                 await guildDocument.set(messagesPath, messages);
             });
         });
