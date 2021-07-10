@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig",
   "compilerOptions": {
-    "lib": ["ES2019"],
+    "lib": ["ES2019", "ES2016"],
     "esModuleInterop": true,
     "outDir": "../dist",
     "rootDir": ".",
@@ -16,7 +16,9 @@
       "@embeds": ["./lib/embeds"],
       "@embeds/*": ["./lib/embeds/*"],
       "@providers": ["./lib/providers"],
-      "@providers/*": ["./lib/providers/*"]
+      "@providers/*": ["./lib/providers/*"],
+      "#models": ["./lib/typeorm/models"],
+      "#models/*": ["./lib/typeorm/models/*"]
     }
   },
   "include": ["./", "./languages/**/*.json"]
