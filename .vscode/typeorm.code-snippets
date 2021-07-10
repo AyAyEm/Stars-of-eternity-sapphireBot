@@ -1,0 +1,83 @@
+{
+  "TypeORM model": {
+    "scope": "typescript",
+    "prefix": "model",
+    "body": [
+      "import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';",
+      "",
+      "@Entity()",
+      "export class ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g} extends BaseEntity {",
+      "  @PrimaryGeneratedColumn()",
+      "  public id: number;$0",
+      "}",
+      ""
+    ]
+  },
+  "TypeORM model with schema": {
+    "scope": "typescript",
+    "prefix": "model:schema",
+    "body": [
+      "import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';",
+      "",
+      "@Entity({ schema: '${1:${TM_DIRECTORY/.*?(\\w+)$/$1/}}' })",
+      "export class ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g} extends BaseEntity {",
+      "  @PrimaryGeneratedColumn()",
+      "  public id: number;$0",
+      "}",
+      ""
+    ]
+  },
+  "TypeORM column": {
+    "scope": "typescript",
+    "prefix": "column",
+    "body": ["@Column({ type: '$1', nullable: false })", "public $2: $3;$0"]
+  },
+  "TypeORM varchar column": {
+    "scope": "typescript",
+    "prefix": "column:varchar",
+    "body": [
+      "@Column({ type: 'varchar', length: $1, nullable: false })",
+      "public $2: string;$0"
+    ]
+  },
+  "TypeORM snowflake id": {
+    "scope": "typescript",
+    "prefix": "column:snowflake",
+    "body": [
+      "@Column({ type: 'varchar', length: 19, nullable: false, unique: true })",
+      "public snowflakeId: string;$0"
+    ]
+  },
+  "TypeORM many to one": {
+    "scope": "typescript",
+    "prefix": "manyToOne",
+    "body": [
+      "@ManyToOne(() => $1)",
+      "public ${1/(.)(.*?)s?$/${1:/downcase}$2/}: $1;$0"
+    ]
+  },
+  "TypeORM many to one inverse side": {
+    "scope": "typescript",
+    "prefix": "manyToOne:iSide",
+    "body": [
+      "@ManyToOne('$1', (${1/(.)(.*?)s?$/${1:/downcase}$2/}: $1) => ${1/(.)(.*?)s?$/${1:/downcase}$2/}.${TM_FILENAME_BASE/(.)(.*?)s?$/${1:/downcase}$2s/})",
+      "public ${1/(.)(.*?)s?$/${1:/downcase}$2/}: $1;$0"
+    ]
+  },
+  "TypeORM one to many": {
+    "scope": "typescript",
+    "prefix": "oneToMany",
+    "body": [
+      "@OneToMany('$1', (${1/(.)(.*?)s?$/${1:/downcase}$2/}: $1) => ${1/(.)(.*?)s?$/${1:/downcase}$2/}.${TM_FILENAME_BASE/(.)(.*?)s?$/${1:/downcase}$2/})",
+      "public ${1/(.)(.*?)s?$/${1:/downcase}$2s/}: $1[];"
+    ]
+  },
+  "TypeORM many to many": {
+    "scope": "typescript",
+    "prefix": "manyToMany",
+    "body": [
+      "@ManyToMany('$1', (${1/(.)(.*?)s?$/${1:/downcase}$2/}: $1) => ${1/(.)(.*?)s?$/${1:/downcase}$2/}.${TM_FILENAME_BASE/(.)(.*)/${1:/downcase}$2/})",
+      "public ${1/(.)(.*)/${1:/downcase}$2/}: $1[];"
+    ]
+  }
+}
