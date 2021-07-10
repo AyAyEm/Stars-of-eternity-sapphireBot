@@ -3,6 +3,8 @@ import { mergeDefault } from '@sapphire/utilities';
 import { ClientOptions } from 'discord.js';
 import { clientOptions } from '@utils/I18n';
 
+import { createConnection, Connection } from 'typeorm';
+
 import { Mongoose } from './providers';
 import { TaskStore } from './structures';
 import { Items } from './eternity/warframe';
@@ -13,6 +15,8 @@ export class EternityClient extends SapphireClient {
   public tasks = new TaskStore();
 
   public provider: Mongoose = new Mongoose();
+
+  public connection!: Connection;
 
   public fetchPrefix = () => '/';
 
@@ -42,5 +46,11 @@ export class EternityClient extends SapphireClient {
    */
   public get invite() {
     return `https://discord.com/oauth2/authorize?client_id=${this.id}&scope=bot`;
+  }
+
+  public async login(token?: string) {
+    this.connection = await createConnection();
+
+    return super.login(token);
   }
 }
