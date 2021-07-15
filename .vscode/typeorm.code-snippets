@@ -79,5 +79,19 @@
       "@ManyToMany('$1', (${1/(.)(.*?)s?$/${1:/downcase}$2/}: $1) => ${1/(.)(.*?)s?$/${1:/downcase}$2/}.${TM_FILENAME_BASE/(.)(.*)/${1:/downcase}$2/})",
       "public ${1/(.)(.*)/${1:/downcase}$2/}: $1[];"
     ]
+  },
+  "TypeORM custom repository": {
+    "scope": "typescript",
+    "prefix": "customRepository",
+    "body": [
+      "import { EntityRepository } from 'typeorm';",
+      "",
+      "import { BaseRepository } from '#structures';",
+      "import { ${1:$TM_FILENAME_BASE} } from '#models';",
+      "",
+      "@EntityRepository($1)",
+      "export class $1Repository extends BaseRepository<$1> { $0}",
+      ""
+    ]
   }
 }
