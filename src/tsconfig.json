@@ -17,8 +17,22 @@
       "@embeds/*": ["./lib/embeds/*"],
       "@providers": ["./lib/providers"],
       "@providers/*": ["./lib/providers/*"],
+      "#root/*": ["./*"],
+      "#config": ["./config"],
+      "#lib": ["./lib"],
+      "#lib/*": ["./lib/*"],
+      "#utils": ["./lib/utils"],
+      "#utils/*": ["./lib/utils/*"],
+      "#embeds": ["./lib/embeds"],
+      "#embeds/*": ["./lib/embeds/*"],
+      "#providers": ["./lib/providers"],
+      "#providers/*": ["./lib/providers/*"],
       "#models": ["./lib/typeorm/models"],
-      "#models/*": ["./lib/typeorm/models/*"]
+      "#models/*": ["./lib/typeorm/models/*"],
+      "#structures": ["./lib/structures"],
+      "#structures/*": ["./lib/structures/*"],
+      "#repositories": ["./lib/typeorm/repositories"],
+      "#repositories/*": ["./lib/typeorm/repositories/*"]
     }
   },
   "include": ["./", "./languages/**/*.json"]
