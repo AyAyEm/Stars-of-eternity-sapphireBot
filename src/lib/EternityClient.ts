@@ -1,3 +1,5 @@
+import '@sapphire/plugin-i18next/register';
+
 import { SapphireClient } from '@sapphire/framework';
 import { mergeDefault } from '@sapphire/utilities';
 import { ClientOptions } from 'discord.js';
@@ -5,6 +7,7 @@ import { clientOptions } from '@utils/I18n';
 
 import { createConnection, Connection } from 'typeorm';
 
+import { config as connectionConfig } from './typeorm/connection';
 import { Mongoose } from './providers';
 import { TaskStore } from './structures';
 import { Items } from './eternity/warframe';
@@ -49,7 +52,11 @@ export class EternityClient extends SapphireClient {
   }
 
   public async login(token?: string) {
-    this.connection = await createConnection();
+    this.connection = await createConnection({
+      ...connectionConfig,
+      migrations: null,
+      subscribers: null,
+    });
 
     return super.login(token);
   }
