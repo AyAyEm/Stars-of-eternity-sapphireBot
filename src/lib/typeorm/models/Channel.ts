@@ -4,15 +4,15 @@ import {
   Column,
   OneToMany,
   ManyToOne,
-  BaseEntity,
 } from 'typeorm';
 
-import { Guilds } from './Guilds';
+import { EternityBaseEntity } from '#structures';
+import { Guild } from './Guild';
 
-import type { Messages } from './Messages';
+import type { Message } from './Message';
 
 @Entity()
-export class Channels extends BaseEntity {
+export class Channel extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
@@ -22,9 +22,9 @@ export class Channels extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: false })
   public name: string;
 
-  @OneToMany('Messages', (message: Messages) => message.channel)
-  public messages: Messages[];
+  @OneToMany('Message', (message: Message) => message.channel)
+  public messages: Message[];
 
-  @ManyToOne('Guilds', (guild: Guilds) => guild.channels)
-  public guild: Guilds;
+  @ManyToOne('Guild', (guild: Guild) => guild.channels)
+  public guild: Guild;
 }

@@ -4,13 +4,14 @@ import {
   Index,
   PrimaryGeneratedColumn,
   ManyToMany,
-  BaseEntity,
 } from 'typeorm';
 
-import type { Guilds } from './Guilds';
+import { EternityBaseEntity } from '#structures';
+
+import type { Guild } from './Guild';
 
 @Entity()
-export class Users extends BaseEntity {
+export class User extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
@@ -22,6 +23,6 @@ export class Users extends BaseEntity {
   @Column({ type: 'varchar', length: 19, nullable: false, unique: true })
   public snowflakeId: string;
 
-  @ManyToMany('Guilds', (guild: Guilds) => guild.users)
-  public guilds: Guilds[];
+  @ManyToMany('Guild', (guild: Guild) => guild.users)
+  public guilds: Guild[];
 }

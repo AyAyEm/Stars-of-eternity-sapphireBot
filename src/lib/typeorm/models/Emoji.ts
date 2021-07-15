@@ -1,7 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index, BaseEntity } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
+
+import { EternityBaseEntity } from '#structures';
 
 @Entity()
-export class Emojis extends BaseEntity {
+export class Emoji extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 

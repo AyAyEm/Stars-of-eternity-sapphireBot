@@ -5,14 +5,14 @@ import {
   Index,
   ManyToMany,
   JoinTable,
-  BaseEntity,
 } from 'typeorm';
 
-import { Guilds } from '#models/Guilds';
-import { Users } from '#models/Users';
+import { EternityBaseEntity } from '#structures';
+import { Guild } from '#models/Guild';
+import { User } from '#models/User';
 
 @Entity({ schema: 'warframe' })
-export class Items extends BaseEntity {
+export class Item extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
@@ -20,11 +20,11 @@ export class Items extends BaseEntity {
   @Column({ type: 'varchar', length: 250, nullable: false, unique: true })
   public name: string;
 
-  @ManyToMany(() => Guilds)
-  @JoinTable({ name: 'invasion_item_guild' })
-  public guilds: Guilds[];
+  @ManyToMany(() => Guild)
+  @JoinTable({ name: 'item_guild' })
+  public guilds: Guild[];
 
-  @ManyToMany(() => Users)
+  @ManyToMany(() => User)
   @JoinTable({ name: 'item_user' })
-  public users: Users[];
+  public users: User[];
 }

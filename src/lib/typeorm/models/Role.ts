@@ -5,15 +5,15 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
-  BaseEntity,
 } from 'typeorm';
 
-import { Guilds } from './Guilds';
+import { EternityBaseEntity } from '#structures';
+import { Guild } from './Guild';
 
-import type { Messages } from './Messages';
+import type { Message } from './Message';
 
 @Entity()
-export class Roles extends BaseEntity {
+export class Role extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
@@ -25,9 +25,9 @@ export class Roles extends BaseEntity {
   @Column({ type: 'varchar', length: 19, nullable: false, unique: true })
   public snowflakeId: string;
 
-  @ManyToOne(() => Guilds)
-  public guild: Guilds;
+  @ManyToOne(() => Guild)
+  public guild: Guild;
 
-  @ManyToMany('Messages', (message: Messages) => message.roles)
-  public messages: Messages[];
+  @ManyToMany('Message', (message: Message) => message.roles)
+  public messages: Message[];
 }

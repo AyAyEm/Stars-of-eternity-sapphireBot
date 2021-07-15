@@ -1,20 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, BaseEntity } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
-import { Messages } from './Messages';
-import { Roles } from './Roles';
-import { Emojis } from './Emojis';
+import { EternityBaseEntity } from '#structures';
+import { Message } from './Message';
+import { Role } from './Role';
+import { Emoji } from './Emoji';
 
 @Entity()
-export class RoleReactions extends BaseEntity {
+export class RoleReaction extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @ManyToOne(() => Messages)
-  public message: Messages;
+  @ManyToOne(() => Message)
+  public message: Message;
 
-  @ManyToOne(() => Roles)
-  public role: Roles;
+  @ManyToOne(() => Role)
+  public role: Role;
 
-  @ManyToOne(() => Emojis)
-  public emoji: Emojis;
+  @ManyToOne(() => Emoji)
+  public emoji: Emoji;
 }
