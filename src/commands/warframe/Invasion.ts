@@ -2,7 +2,6 @@ import i18n from 'i18next';
 
 import { capitalize } from 'lodash';
 import { ApplyOptions } from '@sapphire/decorators';
-import { UserError } from '@sapphire/framework';
 import { getCustomRepository, getConnection } from 'typeorm';
 
 import type { Args } from '@sapphire/framework';
@@ -80,15 +79,12 @@ export default class extends EternityCommandWSC {
   public itemsDict = new CaseInsensitiveMap<string, WarframeItem>(itemNames.all.map((item) => (
     [item.toLowerCase(), { name: item } as WarframeItem])));
 
-  public guildInvasionRepo: GuildInvasionRepository;
+  public get guildInvasionRepo(): GuildInvasionRepository {
+    return getCustomRepository(GuildInvasionRepository);
+  }
 
-  public itemRepo: ItemRepository;
-
-  public async onLoad() {
-    await super.onLoad();
-
-    this.guildInvasionRepo = getCustomRepository(GuildInvasionRepository);
-    this.itemRepo = getCustomRepository(ItemRepository);
+  public get itemRepo(): ItemRepository {
+    return getCustomRepository(ItemRepository);
   }
 
   public async items(msg: EternityMessage, args: Args) {
@@ -121,20 +117,26 @@ export default class extends EternityCommandWSC {
 
     const action = value ? 'enable' : 'disable';
     if (guildInvasion.enabled === value) {
-      throw new UserError({
-        identifier: `commands/Invasion:${action}:already${capitalize(action)}d`,
-        message: `Invasions are already ${action}d in this channel`,
-      });
+      await msg.replyTranslated(`commands/Invasion:${action}:already${capitalize(action)}d`);
+      return;
     }
 
-    await this.guildInvasionRepo.createQueryBuilder('guildInvasion')
+    await this.guildInvasionRepo.createQueryBuilder()
       .update(GuildInvasion)
       .set({ enabled: value })
-      .where('guild_invasions.id = :guildInvasionId', { guildInvasionId: guildInvasion.id })
+      .where('guild_invasion.id = :guildInvasionId', { guildInvasionId: guildInvasion.id })
       .execute();
 
     const reply = await msg.replyTranslated(`commands/Invasion:${action}:success`);
     reply.delete({ timeout: 10000 });
+  }
+
+  public async add(msg: EternityMessage, args: Args) {
+    return this.updateItems('add', msg, args);
+  }
+
+  public async delete(msg: EternityMessage, args: Args) {
+    return this.updateItems('delete', msg, args);
   }
 
   private async updateItems(action: 'add' | 'delete', msg: EternityMessage, args: Args) {
@@ -177,13 +179,5 @@ export default class extends EternityCommandWSC {
       `commands/Invasion:${action}:success${all ? 'All' : ''}`,
       [{ items: [...parsedToUpdateItems].map(({ name }) => name) }],
     );
-  }
-
-  public async add(msg: EternityMessage, args: Args) {
-    return this.updateItems('add', msg, args);
-  }
-
-  public async delete(msg: EternityMessage, args: Args) {
-    return this.updateItems('delete', msg, args);
   }
 }
