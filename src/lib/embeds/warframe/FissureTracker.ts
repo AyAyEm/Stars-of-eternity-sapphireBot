@@ -53,14 +53,12 @@ function getMissionsFields(missionFissures: Fissure[]) {
 }
 
 export function fissuresEmbed(fissures: Fissure[]): Map<RelicTiers, EternityMessageEmbed> {
-  const fissuresMap = new Map(
-    [...Object.entries((_.groupBy(fissures, 'tier')))]
-      .sort(([tierA], [tierB]) => {
-        const { index: A = 0 } = fissureTiers.get(tierA) || {};
-        const { index: B = 0 } = fissureTiers.get(tierB) || {};
-        return B - A;
-      }),
-  );
+  const fissuresMap = new Map([...Object.entries((_.groupBy(fissures, 'tier')))]
+    .sort(([tierA], [tierB]) => {
+      const { index: A = 0 } = fissureTiers.get(tierA) || {};
+      const { index: B = 0 } = fissureTiers.get(tierB) || {};
+      return B - A;
+    }));
 
   const embedsMap = new Map();
 

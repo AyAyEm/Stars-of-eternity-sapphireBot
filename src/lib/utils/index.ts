@@ -5,3 +5,5 @@ export * from './LanguageFunctions';
 export * from './MultiEntryMap';
 export * from './CaseInsensitiveMap';
 export * from './Regexes';
+export * from './deleteMsgs';
+export * from './placeHolder';
