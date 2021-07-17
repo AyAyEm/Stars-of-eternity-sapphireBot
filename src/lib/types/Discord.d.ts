@@ -8,6 +8,11 @@ interface D {
   guild_id: string;
 }
 
+export interface MessageDeleteOptions {
+  timeout?: number;
+  reason?: string;
+}
+
 export interface RawPacket {
   t: string;
   s: number;

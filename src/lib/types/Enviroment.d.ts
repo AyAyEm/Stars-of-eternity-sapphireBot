@@ -5,6 +5,7 @@ declare global {
       DB_USERNAME: string;
       DB_PASSWORD: string;
       DB_PORT: string;
+      TS_NODE_DEV: string;
     }
   }
 }
