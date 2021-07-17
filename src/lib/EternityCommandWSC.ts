@@ -12,10 +12,16 @@ import { CaseInsensitiveMap } from '#structures';
 
 import type { EternityClient } from './EternityClient';
 
+export interface ArgSwitch {
+  name: keyof ArgType;
+  orFlags?: string[];
+}
+
 export interface SubCommand {
   name: string;
   aliases?: string[];
-  requiredArgs?: (keyof ArgType)[];
+  flags?: string[];
+  requiredArgs?: Array<(keyof ArgType) | ArgSwitch>;
   default?: boolean;
 }
 
@@ -34,7 +40,28 @@ export abstract class EternityCommandWSC extends Command {
   public defaultCommand: string | null;
 
   protected constructor(context: PieceContext, options: EternityCommandWSCOptions) {
-    super(context, options);
+    if (options.subCommands) {
+      const flags = new Set(options.strategyOptions?.flags);
+
+      for (const subCommand of options.subCommands) {
+        if (typeof subCommand !== 'string') {
+          subCommand.flags?.forEach((flag) => flags.add(flag));
+
+          const { requiredArgs = [] } = subCommand;
+          if (requiredArgs.length > 0) {
+            for (const requiredArg of requiredArgs) {
+              if (typeof requiredArg !== 'string') {
+                requiredArg.orFlags?.forEach((flag) => flags.add(flag));
+              }
+            }
+          }
+        }
+      }
+
+      super(context, { ...options, strategyOptions: { flags: [...flags] } });
+    } else {
+      super(context, options);
+    }
 
     this.caseInsensitive = options.caseInsensitive ?? true;
 
@@ -110,8 +137,18 @@ export abstract class EternityCommandWSC extends Command {
     if (subCommand) {
       const requiredArgs = subCommand.requiredArgs ?? [];
 
-      const missingArguments = await async.filterSeries(requiredArgs, async (arg) => (
-        !(await args.pickResult(arg)).success));
+      const missingArguments = (await async.filterSeries(requiredArgs, async (arg) => {
+        const argName = typeof arg === 'string' ? arg : arg.name;
+        const orFlags = (arg as ArgSwitch).orFlags ?? [];
+
+        const argIsPassed = (await args.pickResult(argName)).success;
+
+        if (!argIsPassed && orFlags.length > 0) {
+          return !args.getFlags(...orFlags);
+        }
+
+        return !argIsPassed;
+      })).map((arg) => (typeof arg === 'string' ? arg : arg.name));
 
       if (missingArguments.length > 0) {
         message.channel.sendTranslated('missingArgument', [{ args: missingArguments }]);
