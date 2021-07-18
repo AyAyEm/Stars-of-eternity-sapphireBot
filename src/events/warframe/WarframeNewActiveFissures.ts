@@ -29,13 +29,15 @@ export default class extends EternityEvent<'warframeNewActiveFissures'> {
         .where('fissureTracker.id = :fissureTrackerId', { fissureTrackerId: data.fissureTracker_id })
         .getOne();
 
+      const embed = fissuresEmbeds.get(this.tiers[fissureTracker.tier - 1]);
+      if (!embed) return;
+
       const channel = await this.client.channels
         .fetch(fissureTracker.channel.id) as EternityTextChannel;
 
       const message = await channel.messages.fetch(fissureTracker.message.id);
 
-      const embed = fissuresEmbeds.get(this.tiers[fissureTracker.tier - 1]);
-      await message.edit(embed).catch(() => message.edit(embed));
+      await message.edit(embed);
     })().catch((e) => this.client.console.error(e));
 
     fissureTrackers.on('data', handler);
