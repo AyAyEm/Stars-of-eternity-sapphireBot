@@ -13,12 +13,12 @@ import { EternityBaseEntity } from '#structures';
 import { Item } from './Item';
 
 @Entity({ schema: 'warframe' })
-export class GuildInvasion extends EternityBaseEntity {
+export class InvasionTracker extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
   @ManyToMany(() => Item)
-  @JoinTable({ name: 'guild_invasion_item' })
+  @JoinTable({ name: 'invasion_tracker_item' })
   public items: Item[];
 
   @OneToOne(() => Channel, { nullable: false })

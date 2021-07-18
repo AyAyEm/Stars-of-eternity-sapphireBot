@@ -7,7 +7,7 @@ import type { EventOptions } from '@sapphire/framework';
 
 import { EternityEvent } from '#lib';
 import { CaseInsensitiveSet } from '#lib/structures';
-import { GuildInvasionRepository } from '#repositories';
+import { InvasionTrackerRepository } from '#repositories';
 import { Warframe } from '#utils/Constants';
 
 import type { InvasionData, Reward } from '#lib/types/Warframe';
@@ -15,24 +15,24 @@ import type { InvasionData, Reward } from '#lib/types/Warframe';
 @ApplyOptions<EventOptions>({ event: 'warframeNewInvasions' })
 export default class extends EternityEvent<'warframeNewInvasions'> {
   public async run(invasions: InvasionData[]) {
-    const guildInvasionRepo = getCustomRepository(GuildInvasionRepository);
+    const InvasionTrackerRepo = getCustomRepository(InvasionTrackerRepository);
 
-    const guildInvasions = await guildInvasionRepo.createQueryBuilder('guildInvasion')
-      .where('guildInvasion.enabled = :enabled', { enabled: true })
+    const invasionTrackers = await InvasionTrackerRepo.createQueryBuilder('invasionTracker')
+      .where('invasionTracker.enabled = :enabled', { enabled: true })
       .stream();
 
-    const handler = (data: { guildInvasion_id: number }) => (async () => {
-      const guildInvasion = await guildInvasionRepo
-        .createQueryBuilder('guildInvasion')
-        .leftJoinAndSelect('guildInvasion.items', 'items')
-        .leftJoinAndSelect('guildInvasion.channel', 'channel')
-        .where('guildInvasion.id = :guildInvasionId', { guildInvasionId: data.guildInvasion_id })
+    const handler = (data: { invasionTracker_id: number }) => (async () => {
+      const invasionTracker = await InvasionTrackerRepo
+        .createQueryBuilder('invasionTracker')
+        .leftJoinAndSelect('invasionTracker.items', 'items')
+        .leftJoinAndSelect('invasionTracker.channel', 'channel')
+        .where('invasionTracker.id = :invasionTrackerId', { invasionTrackerId: data.invasionTracker_id })
         .getOne();
 
-      if (guildInvasion.items.length > 0) {
-        const itemNames = new CaseInsensitiveSet(guildInvasion.items.map(({ name }) => name));
+      if (invasionTracker.items.length > 0) {
+        const itemNames = new CaseInsensitiveSet(invasionTracker.items.map(({ name }) => name));
 
-        const channelId = guildInvasion.channel.snowflakeId;
+        const channelId = invasionTracker.channel.snowflakeId;
         await Promise.all(invasions
           .filter(({ rewardTypes }) => rewardTypes.find((itemName) => itemNames.has(itemName)))
           .map(async (invasion) => {
@@ -45,7 +45,7 @@ export default class extends EternityEvent<'warframeNewInvasions'> {
       }
     })().catch((e) => this.client.console.error(e));
 
-    guildInvasions.on('data', handler);
+    invasionTrackers.on('data', handler);
   }
 
   private makeEmbeds(invasion: InvasionData, matchedItems: string[]): MessageEmbed[] {

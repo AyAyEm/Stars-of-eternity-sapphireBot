@@ -10,7 +10,7 @@ import type { Item as WarframeItem } from 'warframe-items';
 import { itemNames } from '#lib/utils';
 import { EternityCommandWSC, EternityMessageEmbed } from '#lib';
 import { CaseInsensitiveMap } from '#structures/CaseInsensitiveMap';
-import { GuildInvasion, GuildInvasionRepository, ItemRepository } from '#lib/typeorm';
+import { InvasionTracker, InvasionTrackerRepository, ItemRepository } from '#lib/typeorm';
 
 import type { EternityCommandWSCOptions, EternityMessage } from '#lib';
 
@@ -79,8 +79,8 @@ export default class extends EternityCommandWSC {
   public itemsDict = new CaseInsensitiveMap<string, WarframeItem>(itemNames.all.map((item) => (
     [item.toLowerCase(), { name: item } as WarframeItem])));
 
-  public get guildInvasionRepo(): GuildInvasionRepository {
-    return getCustomRepository(GuildInvasionRepository);
+  public get invasionTrackerRepo(): InvasionTrackerRepository {
+    return getCustomRepository(InvasionTrackerRepository);
   }
 
   public get itemRepo(): ItemRepository {
@@ -89,7 +89,7 @@ export default class extends EternityCommandWSC {
 
   public async items(msg: EternityMessage, args: Args) {
     if (args.getFlags('list', 'l')) {
-      const items = await this.guildInvasionRepo.findItemsByChannel(msg.channel);
+      const items = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
 
       if (items.length === 0) {
         await msg.replyTranslated('commands/Invasion:items:notFound');
@@ -113,18 +113,18 @@ export default class extends EternityCommandWSC {
   }
 
   private async setEnabled(msg: EternityMessage, value: boolean) {
-    const guildInvasion = await this.guildInvasionRepo.findOrInsert(msg.channel);
+    const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel);
 
     const action = value ? 'enable' : 'disable';
-    if (guildInvasion.enabled === value) {
+    if (invasionTracker.enabled === value) {
       await msg.replyTranslated(`commands/Invasion:${action}:already${capitalize(action)}d`);
       return;
     }
 
-    await this.guildInvasionRepo.createQueryBuilder()
-      .update(GuildInvasion)
+    await this.invasionTrackerRepo.createQueryBuilder()
+      .update(InvasionTracker)
       .set({ enabled: value })
-      .where('guild_invasion.id = :guildInvasionId', { guildInvasionId: guildInvasion.id })
+      .where('invasion_tracker.id = :invasionTrackerId', { invasionTrackerId: invasionTracker.id })
       .execute();
 
     const reply = await msg.replyTranslated(`commands/Invasion:${action}:success`);
@@ -144,7 +144,7 @@ export default class extends EternityCommandWSC {
 
     const toUpdateItems = all ? [...this.itemsDict.keys()] : await args.repeat('warframeItem');
 
-    const storedItems = await this.guildInvasionRepo.findItemsByChannel(msg.channel);
+    const storedItems = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
     const storedItemsNames = new Map(storedItems.map((warframeItem) => (
       [warframeItem.name, warframeItem])));
 
@@ -163,14 +163,14 @@ export default class extends EternityCommandWSC {
       return;
     }
 
-    const guildInvasion = await this.guildInvasionRepo.findOrInsert(msg.channel, true);
+    const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel, true);
     await Promise.all(parsedToUpdateItems.map(async (warframeItem: WarframeItem) => {
       const item = await this.itemRepo.findOrInsert(warframeItem);
 
       const query = getConnection()
         .createQueryBuilder()
-        .relation(GuildInvasion, 'items')
-        .of(guildInvasion);
+        .relation(InvasionTracker, 'items')
+        .of(invasionTracker);
 
       await (action === 'add' ? query.add(item) : query.remove(item));
     }));
