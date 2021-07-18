@@ -10,12 +10,12 @@ export class RoleReaction extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @ManyToOne(() => Message)
+  @ManyToOne(() => Message, { nullable: false })
   public message: Message;
 
-  @ManyToOne(() => Role)
+  @ManyToOne(() => Role, { nullable: false })
   public role: Role;
 
-  @ManyToOne(() => Emoji)
+  @ManyToOne(() => Emoji, { nullable: false })
   public emoji: Emoji;
 }
