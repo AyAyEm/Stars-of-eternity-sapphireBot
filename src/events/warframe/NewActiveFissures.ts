@@ -8,12 +8,10 @@ import { fissuresEmbed } from '#lib/embeds/warframe/FissureTracker';
 import { FissureTrackerRepository } from '#repositories';
 
 import type { EternityTextChannel } from '#lib';
-import type { Fissure as WarframeFissure, RelicTiers } from '#lib/types/Warframe';
+import type { Fissure as WarframeFissure } from '#lib/types/Warframe';
 
 @ApplyOptions<EventOptions>({ event: 'warframeNewActiveFissures' })
 export default class extends EternityEvent<'warframeNewActiveFissures'> {
-  public tiers: RelicTiers[] = ['Lith', 'Meso', 'Neo', 'Axi', 'Requiem'];
-
   public async run(fissures: WarframeFissure[]) {
     const fissureTrackerRepo = getCustomRepository(FissureTrackerRepository);
 
@@ -29,7 +27,7 @@ export default class extends EternityEvent<'warframeNewActiveFissures'> {
         .where('fissureTracker.id = :fissureTrackerId', { fissureTrackerId: data.fissureTracker_id })
         .getOne();
 
-      const embed = fissuresEmbeds.get(this.tiers[fissureTracker.tier - 1]);
+      const embed = fissuresEmbeds.get(fissureTracker.tier);
       if (!embed) return;
 
       const channel = await this.client.channels
