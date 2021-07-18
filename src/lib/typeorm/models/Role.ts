@@ -1,15 +1,12 @@
 import {
   Column,
   Entity,
-  ManyToMany,
   ManyToOne,
   PrimaryColumn,
 } from 'typeorm';
 
 import { EternityBaseEntity } from '#structures';
 import { Guild } from './Guild';
-
-import type { Message } from './Message';
 
 @Entity()
 export class Role extends EternityBaseEntity {
@@ -21,7 +18,4 @@ export class Role extends EternityBaseEntity {
 
   @ManyToOne(() => Guild)
   public guild: Guild;
-
-  @ManyToMany('Message', (message: Message) => message.roles)
-  public messages: Message[];
 }
