@@ -1,6 +1,6 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
   OneToMany,
   ManyToOne,
@@ -13,11 +13,8 @@ import type { Message } from './Message';
 
 @Entity()
 export class Channel extends EternityBaseEntity {
-  @PrimaryGeneratedColumn()
-  public id: number;
-
-  @Column({ type: 'varchar', length: 19, nullable: false, unique: true })
-  public snowflakeId: string;
+  @PrimaryColumn({ type: 'varchar', length: 19 })
+  public id: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   public name: string;

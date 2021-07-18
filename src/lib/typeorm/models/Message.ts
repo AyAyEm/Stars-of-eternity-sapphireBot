@@ -1,8 +1,6 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  Index,
+  PrimaryColumn,
   ManyToMany,
   JoinTable,
   ManyToOne,
@@ -15,12 +13,8 @@ import type { Channel } from './Channel';
 
 @Entity()
 export class Message extends EternityBaseEntity {
-  @PrimaryGeneratedColumn()
-  public id: number;
-
-  @Index()
-  @Column({ type: 'varchar', length: 19, nullable: false, unique: true })
-  public snowflakeId: string;
+  @PrimaryColumn({ type: 'varchar', length: 19 })
+  public id: string;
 
   @ManyToMany('Role', (role: Role) => role.messages)
   @JoinTable({ name: 'role_message' })

@@ -48,7 +48,7 @@ export class InvasionTrackerRepository extends BaseRepository<InvasionTracker> {
   public async findByChannelQuery(discordChannel: EternityTextChannel) {
     return this.createQueryBuilder('invasionTracker')
       .leftJoinAndSelect('invasionTracker.channel', 'channel')
-      .where('channel.snowflakeId = :channelId', { channelId: discordChannel.id });
+      .where('channel.id = :channelId', { channelId: discordChannel.id });
   }
 
   public async findItemsByChannel(discordChannel: EternityTextChannel) {

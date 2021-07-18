@@ -33,7 +33,7 @@ export class MessageRepository extends BaseRepository<Message> {
     const channel = await channelRepo.findOrInsert(discordMessage.channel, true);
     return this.createQueryBuilder('message')
       .insert()
-      .values({ channel, snowflakeId: discordMessage.id })
+      .values({ channel, id: discordMessage.id })
       .execute();
   }
 
@@ -49,6 +49,6 @@ export class MessageRepository extends BaseRepository<Message> {
 
   public findQuery(discordMessage: EternityMessage) {
     return this.createQueryBuilder('message')
-      .where('message.snowflakeId = :messageId', { messageId: discordMessage.id });
+      .where('message.id = :messageId', { messageId: discordMessage.id });
   }
 }

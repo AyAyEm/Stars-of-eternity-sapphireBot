@@ -1,17 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
+import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 import { EternityBaseEntity } from '#structures';
 
 @Entity()
 export class Emoji extends EternityBaseEntity {
-  @PrimaryGeneratedColumn()
-  public id: number;
+  @PrimaryColumn({ type: 'varchar', length: 19 })
+  public id: string;
 
-  @Index()
-  @Column({ type: 'varchar', length: 19, nullable: false, unique: true })
-  public snowflakeId: string;
-
-  @Index()
   @Column({ type: 'varchar', length: 19, nullable: false, unique: true })
   public identifier: string;
 

@@ -1,10 +1,9 @@
 import {
   Column,
   Entity,
-  Index,
   ManyToMany,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
 } from 'typeorm';
 
 import { EternityBaseEntity } from '#structures';
@@ -14,16 +13,11 @@ import type { Message } from './Message';
 
 @Entity()
 export class Role extends EternityBaseEntity {
-  @PrimaryGeneratedColumn()
-  public id: number;
+  @PrimaryColumn({ type: 'varchar', length: 19 })
+  public id: string;
 
-  @Index()
   @Column({ type: 'varchar', length: 250, nullable: false })
   public name: string;
-
-  @Index()
-  @Column({ type: 'varchar', length: 19, nullable: false, unique: true })
-  public snowflakeId: string;
 
   @ManyToOne(() => Guild)
   public guild: Guild;

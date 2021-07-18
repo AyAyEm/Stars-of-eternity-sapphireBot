@@ -20,15 +20,10 @@ export class ChannelRepository extends BaseRepository<Channel> {
         await entityManager.createQueryBuilder()
           .insert()
           .into(Channel)
-          .values([{ snowflakeId: discordChannel.id, name: discordChannel.name, guild }])
+          .values([{ id: discordChannel.id, name: discordChannel.name, guild }])
           .execute();
 
         channel = await channelsRepo.find(discordChannel, onlyId);
-
-        // await entityManager.createQueryBuilder()
-        //   .relation(Channel, 'guild')
-        //   .of(channel)
-        //   .set(guild);
       }
 
       return channel;
@@ -47,6 +42,6 @@ export class ChannelRepository extends BaseRepository<Channel> {
 
   public findQuery(discordChannel: EternityTextChannel) {
     return this.createQueryBuilder('channel')
-      .where('channel.snowflakeId = :channelId', { channelId: discordChannel.id });
+      .where('channel.id = :channelId', { channelId: discordChannel.id });
   }
 }

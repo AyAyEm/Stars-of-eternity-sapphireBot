@@ -1,8 +1,7 @@
 import {
   Column,
   Entity,
-  Index,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   ManyToMany,
 } from 'typeorm';
 
@@ -12,16 +11,11 @@ import type { Guild } from './Guild';
 
 @Entity()
 export class User extends EternityBaseEntity {
-  @PrimaryGeneratedColumn()
-  public id: number;
+  @PrimaryColumn({ type: 'varchar', length: 19 })
+  public id: string;
 
-  @Index()
   @Column({ type: 'varchar', length: 250, nullable: false, unique: true })
   public name: string;
-
-  @Index()
-  @Column({ type: 'varchar', length: 19, nullable: false, unique: true })
-  public snowflakeId: string;
 
   @ManyToMany('Guild', (guild: Guild) => guild.users)
   public guilds: Guild[];

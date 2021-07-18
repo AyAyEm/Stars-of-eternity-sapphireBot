@@ -16,7 +16,7 @@ export class GuildRepository extends BaseRepository<Guild> {
         await guildsRepo.createQueryBuilder()
           .insert()
           .into(Guild)
-          .values([{ snowflakeId: discordGuild.id }])
+          .values([{ id: discordGuild.id }])
           .execute();
 
         guild = await guildsRepo.find(discordGuild, onlyId);
@@ -38,6 +38,6 @@ export class GuildRepository extends BaseRepository<Guild> {
 
   public findQuery(discordGuild: EternityGuild) {
     return this.createQueryBuilder('guild')
-      .where('guild.snowflakeId = :guildId', { guildId: discordGuild.id });
+      .where('guild.id = :guildId', { guildId: discordGuild.id });
   }
 }

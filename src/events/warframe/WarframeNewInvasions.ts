@@ -32,7 +32,7 @@ export default class extends EternityEvent<'warframeNewInvasions'> {
       if (invasionTracker.items.length > 0) {
         const itemNames = new CaseInsensitiveSet(invasionTracker.items.map(({ name }) => name));
 
-        const channelId = invasionTracker.channel.snowflakeId;
+        const channelId = invasionTracker.channel.id;
         await Promise.all(invasions
           .filter(({ rewardTypes }) => rewardTypes.find((itemName) => itemNames.has(itemName)))
           .map(async (invasion) => {

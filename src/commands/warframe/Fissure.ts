@@ -56,17 +56,17 @@ export default class extends EternityCommandWSC {
       .createQueryBuilder('fissure')
       .leftJoinAndSelect('fissure.message', 'message')
       .leftJoinAndSelect('fissure.channel', 'channel')
-      .where('channel.snowflakeId = :channelId', { channelId: msg.channel.id })
+      .where('channel.id = :channelId', { channelId: msg.channel.id })
       .getMany();
 
     const { fissureTrackerRepo } = this;
     if (fissureTrackers.length > 0) {
       const messagesDeletion = Promise.all(fissureTrackers.map(async (fissureTracker) => {
         const channel = await this.client.channels
-          .fetch(fissureTracker.channel.snowflakeId) as EternityTextChannel;
+          .fetch(fissureTracker.channel.id) as EternityTextChannel;
 
         const message = await channel.messages
-          .fetch(fissureTracker.message.snowflakeId).catch(() => null);
+          .fetch(fissureTracker.message.id).catch(() => null);
 
         await message?.delete().catch(() => null);
       }));

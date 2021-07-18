@@ -66,7 +66,7 @@ export class FissureTrackerRepository extends BaseRepository<FissureTracker> {
   public findQuery(discordChannel: EternityTextChannel, tier: number) {
     return this.createQueryBuilder('fissureTracker')
       .leftJoin('fissureTracker.channel', 'channel')
-      .where('channel.snowflakeId = :channelId', { channelId: discordChannel.id })
+      .where('channel.id = :channelId', { channelId: discordChannel.id })
       .andWhere('fissureTracker.tier = :tier', { tier });
   }
 
