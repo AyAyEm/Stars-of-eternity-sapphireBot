@@ -14,6 +14,7 @@
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
     "migration:generate": "npm run typeorm -- migration:generate -n migration",
+    "typeorm:reset": "ts-node ./scripts/rm.ts \"./src/lib/typeorm/migrations/generated\" && npm run typeorm -- schema:drop && npm run migration:generate && npm run migration:run",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "test": "jest ./tests",
