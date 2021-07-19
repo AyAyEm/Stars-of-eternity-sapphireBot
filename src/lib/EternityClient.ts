@@ -8,7 +8,6 @@ import { clientOptions } from '@utils/I18n';
 import { createConnection, Connection } from 'typeorm';
 
 import { config as connectionConfig } from './typeorm/connection';
-import { Mongoose } from './providers';
 import { TaskStore } from './structures';
 import { Items } from './eternity/warframe';
 
@@ -16,8 +15,6 @@ import './Extenders';
 
 export class EternityClient extends SapphireClient {
   public tasks = new TaskStore();
-
-  public provider: Mongoose = new Mongoose();
 
   public connection!: Connection;
 
