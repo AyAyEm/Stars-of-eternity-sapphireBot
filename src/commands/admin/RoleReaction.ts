@@ -1,36 +1,33 @@
-import { EternityCommandWSC, EternityMessageEmbed } from '@lib';
-import { UserError } from '@sapphire/framework';
-import { ApplyOptions } from '@sapphire/decorators';
-import _ from 'lodash';
-import async from 'async';
 import i18n from 'i18next';
+import async from 'async';
+import { ApplyOptions } from '@sapphire/decorators';
+import { getCustomRepository } from 'typeorm';
 
-import type { Message } from '@providers/mongoose/models';
 import type { Args } from '@sapphire/framework';
+
+import { EternityCommandWSC, EternityMessageEmbed } from '#lib';
+import { RoleReactionRepository } from '#repositories';
+
 import type {
   EternityCommandWSCOptions,
   EternityMessage,
   EternityGuild,
-} from '@lib';
+} from '#lib';
 
 @ApplyOptions<EternityCommandWSCOptions>({
   preconditions: ['GuildOnly', 'OwnerOnly'],
-  subAliases: [
-    ['delete', ['remove']],
+  subCommands: [
+    'create',
+    'renew',
+    { name: 'delete', requiredArgs: ['message'], aliases: ['remove'] },
+    { name: 'add', requiredArgs: ['emoji', 'role'] },
   ],
-  requiredArgs: [
-    ['delete', ['message']],
-    ['add', ['emoji', 'role']],
-  ],
+  enabled: false,
 })
 export default class extends EternityCommandWSC {
-  private async document(guildId: string) {
-    return new this.client.provider.Guilds(guildId);
-  }
-
   private async mapToEmbed(
     guild: EternityGuild,
-    emojiRoleMap: Map<string, string>,
+    roleEmoji: Map<string, string>,
     title?: string,
   ) {
     const embed = new EternityMessageEmbed();
@@ -39,7 +36,7 @@ export default class extends EternityCommandWSC {
       { name: 'Cargo', value: '', inline: true },
     ];
 
-    await async.forEach(emojiRoleMap.entries(), async ([emoji, roleId]) => {
+    await async.forEach(roleEmoji.entries(), async ([roleId, emoji]) => {
       const role = await guild.roles.fetch(roleId);
       const [emojiField, roleField] = fields;
 
@@ -56,97 +53,19 @@ export default class extends EternityCommandWSC {
     return new EternityMessageEmbed().setTitle(i18n.t('commands/RoleReaction:firstEmbed'));
   }
 
-  public subCommands = {
-    create: async (msg: EternityMessage, args: Args) => {
-      const document = await this.document(msg.guild.id);
-      const message = await msg.channel.send(this.firstEmbed);
+  private get roleReactionRepo() {
+    return getCustomRepository(RoleReactionRepository);
+  }
 
-      const messageContent: Message = {
-        emojiRoleMap: new Map(),
-        msgType: 'roleReaction',
-      };
+  public async create(msg: EternityMessage, args: Args) {
+  }
 
-      await args.pickResult('string')
-        .then((result) => { if (result.success) messageContent.title = result.value; });
+  public async delete(msg: EternityMessage, args: Args) {
+  }
 
-      document.set(`channels.${msg.channel.id}.messages.${message.id}`, messageContent);
-    },
+  public async add(msg: EternityMessage, args: Args) {
+  }
 
-    delete: async (msg: EternityMessage, args: Args) => {
-      const document = await this.document(msg.guild.id);
-      const messagesPath = `channels.${msg.channel.id}.messages`;
-      const messages = await document.get<Map<string, Message>>(messagesPath);
-
-      const roleReactionMessage = await args.pickResult('message')
-        .then((result) => {
-          if (result.success && messages.has(result.value.id)) {
-            return result.value;
-          }
-          throw new UserError({
-            identifier: 'invalidRoleReactionMessage',
-            message: 'commands/RoleReaction:delete:invalidRoleReactionMessage',
-          });
-        });
-
-      messages.delete(roleReactionMessage.id);
-      document.set(messagesPath, messages);
-      roleReactionMessage.delete();
-      (await msg.replyTranslated('commands/RoleReaction:delete:success'))
-        .delete({ timeout: 20000 });
-      msg.delete({ timeout: 20000 });
-    },
-
-    add: async (msg: EternityMessage, args: Args) => {
-      const document = await this.document(msg.guild.id);
-      const emoji = await args.pick('emoji');
-      const role = await args.pick('role');
-
-      const messages = await document.get<Map<string, Message>>(`channels.${msg.channel.id}.messages`, Map);
-      const roleEmojiMessage = await args.pickResult('message').then((result) => {
-        if (result.success && messages.has(result.value.id)) return result.value;
-        return msg.channel.messages.fetch(_.last([...messages.keys()]));
-      });
-
-      await roleEmojiMessage.react(emoji.toString());
-      const { emojiRoleMap, title } = messages.get(roleEmojiMessage.id);
-      emojiRoleMap.set(emoji.toString(), role.id);
-
-      await roleEmojiMessage.edit(await this.mapToEmbed(msg.guild, emojiRoleMap, title));
-      await document.set(
-        `channels.${msg.channel.id}.messages.${roleEmojiMessage.id}.emojiRoleMap`,
-        emojiRoleMap,
-      );
-
-      (await msg.replyTranslated('commands/RoleReaction:add:success'))
-        .delete({ timeout: 20000 });
-      msg.delete({ timeout: 20000 });
-    },
-
-    renew: async (msg: EternityMessage, args: Args) => {
-      const document = await this.document(msg.guild.id);
-
-      const messagesPath = `channels.${msg.channel.id}.messages`;
-      const messages = await document.get<Map<string, Message>>(`channels.${msg.channel.id}.messages`, Map);
-      const emojiRoleMessage = await args.pickResult('message').then((result) => {
-        if (result.success && messages.has(result.value.id)) return result.value;
-        return msg.channel.messages.fetch(_.last([...messages.keys()]));
-      });
-
-      const { emojiRoleMap, title } = messages.get(emojiRoleMessage.id);
-      const messageContent = emojiRoleMap.size > 0
-        ? await this.mapToEmbed(msg.guild, emojiRoleMap, title)
-        : this.firstEmbed;
-
-      const newEmojiRoleMessage = await msg.channel.send(messageContent);
-      messages.delete(emojiRoleMessage.id);
-      messages.set(newEmojiRoleMessage.id, { emojiRoleMap, msgType: 'roleReaction' });
-
-      await document.set(messagesPath, messages);
-
-      await emojiRoleMessage.delete();
-      (await msg.replyTranslated('commands/RoleReaction:renew:success'))
-        .delete({ timeout: 20000 });
-      msg.delete({ timeout: 20000 });
-    },
-  };
+  public async renew(msg: EternityMessage, args: Args) {
+  }
 }
