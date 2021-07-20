@@ -35,9 +35,11 @@ export abstract class BaseWarframe {
     const [
       resources,
       componentItems,
-    ] = biFilter<Component>(components.filter(({ name }) => name !== 'Blueprint'),
+    ] = biFilter<Component>(
+      components.filter(({ name }) => name !== 'Blueprint'),
       ({ uniqueName }: Item) => (
-        uniqueName.includes('Items')));
+        uniqueName.includes('Items')),
+    );
 
     if ('location' in bpSource && 'id' in bpSource) {
       const blueprintString = bpSource.id === 1

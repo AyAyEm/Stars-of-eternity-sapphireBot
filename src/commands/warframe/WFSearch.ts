@@ -33,7 +33,8 @@ export default class extends EternityCommand {
     const { channel, author } = msg;
     const fuzzySet = await this.fuzzySet;
     const matchedItems: { item: Item, score: number }[] = await async.map(
-      fuzzySet.get(itemName).slice(0, 3), async ([score, name]) => {
+      fuzzySet.get(itemName).slice(0, 3),
+      async ([score, name]) => {
         const item = await this.items.get(name);
         return { item, score };
       },
@@ -77,7 +78,9 @@ export default class extends EternityCommand {
   }
 
   public async sendItemMessage(
-    item: Item, msg: EternityMessage, previousSentMessage?: EternityMessage,
+    item: Item,
+    msg: EternityMessage,
+    previousSentMessage?: EternityMessage,
   ) {
     const { author } = msg;
     const embedsMap = itemToEmbed(item);
@@ -87,9 +90,8 @@ export default class extends EternityCommand {
     }
 
     const sentMessage = previousSentMessage
-      ? await previousSentMessage.edit(
-        undefined, [...(embedsMap?.values() || [])][0],
-      ) as EternityMessage
+      ? await previousSentMessage
+        .edit(undefined, [...(embedsMap?.values() || [])][0]) as EternityMessage
       : await msg.channel.send([...(embedsMap?.values() || [])][0]) as EternityMessage;
     const timerOptions = { time: 0, idle: 240000 };
     const collector = sentMessage
