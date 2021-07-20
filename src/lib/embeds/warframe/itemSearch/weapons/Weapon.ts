@@ -18,9 +18,7 @@ class WeaponEmbed extends BaseWeapon {
     if (specialAdjustment) return specialAdjustment(embed);
 
     const components = this.weapon.components || [];
-    const [resources, componentItems] = biFilter(components.filter(
-      ({ name }: Component) => name !== 'Blueprint',
-    ), ({ uniqueName }: Component) => (
+    const [resources, componentItems] = biFilter(components.filter(({ name }: Component) => name !== 'Blueprint'), ({ uniqueName }: Component) => (
       uniqueName.includes('Items')));
 
     if ('id' in this.bpSource && 'location' in this.bpSource) {

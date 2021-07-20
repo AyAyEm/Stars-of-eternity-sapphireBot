@@ -23,7 +23,8 @@ export class EternityMessage extends Structures.get('Message') {
     let toStop = false;
     const stopReactions = () => { toStop = true; };
 
-    const reactions = async.mapSeries<EmojiResolvable, MessageReaction | null>(emojis,
+    const reactions = async.mapSeries<EmojiResolvable, MessageReaction | null>(
+      emojis,
       async (emoji) => {
         if (toStop) return null;
 
@@ -31,7 +32,8 @@ export class EternityMessage extends Structures.get('Message') {
         // await for the reaction query to finish
         await reaction.fetch();
         return reaction;
-      });
+      },
+    );
 
     const then = async (callback: (reactions: MessageReaction[]) => unknown | Promise<unknown>) => (
       callback(await reactions));

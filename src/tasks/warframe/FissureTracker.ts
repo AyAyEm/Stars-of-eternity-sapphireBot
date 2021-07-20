@@ -1,35 +1,40 @@
-import { Task, TaskOptions } from '@lib/structures';
 import { ApplyOptions } from '@sapphire/decorators';
+import { getCustomRepository } from 'typeorm';
 import axios from 'axios';
 
-import type { Fissure } from '@lib/types/Warframe';
+import { Task, TaskOptions } from '#lib/structures';
+import { FissureRepository } from '#repositories';
 
-@ApplyOptions<TaskOptions>({ time: 10000 })
+import type { Fissure } from '#lib/types/Warframe';
+
+@ApplyOptions<TaskOptions>({ time: 60000 })
 export default class extends Task {
-  public document = new this.client.provider.Trackers({ id: { tracker: 'fissure' } });
-
   public fissuresUrl = 'https://api.warframestat.us/pc/fissures';
+
+  public get fissureRepo() {
+    return getCustomRepository(FissureRepository);
+  }
 
   public async run() {
     axios.get(this.fissuresUrl).then(async ({ data: fissuresData }: { data: Fissure[] }) => {
-      if (process.env.NODE_ENV !== 'production') await this.document.reload();
+      const { fissureRepo } = this;
+      const { activation: latestActivation = '0' } = (await fissureRepo.findLatest()) ?? {};
 
-      const activeFissures = fissuresData.filter(({ active }) => active);
+      const getTime = (timestamp: string) => new Date(timestamp).getTime();
 
-      const fissuresIds = await this.document.get<string[]>('data.cacheIds', []);
+      const activeInvasions = fissuresData.filter(({ active }) => active);
+      const newFissures = activeInvasions.filter(({ activation }) => (
+        getTime(activation) > getTime(latestActivation)));
 
-      const newFissures = activeFissures.filter((fissure) => !fissuresIds.includes(fissure.id));
       if (newFissures.length > 0) {
-        // this.client.emit('warframeNewFissures', newFissures);
-        this.client.emit('warframeNewActiveFissures', activeFissures);
+        await fissureRepo.insert(newFissures);
 
-        const updatedFissureIds = fissuresData.map(({ id }) => id);
-        await this.document.set('data.cacheIds', updatedFissureIds);
+        this.client.emit('warframeNewActiveFissures', newFissures);
       }
     })
       .catch((err) => {
         if (err.message.includes('Request failed')) return;
-        console.error(err);
+        this.client.console.error(err);
       });
   }
 }

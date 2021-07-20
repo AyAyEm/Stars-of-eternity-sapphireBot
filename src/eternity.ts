@@ -1,5 +1,3 @@
-import './development';
-
 import { EternityClient } from '@lib';
 import { config } from './config';
 

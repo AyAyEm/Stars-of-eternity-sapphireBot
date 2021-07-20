@@ -1,10 +1,10 @@
-import { MessageEmbed } from 'discord.js';
 import { timezone } from '@root/config';
 import moment from 'moment-timezone';
 import _ from 'lodash';
 
-import type { EternityMessageEmbed } from '@lib';
-import type { Fissure, RelicTiers } from '@lib/types/Warframe';
+import { EternityMessageEmbed } from '@lib';
+
+import type { Fissure } from '@lib/types/Warframe';
 
 // Fissures: Lith, Meso, Neo, Axi and Requiem
 const fissureIcons = [
@@ -52,20 +52,18 @@ function getMissionsFields(missionFissures: Fissure[]) {
   }];
 }
 
-export function fissuresEmbed(fissures: Fissure[]): Map<RelicTiers, EternityMessageEmbed> {
-  const fissuresMap = new Map(
-    [...Object.entries((_.groupBy(fissures, 'tier')))]
-      .sort(([tierA], [tierB]) => {
-        const { index: A = 0 } = fissureTiers.get(tierA) || {};
-        const { index: B = 0 } = fissureTiers.get(tierB) || {};
-        return B - A;
-      }),
-  );
+export function fissuresEmbed(fissures: Fissure[]): Map<number, EternityMessageEmbed> {
+  const fissuresMap = new Map([...Object.entries((_.groupBy(fissures, 'tier')))]
+    .sort(([tierA], [tierB]) => {
+      const { index: A = 0 } = fissureTiers.get(tierA) || {};
+      const { index: B = 0 } = fissureTiers.get(tierB) || {};
+      return B - A;
+    }));
 
-  const embedsMap = new Map();
+  const embedsMap: Map<number, EternityMessageEmbed> = new Map();
 
   fissuresMap.forEach((tierFissures, tier) => {
-    const { icon } = fissureTiers.get(tier) || {};
+    const { icon, index: tierNumber } = fissureTiers.get(tier) || {};
 
     const missionsTypes = _.uniqBy(tierFissures, 'missionType')
       .reduce((types, { missionType }, index, uniqFissures) => (
@@ -75,7 +73,7 @@ export function fissuresEmbed(fissures: Fissure[]): Map<RelicTiers, EternityMess
     const fields = Object.values(groupedByType)
       .flatMap(([...missionFissures]) => getMissionsFields(missionFissures));
 
-    const embed = new MessageEmbed()
+    const embed = new EternityMessageEmbed()
       .setTitle(`${tier} fendas ativas: ${tierFissures.length}`)
       .setAuthor(missionsTypes)
       .setDescription('')
@@ -84,8 +82,9 @@ export function fissuresEmbed(fissures: Fissure[]): Map<RelicTiers, EternityMess
       .setFooter('Horário de São Paulo')
       .addFields(...fields);
 
-    embedsMap.set(tier, embed);
+    embedsMap.set(tierNumber + 1, embed);
   });
+
   return embedsMap;
 }
 
