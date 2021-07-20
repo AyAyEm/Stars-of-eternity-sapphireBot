@@ -59,7 +59,7 @@
     "typeorm": "^0.2.34",
     "typeorm-naming-strategies": "^2.0.0",
     "utf-8-validate": "^5.0.3",
-    "warframe-items": "^1.1199.0",
+    "warframe-items": "^1.1248.9",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
