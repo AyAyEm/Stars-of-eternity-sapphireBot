@@ -5,7 +5,7 @@
   "main": "dist/eternity.js",
   "scripts": {
     "start": "node .",
-    "dev": "tsc-watch -p ./src/tsconfig.json --compiler ./node_modules/ttypescript/lib/tsc.js --onSuccess \"node ./dist/eternity.js\"",
+    "dev": "tsc-watch -p ./src/tsconfig.json --compiler ./node_modules/ttypescript/lib/tsc.js --onSuccess \"node -r source-map-support/register ./dist/eternity.js\"",
     "build": "ttsc -b src",
     "build:start": "npm run build && npm run start",
     "build:clean": "ttsc -b src --clean && npm run build",
