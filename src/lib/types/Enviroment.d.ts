@@ -6,6 +6,7 @@ declare global {
       DB_PASSWORD: string;
       DB_PORT: string;
       TS_NODE_DEV: string;
+      NODE_ENV: 'production' | 'development';
     }
   }
 }
