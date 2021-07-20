@@ -16,7 +16,7 @@ export const config: ConnectionOptions = {
   password: process.env.DB_PASSWORD,
   database: 'starsOfEternity',
   synchronize: false,
-  logging: 'all',
+  logging: process.env.NODE_ENV === 'development' ? 'all' : false,
   namingStrategy: new SnakeNamingStrategy(),
   entities: [...Object.values(entities)],
   migrations: [
