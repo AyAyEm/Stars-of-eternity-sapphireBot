@@ -90,7 +90,13 @@
       "import { ${1:$TM_FILENAME_BASE} } from '#models';",
       "",
       "@EntityRepository($1)",
-      "export class $1Repository extends BaseRepository<$1> { $0}",
+      "export class $1Repository extends BaseRepository<$1> {",
+      "public async findOrInsert($2, onlyId?: boolean) { }",
+      "",
+      "public async find($2, onlyId?: boolean) { }",
+      "",
+      "public findQuery($2) { }$0",
+      "}",
       ""
     ]
   }
