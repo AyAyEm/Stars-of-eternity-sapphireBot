@@ -49,27 +49,30 @@ export default class extends EternityEvent<'warframeNewInvasions'> {
   }
 
   private makeEmbeds(invasion: InvasionData, matchedItems: string[]): MessageEmbed[] {
-    function embedMaker([reward, defendingFaction, attackingFaction]: [Reward, string, string]) {
+    function embedMaker([reward, ...factions]: [Reward, string, string]) {
       const { factionsStyle } = Warframe;
 
       return new MessageEmbed()
         .setTitle(`${reward.itemString}`)
         .setThumbnail(reward.thumbnail)
         .setTimestamp()
-        .setColor(factionsStyle.get(defendingFaction)?.color || 'white')
-        .setAuthor(`${invasion.node} ${invasion.desc}`, factionsStyle.get(defendingFaction)?.tumb)
-        .setFooter(`${defendingFaction} x ${attackingFaction}`, factionsStyle.get(attackingFaction)?.tumb);
+        .setColor(factionsStyle.get(factions[0])?.color || 'white')
+        .setAuthor(`${invasion.node} ${invasion.desc}`, factionsStyle.get(factions[0])?.tumb)
+        .setFooter(`${factions[0]} x ${factions[1]}`, factionsStyle.get(factions[1])?.tumb);
     }
 
     const embeds = new Set<MessageEmbed>();
-    const numbOfItems = matchedItems.length;
     const {
-      attackingFaction, defendingFaction, attackerReward, defenderReward, rewardTypes,
+      attackingFaction,
+      defendingFaction,
+      attackerReward,
+      defenderReward,
+      rewardTypes,
     } = invasion;
 
     if (attackingFaction === 'Infested') {
       embeds.add(embedMaker([defenderReward, attackingFaction, defendingFaction]));
-      if (numbOfItems === 1) return [...embeds];
+      if (matchedItems.length === 1) return [...embeds];
     }
 
     if (matchedItems.includes(rewardTypes[0])) {
