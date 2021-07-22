@@ -1,63 +1,72 @@
-import axios from 'axios';
 import _ from 'lodash';
-import async from 'async';
+import axios from 'axios';
 import fse from 'fs-extra';
 import path from 'path';
+import JSONStream from 'JSONStream';
+import es from 'event-stream';
 
+import type { Readable } from 'stream';
 import type { Item } from 'warframe-items';
-import type { Awaited } from '@sapphire/framework';
-
-import Root from 'app-root-path';
 
 export class Items {
-  public readonly dir = path.join(Root.path, 'data/warframe-items');
+  public readonly dir = 'data/warframe-items';
 
-  public readonly source = 'https://raw.githubusercontent.com/WFCD/warframe-items/development/data/json/All.json';
+  public readonly source = 'https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/All.json';
 
-  private _uniqueNameDict: Record<string, string>;
+  private uniqueNameDict: Map<string, string | string[]>;
 
   public latestUpdate?: Date;
 
-  public getUniqueNameDict(): Awaited<Record<string, string>> {
-    if (!this._uniqueNameDict) {
-      const result = import(`${this.dir}.json`)
-        .catch(() => this.create())
-        .then(() => import(`${this.dir}.json`))
-        .catch(console.error);
+  private async _getUniqueNames() {
+    return new Map<string, string | string[]>(Object.entries(await fse.readJson(`${this.dir}.json`)));
+  }
 
-      result.then((uniqueNameDict: Record<string, string>) => {
-        if (uniqueNameDict) this._uniqueNameDict = uniqueNameDict;
-      });
-
-      return result;
+  public async getUniqueNames() {
+    if (!this.uniqueNameDict) {
+      try {
+        this.uniqueNameDict = await this._getUniqueNames();
+      } catch {
+        await this.create();
+        this.uniqueNameDict = await this._getUniqueNames();
+      }
     }
-    return this._uniqueNameDict;
+
+    return this.uniqueNameDict;
   }
 
   public async create() {
-    const { data }: { data: Item[] } = await axios.get(this.source);
+    const { data } = await axios.get<Readable>(this.source, { responseType: 'stream' });
 
-    const dataDict = _.fromPairs(_.map(data, ({ name, uniqueName }) => (
-      [name.toLowerCase(), uniqueName])));
+    await new Promise((resolve, reject) => {
+      const writes = [];
+      data
+        .pipe(JSONStream.parse('*'))
+        .pipe(es.mapSync((item: Item) => {
+          writes.push(fse.outputJson(path.join(this.dir, item.uniqueName), item));
+          return { [item.name.toLowerCase()]: item.uniqueName };
+        }))
+        .pipe(es.writeArray((err: Error, t: Record<string, string[]>[]) => {
+          if (err) reject(err);
+          // eslint-disable-next-line consistent-return
+          const uniqueNames = t.reduce((acc, uniqueName) => _.mergeWith(acc, uniqueName, (a, b) => {
+            if (a) {
+              if (_.isArray(a)) return a.concat(b);
+              if (_.isArray(b)) return b.concat(a);
 
-    this._uniqueNameDict = dataDict;
-    fse.outputJson(`${this.dir}.json`, dataDict);
+              return [a, b];
+            }
+          }));
 
-    const operations = data.map((item) => async () => (
-      fse.outputJson(path.join(this.dir, `${item.uniqueName}.json`), item)));
-
-    return new Promise((resolve, reject) => {
-      async.parallelLimit(operations, 64, (error) => {
-        if (error) reject(error);
-        else resolve(undefined);
-      });
-      this.latestUpdate = new Date();
+          writes.push(fse.outputJSON('data/warframe-items.json', uniqueNames));
+          resolve(Promise.all(writes));
+        }));
     });
   }
 
   public async get(name: string): Promise<Item | null> {
-    const uniqueNameDict = await this.getUniqueNameDict();
+    const uniqueNames = await this.getUniqueNames();
+    const uniqueName = uniqueNames.get(name.toLowerCase());
 
-    return import(path.join(this.dir, uniqueNameDict[name.toLowerCase()]));
+    return fse.readJSON(path.join(this.dir, typeof uniqueName === 'string' ? uniqueName : uniqueName[0]));
   }
 }

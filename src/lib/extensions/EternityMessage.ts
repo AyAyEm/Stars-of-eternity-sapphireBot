@@ -21,7 +21,6 @@ export class EternityMessage extends Structures.get('Message') {
    */
   public multiReact(emojis: IterableCollection<EmojiResolvable>) {
     let toStop = false;
-    const stopReactions = () => { toStop = true; };
 
     const reactions = async.mapSeries<EmojiResolvable, MessageReaction | null>(
       emojis,
@@ -37,6 +36,11 @@ export class EternityMessage extends Structures.get('Message') {
 
     const then = async (callback: (reactions: MessageReaction[]) => unknown | Promise<unknown>) => (
       callback(await reactions));
+
+    const stopReactions = () => {
+      toStop = true;
+      return { then };
+    };
 
     return { then, stopReactions };
   }

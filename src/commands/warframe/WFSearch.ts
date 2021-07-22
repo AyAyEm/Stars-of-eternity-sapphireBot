@@ -1,37 +1,48 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { EternityCommand, EternityMessage } from '@lib';
-import { CommandOptions, Args } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
+import i18n from 'i18next';
 import async from 'async';
 import FuzzySet from 'fuzzyset.js';
+import { ApplyOptions } from '@sapphire/decorators';
+import { MessageEmbed } from 'discord.js';
 
-import itemToEmbed from '@embeds/warframe/itemSearch';
-import { numberEmojis } from '@utils/Constants';
+import type { Args } from '@sapphire/framework';
+import type { CollectorFilter } from 'discord.js';
+import type { Item, Category } from 'warframe-items';
 
-import type { User, GuildMember } from 'discord.js';
-import type { Item } from 'warframe-items';
+import { WarframePagedEmbed, WeaponPagedEmbed, ModPagedEmbed } from '#embeds/warframe/itemSearch';
+import { numberEmojis, MultiEntryMap } from '#utils';
+import { EternityCommand, EternityMessage, EternityCommandOptions } from '#lib';
 
-function isAuthorFilter(author: User | GuildMember) {
-  return function checkIfUserIsAuthor(_: any, user: User) {
-    return author.id === user.id;
-  };
-}
+import type { BaseItemPagedEmbed } from '#embeds/warframe/itemSearch/BaseItem';
 
-@ApplyOptions<CommandOptions>({
+type ItemCategory = Category | 'Arch-Gun' | 'Arch-Melee';
+
+@ApplyOptions<EternityCommandOptions>({
   aliases: ['wfs'],
   preconditions: ['GuildOnly'],
 })
 export default class extends EternityCommand {
   public items = this.client.warframe.items;
 
-  public itemNames = Promise.resolve(this.items.getUniqueNameDict()).then(Object.keys);
+  public fuzzySet: FuzzySet;
 
-  public fuzzySet = this.itemNames.then(FuzzySet);
+  public categoryDictionary = new MultiEntryMap<ItemCategory, typeof BaseItemPagedEmbed>([
+    [['Arch-Gun', 'Arch-Melee', 'Melee', 'Primary', 'Secondary'], WeaponPagedEmbed],
+    [['Archwing', 'Warframes'], WarframePagedEmbed],
+    [['Mods'], ModPagedEmbed],
+  ]);
+
+  public async onLoad() {
+    super.onLoad();
+    const uniqueNames = await this.items.getUniqueNames();
+
+    this.fuzzySet = FuzzySet([...uniqueNames.keys()]);
+  }
 
   public async run(msg: EternityMessage, args: Args) {
+    const { channel } = msg;
+    const { fuzzySet } = this;
+
     const itemName = await args.rest('string');
-    const { channel, author } = msg;
-    const fuzzySet = await this.fuzzySet;
     const matchedItems: { item: Item, score: number }[] = await async.map(
       fuzzySet.get(itemName).slice(0, 3),
       async ([score, name]) => {
@@ -40,77 +51,54 @@ export default class extends EternityCommand {
       },
     );
 
+    let warframeItem = matchedItems[0].item;
+    let noMatchMessage: EternityMessage | null = null;
     if ((matchedItems[0].score || 0) < 0.7) {
       const matchItemsString = matchedItems
         .map(({ item }, index: number) => `${numberEmojis[index + 1]} ${item.name} ${item.category}`);
 
       const noMatchEmbed = new MessageEmbed()
-        .setTitle('Item não encontrado')
-        .setDescription(`Selecione um dos seguintes items:\n\n${matchItemsString.join('\n\n')}`);
+        .setTitle(i18n.t('commands/WFSearch:itemNotFound'))
+        .setDescription(i18n.t('commands/WFSearch:selectOneOf', { items: matchItemsString.join('\n\n') }));
 
-      const noMatchMessage = (await channel.send(noMatchEmbed)) as EternityMessage;
+      noMatchMessage = (await channel.send(noMatchEmbed)) as EternityMessage;
       const collector = noMatchMessage
-        .createReactionCollector(isAuthorFilter(author), { time: 15000 });
+        .createReactionCollector(() => true, { time: 15000 });
+
       const reactions = noMatchMessage.multiReact([...numberEmojis.slice(1, 4), '❌']);
+
+      let collectedReaction = false;
       collector.on('collect', async (reaction) => {
         if (reaction.emoji.name === '❌') {
           collector.stop('User decided to stop');
-          return;
-        }
+        } else if (!collectedReaction) {
+          collectedReaction = true;
 
-        reactions.stopReactions();
-        await reactions;
-        const index = numberEmojis.indexOf(reaction.emoji.name);
-        reaction.message.reactions.removeAll();
-        collector.stop('Reaction defined');
-        this.sendItemMessage(matchedItems[index - 1].item, msg, noMatchMessage as EternityMessage);
+          await reactions.stopReactions();
+          const index = numberEmojis.indexOf(reaction.emoji.name);
+          reaction.message.reactions.removeAll();
+          collector.stop('Reaction defined');
+
+          warframeItem = matchedItems[index - 1].item;
+        }
       });
 
       collector.on('end', (_, endingReason) => {
         if (endingReason === 'time' || endingReason === 'User decided to stop') {
-          // msg.delete({ endingReason });
+          msg.delete();
           collector.message.delete({ reason: endingReason });
         }
       });
+    }
+
+    const PagedEmbed = this.categoryDictionary.get(warframeItem.category);
+    if (PagedEmbed) {
+      const context = { client: this.client, item: warframeItem, channel: msg.channel };
+      const filter: CollectorFilter = (_, user) => user.id === msg.author.id;
+      const pagedEmbed = new PagedEmbed(context, { filter });
+      pagedEmbed.send(noMatchMessage);
     } else {
-      this.sendItemMessage(matchedItems[0].item, msg);
+      msg.replyTranslated('commands/WFSearch:invalidQuery');
     }
-  }
-
-  public async sendItemMessage(
-    item: Item,
-    msg: EternityMessage,
-    previousSentMessage?: EternityMessage,
-  ) {
-    const { author } = msg;
-    const embedsMap = itemToEmbed(item);
-    if (!embedsMap) {
-      msg.channel.sendTranslated('commands/WFSearch:invalidQuery', [{ item }]);
-      return;
-    }
-
-    const sentMessage = previousSentMessage
-      ? await previousSentMessage
-        .edit(undefined, [...(embedsMap?.values() || [])][0]) as EternityMessage
-      : await msg.channel.send([...(embedsMap?.values() || [])][0]) as EternityMessage;
-    const timerOptions = { time: 0, idle: 240000 };
-    const collector = sentMessage
-      .createReactionCollector(isAuthorFilter(author), { ...timerOptions, dispose: true });
-    collector.on('collect', (reaction) => {
-      if (reaction.emoji.name === '❌') {
-        collector.stop('User decided to end it');
-        return;
-      }
-      sentMessage.edit(undefined, embedsMap?.get(reaction.emoji.name));
-      collector.resetTimer(timerOptions);
-      reaction.users.remove(author);
-    });
-    collector.on('end', () => {
-      // const reason = 'Command ended';
-      // msg.delete({ reason });
-      // collector.message.delete({ reason });
-      collector.message.reactions.removeAll();
-    });
-    sentMessage.multiReact([...(embedsMap?.keys() || []), '❌']);
   }
 }
