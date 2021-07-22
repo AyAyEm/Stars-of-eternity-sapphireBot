@@ -12,35 +12,35 @@ const typeorm_2 = require("../../lib/typeorm");
 let default_1 = class extends _lib_1.EternityCommandWSC {
     possibleItemsEmbed = new _lib_1.EternityMessageEmbed()
         .addFields({
-        name: i18next_1.default.t('commands/Invasion:listItems:commonResources'),
+        name: i18next_1.default.t('commands/invasion:listItems:commonResources'),
         value: utils_1.itemNames.commonItems.join(' | '),
         inline: false,
     }, {
-        name: i18next_1.default.t('commands/Invasion:listItems:uncommonResources'),
+        name: i18next_1.default.t('commands/invasion:listItems:uncommonResources'),
         value: utils_1.itemNames.uncommonItems.join(' | '),
         inline: false,
     }, {
-        name: i18next_1.default.t('commands/Invasion:listItems:rareResources'),
+        name: i18next_1.default.t('commands/invasion:listItems:rareResources'),
         value: utils_1.itemNames.rareItems.join(' | '),
         inline: false,
     }, {
-        name: i18next_1.default.t('commands/Invasion:listItems:weapons'),
+        name: i18next_1.default.t('commands/invasion:listItems:weapons'),
         value: utils_1.itemNames.weapons.join(' | '),
         inline: false,
     }, {
-        name: i18next_1.default.t('commands/Invasion:listItems:bestItems'),
+        name: i18next_1.default.t('commands/invasion:listItems:bestItems'),
         value: utils_1.itemNames.goodOnes.join(' | '),
         inline: false,
     }, {
-        name: i18next_1.default.t('commands/Invasion:listItems:factionItems'),
+        name: i18next_1.default.t('commands/invasion:listItems:factionItems'),
         value: utils_1.itemNames.faction.join(' | '),
         inline: false,
     }, {
-        name: i18next_1.default.t('commands/Invasion:listItems:others'),
+        name: i18next_1.default.t('commands/invasion:listItems:others'),
         value: utils_1.itemNames.others.join(' | '),
         inline: false,
     })
-        .setTitle(i18next_1.default.t('commands/Invasion:listItems:title'));
+        .setTitle(i18next_1.default.t('commands/invasion:listItems:title'));
     itemsDict = new CaseInsensitiveMap_1.CaseInsensitiveMap(utils_1.itemNames.all.map((item) => ([item.toLowerCase(), { name: item }])));
     get invasionTrackerRepo() {
         return typeorm_1.getCustomRepository(typeorm_2.InvasionTrackerRepository);
@@ -52,10 +52,10 @@ let default_1 = class extends _lib_1.EternityCommandWSC {
         if (args.getFlags('list', 'l')) {
             const items = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
             if (items.length === 0) {
-                await msg.replyTranslated('commands/Invasion:items:notFound');
+                await msg.replyTranslated('commands/invasion:items:notFound');
             }
             else {
-                await msg.replyTranslated('commands/Invasion:items:found', [{ items: items.map(({ name }) => name) }]);
+                await msg.replyTranslated('commands/invasion:items:found', [{ items: items.map(({ name }) => name) }]);
             }
         }
         else {
@@ -72,7 +72,7 @@ let default_1 = class extends _lib_1.EternityCommandWSC {
         const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel);
         const action = value ? 'enable' : 'disable';
         if (invasionTracker.enabled === value) {
-            await msg.replyTranslated(`commands/Invasion:${action}:already${lodash_1.capitalize(action)}d`);
+            await msg.replyTranslated(`commands/invasion:${action}:already${lodash_1.capitalize(action)}d`);
             return;
         }
         await this.invasionTrackerRepo.createQueryBuilder()
@@ -80,7 +80,7 @@ let default_1 = class extends _lib_1.EternityCommandWSC {
             .set({ enabled: value })
             .where('invasion_tracker.id = :invasionTrackerId', { invasionTrackerId: invasionTracker.id })
             .execute();
-        const reply = await msg.replyTranslated(`commands/Invasion:${action}:success`);
+        const reply = await msg.replyTranslated(`commands/invasion:${action}:success`);
         reply.delete({ timeout: 10000 });
     }
     async add(msg, args) {
@@ -101,7 +101,7 @@ let default_1 = class extends _lib_1.EternityCommandWSC {
             return action === 'add' ? !hasItem : hasItem;
         });
         if (parsedToUpdateItems.length <= 0) {
-            msg.replyTranslated(`commands/Invasion:${action}:already${action === 'add' ? 'Added' : 'Deleted'}${all ? 'All' : ''}`, [{ items: toUpdateItems }]);
+            msg.replyTranslated(`commands/invasion:${action}:already${action === 'add' ? 'Added' : 'Deleted'}${all ? 'All' : ''}`, [{ items: toUpdateItems }]);
             return;
         }
         const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel, true);
@@ -113,7 +113,7 @@ let default_1 = class extends _lib_1.EternityCommandWSC {
                 .of(invasionTracker);
             await (action === 'add' ? query.add(item) : query.remove(item));
         }));
-        msg.replyTranslated(`commands/Invasion:${action}:success${all ? 'All' : ''}`, [{ items: [...parsedToUpdateItems].map(({ name }) => name) }]);
+        msg.replyTranslated(`commands/invasion:${action}:success${all ? 'All' : ''}`, [{ items: [...parsedToUpdateItems].map(({ name }) => name) }]);
     }
 };
 default_1 = tslib_1.__decorate([
