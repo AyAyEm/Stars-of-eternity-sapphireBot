@@ -7,7 +7,7 @@ import { masteryRankImgs, rivenDisposition, ItemUtilities } from '#utils';
 import { EternityMessageEmbed } from '#lib/extensions';
 import { InitPagedEmbed, Page } from '#decorators';
 
-import { specialItems } from './specialItems';
+import { specialItems } from './SpecialItems';
 import { BaseItemPagedEmbed } from './BaseItem';
 
 @InitPagedEmbed()
