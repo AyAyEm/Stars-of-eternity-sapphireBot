@@ -3,7 +3,7 @@ import '@sapphire/plugin-i18next/register';
 import { SapphireClient } from '@sapphire/framework';
 import { mergeDefault } from '@sapphire/utilities';
 import { ClientOptions } from 'discord.js';
-import { clientOptions } from '@utils/I18n';
+import { i18nClientOptions } from '@utils/I18n';
 
 import { createConnection, Connection } from 'typeorm';
 
@@ -35,7 +35,7 @@ export class EternityClient extends SapphireClient {
 
   constructor(options?: ClientOptions) {
     // @ts-expect-error Type instantiation is excessively deep and possibly infinite. ts(2589)
-    super(mergeDefault(clientOptions, { ...options, caseInsensitiveCommands: true }));
+    super(mergeDefault(i18nClientOptions, { ...options, caseInsensitiveCommands: true }));
 
     this.stores.register(this.tasks)
       .registerUserDirectories();

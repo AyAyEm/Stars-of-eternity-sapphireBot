@@ -6,7 +6,7 @@ import i18next from 'i18next';
 import { list } from './LanguageFunctions';
 import { EternityFormatters } from './Enums';
 
-export const clientOptions = {
+export const i18nClientOptions = {
   i18n: {
     defaultName: 'pt-BR',
     defaultLanguageDirectory: path.resolve(__dirname.split('lib')[0], 'languages'),
