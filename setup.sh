@@ -4,6 +4,9 @@ echo
 echo "Insert database host"
 read DB_HOST
 echo
+echo "Insert database name"
+read DB_NAME
+echo
 echo "Insert database username"
 read DB_USERNAME
 echo
@@ -15,6 +18,7 @@ read DB_PORT
 
 echo "DISCORD_TOKEN=$DISCORD_TOKEN" >> .env
 echo "DB_HOST=$DB_HOST" >> .env
+echo "DB_NAME=$DB_NAME" >> .env
 echo "DB_USERNAME=$DB_USERNAME" >> .env
 echo "DB_PASSWORD=$DB_PASSWORD" >> .env
 echo "DB_PORT=$DB_PORT" >> .env
