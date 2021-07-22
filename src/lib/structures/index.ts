@@ -4,3 +4,4 @@ export * from './EternityBasePiece';
 export * from './typeorm';
 export * from './CaseInsensitiveMap';
 export * from './CaseInsensitiveSet';
+export * from './PagedEmbed';
