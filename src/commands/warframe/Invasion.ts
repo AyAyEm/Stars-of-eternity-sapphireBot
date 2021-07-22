@@ -39,42 +39,42 @@ export default class extends EternityCommandWSC {
   public possibleItemsEmbed = new EternityMessageEmbed()
     .addFields(
       {
-        name: i18n.t('commands/Invasion:listItems:commonResources'),
+        name: i18n.t('commands/invasion:listItems:commonResources'),
         value: itemNames.commonItems.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/Invasion:listItems:uncommonResources'),
+        name: i18n.t('commands/invasion:listItems:uncommonResources'),
         value: itemNames.uncommonItems.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/Invasion:listItems:rareResources'),
+        name: i18n.t('commands/invasion:listItems:rareResources'),
         value: itemNames.rareItems.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/Invasion:listItems:weapons'),
+        name: i18n.t('commands/invasion:listItems:weapons'),
         value: itemNames.weapons.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/Invasion:listItems:bestItems'),
+        name: i18n.t('commands/invasion:listItems:bestItems'),
         value: itemNames.goodOnes.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/Invasion:listItems:factionItems'),
+        name: i18n.t('commands/invasion:listItems:factionItems'),
         value: itemNames.faction.join(' | '),
         inline: false,
       },
       {
-        name: i18n.t('commands/Invasion:listItems:others'),
+        name: i18n.t('commands/invasion:listItems:others'),
         value: itemNames.others.join(' | '),
         inline: false,
       },
     )
-    .setTitle(i18n.t('commands/Invasion:listItems:title'));
+    .setTitle(i18n.t('commands/invasion:listItems:title'));
 
   public itemsDict = new CaseInsensitiveMap<string, WarframeItem>(itemNames.all.map((item) => (
     [item.toLowerCase(), { name: item } as WarframeItem])));
@@ -92,10 +92,10 @@ export default class extends EternityCommandWSC {
       const items = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
 
       if (items.length === 0) {
-        await msg.replyTranslated('commands/Invasion:items:notFound');
+        await msg.replyTranslated('commands/invasion:items:notFound');
       } else {
         await msg.replyTranslated(
-          'commands/Invasion:items:found',
+          'commands/invasion:items:found',
           [{ items: items.map(({ name }) => name) }],
         );
       }
@@ -117,7 +117,7 @@ export default class extends EternityCommandWSC {
 
     const action = value ? 'enable' : 'disable';
     if (invasionTracker.enabled === value) {
-      await msg.replyTranslated(`commands/Invasion:${action}:already${capitalize(action)}d`);
+      await msg.replyTranslated(`commands/invasion:${action}:already${capitalize(action)}d`);
       return;
     }
 
@@ -127,7 +127,7 @@ export default class extends EternityCommandWSC {
       .where('invasion_tracker.id = :invasionTrackerId', { invasionTrackerId: invasionTracker.id })
       .execute();
 
-    const reply = await msg.replyTranslated(`commands/Invasion:${action}:success`);
+    const reply = await msg.replyTranslated(`commands/invasion:${action}:success`);
     reply.delete({ timeout: 10000 });
   }
 
@@ -157,7 +157,7 @@ export default class extends EternityCommandWSC {
 
     if (parsedToUpdateItems.length <= 0) {
       msg.replyTranslated(
-        `commands/Invasion:${action}:already${action === 'add' ? 'Added' : 'Deleted'}${all ? 'All' : ''}`,
+        `commands/invasion:${action}:already${action === 'add' ? 'Added' : 'Deleted'}${all ? 'All' : ''}`,
         [{ items: toUpdateItems }],
       );
       return;
@@ -176,7 +176,7 @@ export default class extends EternityCommandWSC {
     }));
 
     msg.replyTranslated(
-      `commands/Invasion:${action}:success${all ? 'All' : ''}`,
+      `commands/invasion:${action}:success${all ? 'All' : ''}`,
       [{ items: [...parsedToUpdateItems].map(({ name }) => name) }],
     );
   }
