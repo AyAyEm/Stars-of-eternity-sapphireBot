@@ -1,14 +1,7 @@
 import { Task } from "../../lib/structures";
+import { InvasionRepository } from "../../lib/typeorm/repositories";
 export default class InvasionTracker extends Task {
-    document: {
-        document: any;
-        query: import("../../lib/providers").Query;
-        load: Promise<any>;
-        reload(): Promise<any>;
-        get<Result = unknown>(path: string, defaultType?: unknown): Promise<Result>;
-        set<Value = unknown>(path: string, value: Value): Promise<any>;
-    };
     invasionUrl: string;
-    onLoad(): Promise<void>;
+    get invasionRepo(): InvasionRepository;
     run(): Promise<void>;
 }

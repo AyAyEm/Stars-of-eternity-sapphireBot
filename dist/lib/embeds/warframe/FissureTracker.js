@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fissuresEmbed = void 0;
 const tslib_1 = require("tslib");
-const discord_js_1 = require("discord.js");
 const config_1 = require("../../../config");
 const moment_timezone_1 = tslib_1.__importDefault(require("moment-timezone"));
 const lodash_1 = tslib_1.__importDefault(require("lodash"));
+const _lib_1 = require("../..");
 // Fissures: Lith, Meso, Neo, Axi and Requiem
 const fissureIcons = [
     'https://i.imgur.com/ZSxJCTI.png',
@@ -54,13 +54,13 @@ function fissuresEmbed(fissures) {
     }));
     const embedsMap = new Map();
     fissuresMap.forEach((tierFissures, tier) => {
-        const { icon } = fissureTiers.get(tier) || {};
+        const { icon, index: tierNumber } = fissureTiers.get(tier) || {};
         const missionsTypes = lodash_1.default.uniqBy(tierFissures, 'missionType')
             .reduce((types, { missionType }, index, uniqFissures) => (`${types} ${missionType}${index === uniqFissures.length - 1 ? '' : ','}`), '');
         const groupedByType = lodash_1.default.groupBy(tierFissures, 'missionType');
         const fields = Object.values(groupedByType)
             .flatMap(([...missionFissures]) => getMissionsFields(missionFissures));
-        const embed = new discord_js_1.MessageEmbed()
+        const embed = new _lib_1.EternityMessageEmbed()
             .setTitle(`${tier} fendas ativas: ${tierFissures.length}`)
             .setAuthor(missionsTypes)
             .setDescription('')
@@ -68,7 +68,7 @@ function fissuresEmbed(fissures) {
             .setTimestamp()
             .setFooter('Horário de São Paulo')
             .addFields(...fields);
-        embedsMap.set(tier, embed);
+        embedsMap.set(tierNumber + 1, embed);
     });
     return embedsMap;
 }

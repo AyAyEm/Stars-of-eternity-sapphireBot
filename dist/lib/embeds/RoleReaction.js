@@ -8,19 +8,16 @@ async function mapToEmbed(guild, rolesEmoji, title) {
     const fields = [
         { name: 'Emoji', value: '', inline: true },
         { name: 'Cargo', value: '', inline: true },
-        { name: 'Descrição', value: '', inline: true },
     ];
     // const roleMap = new Map([...reactionRoleMap.entries()].reverse());
     const roleMap = rolesEmoji;
-    await roleMap.forEach(async ({ roleID, description }, emojiId) => {
+    await roleMap.forEach(async ({ roleId: roleID }, emojiId) => {
         const role = await guild.roles.fetch(roleID);
         const emoji = unicodeEmojiRegex.test(emojiId) ? emojiId : guild.emojis.resolve(emojiId);
         const emojiIcon = typeof emoji === 'object' ? `<:${emoji?.name}:${emoji?.id}>` : emoji;
-        const [emojiField, roleField, descriptionField] = fields;
-        const embedDescription = description || 'Clique na reação para se ganhar este cargo';
+        const [emojiField, roleField] = fields;
         roleField.value += `${role?.name}\n`;
         emojiField.value += `${emojiIcon}\n`;
-        descriptionField.value += `${embedDescription}\n`;
     });
     if (title)
         embed.setTitle(title);

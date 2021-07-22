@@ -1,13 +1,7 @@
 import { Task } from "../../lib/structures";
+import { FissureRepository } from "../../lib/typeorm/repositories";
 export default class extends Task {
-    document: {
-        document: any;
-        query: import("../../lib/providers").Query;
-        load: Promise<any>;
-        reload(): Promise<any>;
-        get<Result = unknown>(path: string, defaultType?: unknown): Promise<Result>;
-        set<Value = unknown>(path: string, value: Value): Promise<any>;
-    };
     fissuresUrl: string;
+    get fissureRepo(): FissureRepository;
     run(): Promise<void>;
 }

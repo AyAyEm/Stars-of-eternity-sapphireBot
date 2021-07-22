@@ -23,16 +23,20 @@
     },
     "add": {
         "channelNotConfigured": "Este canal não está configurado para invasões!",
-        "success": "Items adicionados com sucesso! Items: `{{items, andList}}`"
+        "alreadyAdded": "Estes items já foram adicionados ao canal! Items: `{{items, andList}}`",
+        "success": "Items adicionados com sucesso! Items: `{{items, andList}}`",
+        "successAll": "Todos os items foram adicionados com sucesso!",
+        "alreadyAddedAll": "Todos os items já foram adicionados, não tem nenhum sobrando."
     },
     "addAll": {
-        "success": "Todos os items foram adicionados com sucesso!"
+        "success": "Todos os items foram adicionados com sucesso!",
+        "alreadyAdded": "Todos os items já foram adicionados, não tem nenhum sobrando."
     },
     "delete": {
         "channelNotConfigured": "Este canal não está configurado para invasões!",
-        "success": "Items removidos com sucesso! Items: `{{items, andList}}`"
-    },
-    "deleteAll": {
-        "success": "Todos os items foram removidos com sucesso!"
+        "success": "Items removidos com sucesso! Items: `{{items, andList}}`",
+        "alreadyDeleted": "Os items passados já foram removidos! `{{items, andList}}`",
+        "successAll": "Todos os items foram removidos com sucesso!",
+        "alreadyDeletedAll": "Todos os items já foram removidos, não tem nenhum sobrando."
     }
 }

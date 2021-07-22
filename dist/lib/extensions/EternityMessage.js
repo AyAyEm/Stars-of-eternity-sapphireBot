@@ -12,7 +12,6 @@ class EternityMessage extends discord_js_1.Structures.get('Message') {
      */
     multiReact(emojis) {
         let toStop = false;
-        const stopReactions = () => { toStop = true; };
         const reactions = async_1.default.mapSeries(emojis, async (emoji) => {
             if (toStop)
                 return null;
@@ -22,6 +21,10 @@ class EternityMessage extends discord_js_1.Structures.get('Message') {
             return reaction;
         });
         const then = async (callback) => (callback(await reactions));
+        const stopReactions = () => {
+            toStop = true;
+            return { then };
+        };
         return { then, stopReactions };
     }
 }

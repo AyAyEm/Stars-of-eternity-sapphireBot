@@ -1,13 +1,14 @@
 /// <reference types="node" />
+import '@sapphire/plugin-i18next/register';
 import { SapphireClient } from '@sapphire/framework';
 import { ClientOptions } from 'discord.js';
-import { Mongoose } from './providers';
+import { Connection } from 'typeorm';
 import { TaskStore } from './structures';
 import { Items } from './eternity/warframe';
 import './Extenders';
 export declare class EternityClient extends SapphireClient {
     tasks: TaskStore;
-    provider: Mongoose;
+    connection: Connection;
     fetchPrefix: () => string;
     fetchLanguage: () => string;
     warframe: {
@@ -23,4 +24,5 @@ export declare class EternityClient extends SapphireClient {
      * Returns an invitation link for the bot.
      */
     get invite(): string;
+    login(token?: string): Promise<string>;
 }

@@ -1,3 +1,5 @@
 {
-    "invalidQuery": "O item: {{item.name}} que você tentou pesquisar é inválido ou ainda não está disponível para consulta."
+    "invalidQuery": "O item: {{item.name}} que você tentou pesquisar é inválido ou ainda não está disponível para consulta.",
+    "itemNotFound": "Item não encontrado",
+    "selectOneOf": "Selecione um dos seguintes items:\n\n{{items}}"
 }

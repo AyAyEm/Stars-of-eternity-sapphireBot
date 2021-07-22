@@ -1,2 +1,8 @@
-import type { Item } from 'warframe-items';
-export declare function mod(modItem: Item): Map<any, any>;
+import { EternityMessageEmbed } from "../../..";
+import { BaseItemPagedEmbed } from './BaseItem';
+export declare class ModPagedEmbed extends BaseItemPagedEmbed {
+    rarityColorMap: Map<string, string>;
+    baseEmbed(): EternityMessageEmbed;
+    mainInfo(): EternityMessageEmbed;
+    dropsPage(): EternityMessageEmbed;
+}

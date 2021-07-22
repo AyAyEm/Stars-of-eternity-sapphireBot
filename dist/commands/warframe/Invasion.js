@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
 const i18next_1 = tslib_1.__importDefault(require("i18next"));
-const _lib_1 = require("../../lib");
+const lodash_1 = require("lodash");
 const decorators_1 = require("@sapphire/decorators");
-const framework_1 = require("@sapphire/framework");
+const typeorm_1 = require("typeorm");
 const utils_1 = require("../../lib/utils");
+const _lib_1 = require("../../lib");
+const CaseInsensitiveMap_1 = require("../../lib/structures/CaseInsensitiveMap");
+const typeorm_2 = require("../../lib/typeorm");
 let default_1 = class extends _lib_1.EternityCommandWSC {
-    async document(guildId) {
-        return new this.client.provider.Guilds(guildId);
-    }
     possibleItemsEmbed = new _lib_1.EternityMessageEmbed()
         .addFields({
         name: i18next_1.default.t('commands/Invasion:listItems:commonResources'),
@@ -41,114 +41,101 @@ let default_1 = class extends _lib_1.EternityCommandWSC {
         inline: false,
     })
         .setTitle(i18next_1.default.t('commands/Invasion:listItems:title'));
-    items = {
-        dictionary: new Map(utils_1.itemNames.all.map((item) => [item.toLowerCase(), item])),
-    };
-    subCommands = {
-        items: async (msg) => {
-            const document = await this.document(msg.guild.id);
-            const items = await document.get(`channels.${msg.channel.id}.invasionItems.items`, []);
+    itemsDict = new CaseInsensitiveMap_1.CaseInsensitiveMap(utils_1.itemNames.all.map((item) => ([item.toLowerCase(), { name: item }])));
+    get invasionTrackerRepo() {
+        return typeorm_1.getCustomRepository(typeorm_2.InvasionTrackerRepository);
+    }
+    get itemRepo() {
+        return typeorm_1.getCustomRepository(typeorm_2.ItemRepository);
+    }
+    async items(msg, args) {
+        if (args.getFlags('list', 'l')) {
+            const items = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
             if (items.length === 0) {
-                throw new framework_1.UserError({
-                    identifier: 'commands/Invasion:items:notFound',
-                    message: 'No invasion items were found',
-                });
-            }
-            msg.channel.sendTranslated('commands/Invasion:items:found', [{ items }]);
-        },
-        listItems: async (msg) => {
-            msg.channel.send(this.possibleItemsEmbed);
-        },
-        disable: async (msg) => {
-            const document = await this.document(msg.guild.id);
-            const invasionItems = await document.get(`channels.${msg.channel.id}.invasionItems`, {});
-            if (!invasionItems.enabled) {
-                throw new framework_1.UserError({
-                    identifier: 'commands/Invasion:disable:alreadyDisabled',
-                    message: 'Invasions are already disabled in this channel',
-                });
+                await msg.replyTranslated('commands/Invasion:items:notFound');
             }
             else {
-                await document.set(`channels.${msg.channel.id}.invasionItems.enabled`, false);
-                (await msg.replyTranslated('commands/Invasion:disable:success')).delete({ timeout: 10000 });
+                await msg.replyTranslated('commands/Invasion:items:found', [{ items: items.map(({ name }) => name) }]);
             }
-        },
-        enable: async (msg) => {
-            const document = await this.document(msg.guild.id);
-            const invasionItems = await document.get(`channels.${msg.channel.id}.invasionItems`, {});
-            if (invasionItems.enabled) {
-                throw new framework_1.UserError({
-                    identifier: 'commands/Invasion:enable:alreadyEnabled',
-                    message: 'Invasions are already disabled in this channel',
-                });
-            }
-            else {
-                await document.set(`channels.${msg.channel.id}.invasionItems.enabled`, true);
-                (await msg.replyTranslated('commands/Invasion:enable:success')).delete({ timeout: 10000 });
-            }
-        },
-        add: async (msg, args) => {
-            const document = await this.document(msg.guild.id);
-            const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
-            const invasionItems = await document.get(invasionItemsPath);
-            if (!invasionItems) {
-                const defaultMessage = 'This channel was not configured for invasions!';
-                throw new framework_1.UserError({
-                    identifier: 'commands/Invasion:add:channelNotConfigured',
-                    message: defaultMessage,
-                });
-            }
-            else {
-                const newItems = await args.repeat('warframeItem');
-                const parsedNewItems = newItems.map((item) => this.items.dictionary.get(item));
-                const itemsData = new Set([...invasionItems.items, ...parsedNewItems]);
-                await document.set(`${invasionItemsPath}.items`, [...itemsData.values()]);
-                msg.replyTranslated('commands/Invasion:add:success', [{ items: newItems }]);
-            }
-        },
-        addAll: async (msg) => {
-            const document = await this.document(msg.guild.id);
-            const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
-            await document.set(`${invasionItemsPath}.items`, utils_1.itemNames.all);
-            msg.replyTranslated('commands/Invasion:addAll:success');
-        },
-        delete: async (msg, args) => {
-            const document = await this.document(msg.guild.id);
-            const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
-            const invasionItems = await document.get(invasionItemsPath);
-            if (!invasionItems) {
-                const defaultMessage = 'This channel was not configured for invasions!';
-                throw new framework_1.UserError({
-                    identifier: 'commands/Invasion:delete:channelNotConfigured',
-                    message: defaultMessage,
-                });
-            }
-            else {
-                const newItems = await args.repeat('warframeItem');
-                const parsedNewItems = newItems.map((item) => this.items.dictionary.get(item));
-                const itemsData = invasionItems.items.filter((item) => parsedNewItems.includes(item));
-                await document.set(`${invasionItemsPath}.items`, [...itemsData.values()]);
-                msg.replyTranslated('commands/Invasion:delete:success', [{ items: newItems }]);
-            }
-        },
-        deleteAll: async (msg) => {
-            const document = await this.document(msg.guild.id);
-            const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
-            await document.set(`${invasionItemsPath}.items`, []);
-            msg.replyTranslated('commands/Invasion:deleteAll:success');
-        },
-    };
+        }
+        else {
+            await msg.channel.send(this.possibleItemsEmbed);
+        }
+    }
+    async disable(msg) {
+        return this.setEnabled(msg, false);
+    }
+    async enable(msg) {
+        return this.setEnabled(msg, true);
+    }
+    async setEnabled(msg, value) {
+        const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel);
+        const action = value ? 'enable' : 'disable';
+        if (invasionTracker.enabled === value) {
+            await msg.replyTranslated(`commands/Invasion:${action}:already${lodash_1.capitalize(action)}d`);
+            return;
+        }
+        await this.invasionTrackerRepo.createQueryBuilder()
+            .update(typeorm_2.InvasionTracker)
+            .set({ enabled: value })
+            .where('invasion_tracker.id = :invasionTrackerId', { invasionTrackerId: invasionTracker.id })
+            .execute();
+        const reply = await msg.replyTranslated(`commands/Invasion:${action}:success`);
+        reply.delete({ timeout: 10000 });
+    }
+    async add(msg, args) {
+        return this.updateItems('add', msg, args);
+    }
+    async delete(msg, args) {
+        return this.updateItems('delete', msg, args);
+    }
+    async updateItems(action, msg, args) {
+        const all = args.getFlags('all');
+        const toUpdateItems = all ? [...this.itemsDict.keys()] : await args.repeat('warframeItem');
+        const storedItems = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
+        const storedItemsNames = new Map(storedItems.map((warframeItem) => ([warframeItem.name, warframeItem])));
+        const parsedToUpdateItems = toUpdateItems
+            .map((item) => (this.itemsDict.get(item)))
+            .filter((item) => {
+            const hasItem = storedItemsNames.has(item.name);
+            return action === 'add' ? !hasItem : hasItem;
+        });
+        if (parsedToUpdateItems.length <= 0) {
+            msg.replyTranslated(`commands/Invasion:${action}:already${action === 'add' ? 'Added' : 'Deleted'}${all ? 'All' : ''}`, [{ items: toUpdateItems }]);
+            return;
+        }
+        const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel, true);
+        await Promise.all(parsedToUpdateItems.map(async (warframeItem) => {
+            const item = await this.itemRepo.findOrInsert(warframeItem);
+            const query = typeorm_1.getConnection()
+                .createQueryBuilder()
+                .relation(typeorm_2.InvasionTracker, 'items')
+                .of(invasionTracker);
+            await (action === 'add' ? query.add(item) : query.remove(item));
+        }));
+        msg.replyTranslated(`commands/Invasion:${action}:success${all ? 'All' : ''}`, [{ items: [...parsedToUpdateItems].map(({ name }) => name) }]);
+    }
 };
 default_1 = tslib_1.__decorate([
     decorators_1.ApplyOptions({
         preconditions: ['GuildOnly'],
-        requiredArgs: [
-            ['add', ['warframeItem']],
-            ['delete', ['warframeItem']],
+        subCommands: [
+            { name: 'items', flags: ['list', 'l'] },
+            'disable',
+            'enable',
+            {
+                name: 'add',
+                requiredArgs: [{ name: 'warframeItem', orFlags: ['all'] }],
+            },
+            {
+                name: 'delete',
+                aliases: ['remove'],
+                requiredArgs: [{ name: 'warframeItem', orFlags: ['all'] }],
+            },
         ],
-        subAliases: [
-            ['listItems', ['li']],
-        ],
+        strategyOptions: {
+            flags: ['all'],
+        },
         caseInsensitive: true,
     })
 ], default_1);

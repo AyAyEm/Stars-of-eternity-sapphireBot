@@ -1,11 +1,15 @@
-import { EternityCommand, EternityMessage } from "../../lib";
-import { Args } from '@sapphire/framework';
 import FuzzySet from 'fuzzyset.js';
-import type { Item } from 'warframe-items';
+import type { Args } from '@sapphire/framework';
+import type { Category } from 'warframe-items';
+import { MultiEntryMap } from "../../lib/utils";
+import { EternityCommand, EternityMessage } from "../../lib";
+import type { BaseItemPagedEmbed } from "../../lib/embeds/warframe/itemSearch/BaseItem";
+declare type ItemCategory = Category | 'Arch-Gun' | 'Arch-Melee';
 export default class extends EternityCommand {
     items: import("../../lib/eternity").Items;
-    itemNames: Promise<string[]>;
-    fuzzySet: Promise<FuzzySet>;
+    fuzzySet: FuzzySet;
+    categoryDictionary: MultiEntryMap<ItemCategory, typeof BaseItemPagedEmbed>;
+    onLoad(): Promise<void>;
     run(msg: EternityMessage, args: Args): Promise<void>;
-    sendItemMessage(item: Item, msg: EternityMessage, previousSentMessage?: EternityMessage): Promise<void>;
 }
+export {};

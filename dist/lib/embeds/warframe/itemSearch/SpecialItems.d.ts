@@ -1,3 +1,2 @@
-import type { MessageEmbed } from 'discord.js';
-declare const _default: Map<string, (embed: MessageEmbed) => MessageEmbed>;
-export default _default;
+import type { EternityMessageEmbed } from "../../../extensions";
+export declare const specialItems: Map<string, (embed: EternityMessageEmbed) => EternityMessageEmbed>;

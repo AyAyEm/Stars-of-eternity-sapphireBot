@@ -1,11 +1,11 @@
 import type { Item } from 'warframe-items';
-import type { Awaited } from '@sapphire/framework';
 export declare class Items {
-    readonly dir: string;
-    readonly source = "https://raw.githubusercontent.com/WFCD/warframe-items/development/data/json/All.json";
-    private _uniqueNameDict;
+    readonly dir = "data/warframe-items";
+    readonly source = "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/All.json";
+    private uniqueNameDict;
     latestUpdate?: Date;
-    getUniqueNameDict(): Awaited<Record<string, string>>;
-    create(): Promise<unknown>;
+    private _getUniqueNames;
+    getUniqueNames(): Promise<Map<string, string | string[]>>;
+    create(): Promise<void>;
     get(name: string): Promise<Item | null>;
 }

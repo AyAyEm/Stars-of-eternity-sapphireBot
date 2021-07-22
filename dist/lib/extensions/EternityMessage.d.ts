@@ -17,7 +17,9 @@ export declare class EternityMessage extends EternityMessage_base {
      */
     multiReact(emojis: IterableCollection<EmojiResolvable>): {
         then: (callback: (reactions: MessageReaction[]) => unknown | Promise<unknown>) => Promise<unknown>;
-        stopReactions: () => void;
+        stopReactions: () => {
+            then: (callback: (reactions: MessageReaction[]) => unknown | Promise<unknown>) => Promise<unknown>;
+        };
     };
 }
 export {};

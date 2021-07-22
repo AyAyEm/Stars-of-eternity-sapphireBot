@@ -1,7 +1,9 @@
 import '@sapphire/plugin-i18next/register-discordjs';
-export declare const clientOptions: {
+import type { TOptions, StringMap } from 'i18next';
+export declare const i18nClientOptions: {
     i18n: {
         defaultName: string;
+        defaultLanguageDirectory: string;
         i18next: {
             fallbackNS: string;
             interpolation: {
@@ -9,4 +11,8 @@ export declare const clientOptions: {
             };
         };
     };
+};
+export declare function translationBy(preKey: string): {
+    (key: string, defaultValue: string, options?: TOptions<StringMap> | TOptions<StringMap>[]): string;
+    (key: string, options?: TOptions<StringMap> | TOptions<StringMap>[]): string;
 };
