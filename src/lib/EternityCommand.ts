@@ -37,8 +37,10 @@ export abstract class EternityCommand extends Command {
 
     if (missingArguments.length > 0) {
       message.channel.sendTranslated('missingArgument', [{ args: missingArguments }]);
-      throw this.error('missingArgument',
-        `The argument(s) ${list(missingArguments, 'and')} was missing.`);
+      throw this.error(
+        'missingArgument',
+        `The argument(s) ${list(missingArguments, 'and')} was missing.`,
+      );
     }
   }
 

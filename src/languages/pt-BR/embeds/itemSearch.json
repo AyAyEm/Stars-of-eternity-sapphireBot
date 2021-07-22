@@ -1,0 +1,52 @@
+{
+  "specialItems": {
+    "loginWeapon": "Arma de login\nAdquirida como opção de recompensa diária\nDe 200 em 200 dias a partir do dia {{startDay}}\n**Exemplo**:\n*[{{example}}...]*"
+  },
+  "warframe": {
+    "fields": {
+      "status": "Vida: {{health}}\nArmadura: {{armor}}\nEscudo: {{shield}}\nEnergia: {{power}}\nVelocidade de corrida: {{sprintSpeed}}"
+    }
+  },
+  "weapon": {
+    "fields": {
+      "critical": "Chance: {{chance}}%\nMultiplicador: {{multiplier}}x",
+      "status": "Chance: {{chance}}%",
+      "ammo": "Pente: {{magazineSize}}\nTotal: {{ammo}}",
+      "utility": {
+        "attackSpeed": "Velocidade de ataque: {{fireRate}}",
+        "fireRate": "Taxa de tiro: {{fireRate}}/s",
+        "trigger": "Gatilho: {{trigger}}",
+        "projectile": "Projétil: {{projectile}}",
+        "reloadTime": "Tempo de recarga: {{reloadTime}}s",
+        "accuracy": "Precisão: {{accuracy}}"
+      }
+    }
+  },
+  "mod": {
+    "groups": {
+      "Enemy Mod Tables": "Inimigos",
+      "Mission Rewards": "Recompensa de missão"
+    }
+  },
+  "fields": {
+    "acquisition": "Aquisição",
+    "ammo": "Munição",
+    "blueprint": "Diagrama",
+    "category": "Categoria",
+    "chance": "Chance",
+    "components": "Componentes",
+    "critical": "Crítico",
+    "damage": "Dano {{totalDamage}}",
+    "minMax": "Min/Max",
+    "resources": "Recursos",
+    "stat": "Atributo",
+    "status": "Status",
+    "tradable": "Trocável",
+    "transmutable": "Transmutável",
+    "type": "Tipo",
+    "utility": "Utilidade"
+  },
+  "footer": {
+    "mastery": "Maestria"
+  }
+}

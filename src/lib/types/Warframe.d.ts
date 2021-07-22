@@ -33,7 +33,7 @@ export interface InvasionData {
   eta: string;
   defendingFaction: string;
   id: string;
-  activation: Date;
+  activation: string;
   rewardTypes: string[];
   desc: string;
 }

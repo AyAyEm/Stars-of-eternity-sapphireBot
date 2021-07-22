@@ -1,29 +1,41 @@
 import i18n from 'i18next';
-import { EternityCommandWSC, EternityMessageEmbed } from '@lib';
-import { ApplyOptions } from '@sapphire/decorators';
-import { UserError } from '@sapphire/framework';
-import { itemNames } from '@lib/utils';
 
-import type { EternityCommandWSCOptions, EternityMessage } from '@lib';
-import type { InvasionItems } from '@providers/mongoose/models';
+import { capitalize } from 'lodash';
+import { ApplyOptions } from '@sapphire/decorators';
+import { getCustomRepository, getConnection } from 'typeorm';
+
 import type { Args } from '@sapphire/framework';
+import type { Item as WarframeItem } from 'warframe-items';
+
+import { itemNames } from '#lib/utils';
+import { EternityCommandWSC, EternityMessageEmbed } from '#lib';
+import { CaseInsensitiveMap } from '#structures/CaseInsensitiveMap';
+import { InvasionTracker, InvasionTrackerRepository, ItemRepository } from '#lib/typeorm';
+
+import type { EternityCommandWSCOptions, EternityMessage } from '#lib';
 
 @ApplyOptions<EternityCommandWSCOptions>({
   preconditions: ['GuildOnly'],
-  requiredArgs: [
-    ['add', ['warframeItem']],
-    ['delete', ['warframeItem']],
+  subCommands: [
+    { name: 'items', flags: ['list', 'l'] },
+    'disable',
+    'enable',
+    {
+      name: 'add',
+      requiredArgs: [{ name: 'warframeItem', orFlags: ['all'] }],
+    },
+    {
+      name: 'delete',
+      aliases: ['remove'],
+      requiredArgs: [{ name: 'warframeItem', orFlags: ['all'] }],
+    },
   ],
-  subAliases: [
-    ['listItems', ['li']],
-  ],
+  strategyOptions: {
+    flags: ['all'],
+  },
   caseInsensitive: true,
 })
 export default class extends EternityCommandWSC {
-  public async document(guildId: string) {
-    return new this.client.provider.Guilds(guildId);
-  }
-
   public possibleItemsEmbed = new EternityMessageEmbed()
     .addFields(
       {
@@ -64,111 +76,108 @@ export default class extends EternityCommandWSC {
     )
     .setTitle(i18n.t('commands/Invasion:listItems:title'));
 
-  public items = {
-    dictionary: new Map(itemNames.all.map((item) => [item.toLowerCase(), item])),
-  };
+  public itemsDict = new CaseInsensitiveMap<string, WarframeItem>(itemNames.all.map((item) => (
+    [item.toLowerCase(), { name: item } as WarframeItem])));
 
-  public subCommands = {
-    items: async (msg: EternityMessage) => {
-      const document = await this.document(msg.guild.id);
+  public get invasionTrackerRepo(): InvasionTrackerRepository {
+    return getCustomRepository(InvasionTrackerRepository);
+  }
 
-      const items = await document.get<string[]>(`channels.${msg.channel.id}.invasionItems.items`, []);
+  public get itemRepo(): ItemRepository {
+    return getCustomRepository(ItemRepository);
+  }
+
+  public async items(msg: EternityMessage, args: Args) {
+    if (args.getFlags('list', 'l')) {
+      const items = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
+
       if (items.length === 0) {
-        throw new UserError({
-          identifier: 'commands/Invasion:items:notFound',
-          message: 'No invasion items were found',
-        });
-      }
-
-      msg.channel.sendTranslated('commands/Invasion:items:found', [{ items }]);
-    },
-
-    listItems: async (msg: EternityMessage) => {
-      msg.channel.send(this.possibleItemsEmbed);
-    },
-
-    disable: async (msg: EternityMessage) => {
-      const document = await this.document(msg.guild.id);
-      const invasionItems = await document.get<InvasionItems>(`channels.${msg.channel.id}.invasionItems`, {});
-
-      if (!invasionItems.enabled) {
-        throw new UserError({
-          identifier: 'commands/Invasion:disable:alreadyDisabled',
-          message: 'Invasions are already disabled in this channel',
-        });
+        await msg.replyTranslated('commands/Invasion:items:notFound');
       } else {
-        await document.set<InvasionItems['enabled']>(`channels.${msg.channel.id}.invasionItems.enabled`, false);
-        (await msg.replyTranslated('commands/Invasion:disable:success')).delete({ timeout: 10000 });
+        await msg.replyTranslated(
+          'commands/Invasion:items:found',
+          [{ items: items.map(({ name }) => name) }],
+        );
       }
-    },
+    } else {
+      await msg.channel.send(this.possibleItemsEmbed);
+    }
+  }
 
-    enable: async (msg: EternityMessage) => {
-      const document = await this.document(msg.guild.id);
-      const invasionItems = await document.get<InvasionItems>(`channels.${msg.channel.id}.invasionItems`, {});
+  public async disable(msg: EternityMessage) {
+    return this.setEnabled(msg, false);
+  }
 
-      if (invasionItems.enabled) {
-        throw new UserError({
-          identifier: 'commands/Invasion:enable:alreadyEnabled',
-          message: 'Invasions are already disabled in this channel',
-        });
-      } else {
-        await document.set<InvasionItems['enabled']>(`channels.${msg.channel.id}.invasionItems.enabled`, true);
-        (await msg.replyTranslated('commands/Invasion:enable:success')).delete({ timeout: 10000 });
-      }
-    },
+  public async enable(msg: EternityMessage) {
+    return this.setEnabled(msg, true);
+  }
 
-    add: async (msg: EternityMessage, args: Args) => {
-      const document = await this.document(msg.guild.id);
-      const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
-      const invasionItems = await document.get<InvasionItems>(invasionItemsPath);
+  private async setEnabled(msg: EternityMessage, value: boolean) {
+    const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel);
 
-      if (!invasionItems) {
-        const defaultMessage = 'This channel was not configured for invasions!';
-        throw new UserError({
-          identifier: 'commands/Invasion:add:channelNotConfigured',
-          message: defaultMessage,
-        });
-      } else {
-        const newItems = await args.repeat('warframeItem');
-        const parsedNewItems = newItems.map((item) => this.items.dictionary.get(item));
-        const itemsData = new Set([...invasionItems.items, ...parsedNewItems]);
-        await document.set<InvasionItems['items']>(`${invasionItemsPath}.items`, [...itemsData.values()]);
-        msg.replyTranslated('commands/Invasion:add:success', [{ items: newItems }]);
-      }
-    },
+    const action = value ? 'enable' : 'disable';
+    if (invasionTracker.enabled === value) {
+      await msg.replyTranslated(`commands/Invasion:${action}:already${capitalize(action)}d`);
+      return;
+    }
 
-    addAll: async (msg: EternityMessage) => {
-      const document = await this.document(msg.guild.id);
-      const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
-      await document.set<InvasionItems['items']>(`${invasionItemsPath}.items`, itemNames.all);
-      msg.replyTranslated('commands/Invasion:addAll:success');
-    },
+    await this.invasionTrackerRepo.createQueryBuilder()
+      .update(InvasionTracker)
+      .set({ enabled: value })
+      .where('invasion_tracker.id = :invasionTrackerId', { invasionTrackerId: invasionTracker.id })
+      .execute();
 
-    delete: async (msg: EternityMessage, args: Args) => {
-      const document = await this.document(msg.guild.id);
-      const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
-      const invasionItems = await document.get<InvasionItems>(invasionItemsPath);
+    const reply = await msg.replyTranslated(`commands/Invasion:${action}:success`);
+    reply.delete({ timeout: 10000 });
+  }
 
-      if (!invasionItems) {
-        const defaultMessage = 'This channel was not configured for invasions!';
-        throw new UserError({
-          identifier: 'commands/Invasion:delete:channelNotConfigured',
-          message: defaultMessage,
-        });
-      } else {
-        const newItems = await args.repeat('warframeItem');
-        const parsedNewItems = newItems.map((item) => this.items.dictionary.get(item));
-        const itemsData = invasionItems.items.filter((item) => parsedNewItems.includes(item));
-        await document.set<InvasionItems['items']>(`${invasionItemsPath}.items`, [...itemsData.values()]);
-        msg.replyTranslated('commands/Invasion:delete:success', [{ items: newItems }]);
-      }
-    },
+  public async add(msg: EternityMessage, args: Args) {
+    return this.updateItems('add', msg, args);
+  }
 
-    deleteAll: async (msg: EternityMessage) => {
-      const document = await this.document(msg.guild.id);
-      const invasionItemsPath = `channels.${msg.channel.id}.invasionItems`;
-      await document.set<InvasionItems['items']>(`${invasionItemsPath}.items`, []);
-      msg.replyTranslated('commands/Invasion:deleteAll:success');
-    },
-  };
+  public async delete(msg: EternityMessage, args: Args) {
+    return this.updateItems('delete', msg, args);
+  }
+
+  private async updateItems(action: 'add' | 'delete', msg: EternityMessage, args: Args) {
+    const all = args.getFlags('all');
+
+    const toUpdateItems = all ? [...this.itemsDict.keys()] : await args.repeat('warframeItem');
+
+    const storedItems = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
+    const storedItemsNames = new Map(storedItems.map((warframeItem) => (
+      [warframeItem.name, warframeItem])));
+
+    const parsedToUpdateItems = toUpdateItems
+      .map((item) => (this.itemsDict.get(item)))
+      .filter((item) => {
+        const hasItem = storedItemsNames.has(item.name);
+        return action === 'add' ? !hasItem : hasItem;
+      });
+
+    if (parsedToUpdateItems.length <= 0) {
+      msg.replyTranslated(
+        `commands/Invasion:${action}:already${action === 'add' ? 'Added' : 'Deleted'}${all ? 'All' : ''}`,
+        [{ items: toUpdateItems }],
+      );
+      return;
+    }
+
+    const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel, true);
+    await Promise.all(parsedToUpdateItems.map(async (warframeItem: WarframeItem) => {
+      const item = await this.itemRepo.findOrInsert(warframeItem);
+
+      const query = getConnection()
+        .createQueryBuilder()
+        .relation(InvasionTracker, 'items')
+        .of(invasionTracker);
+
+      await (action === 'add' ? query.add(item) : query.remove(item));
+    }));
+
+    msg.replyTranslated(
+      `commands/Invasion:${action}:success${all ? 'All' : ''}`,
+      [{ items: [...parsedToUpdateItems].map(({ name }) => name) }],
+    );
+  }
 }

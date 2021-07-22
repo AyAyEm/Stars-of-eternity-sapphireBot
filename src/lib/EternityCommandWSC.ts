@@ -1,84 +1,121 @@
 import async from 'async';
+import { Collection } from 'discord.js';
 import { Command, CommandOptions } from '@sapphire/framework';
 import { list } from '@utils/LanguageFunctions';
 import { CommandError } from '@lib/errors';
-import { CIMap } from '@utils';
 
-import type { Args, Awaited, PieceContext, ArgType, CommandContext } from '@sapphire/framework';
+import type { Args, PieceContext, ArgType, CommandContext } from '@sapphire/framework';
 
 import type { EternityMessage } from '@lib';
+
+import { CaseInsensitiveMap } from '#structures';
+
 import type { EternityClient } from './EternityClient';
 
-type CommandRun = (message: EternityMessage, args: Args) => Awaited<void>;
+export interface ArgSwitch {
+  name: keyof ArgType;
+  orFlags?: string[];
+}
+
+export interface SubCommand {
+  name: string;
+  aliases?: string[];
+  flags?: string[];
+  requiredArgs?: Array<(keyof ArgType) | ArgSwitch>;
+  default?: boolean;
+}
 
 export interface EternityCommandWSCOptions extends CommandOptions {
-  requiredArgs?: [string, (keyof ArgType)[]][];
-  defaultCommand?: string;
-  enableDefault?: boolean;
+  subCommands?: (SubCommand | string)[];
   caseInsensitive?: boolean;
-  subAliases?: [string, string[]][];
 }
 
 export abstract class EternityCommandWSC extends Command {
-  public requiredArgs: Map<string, (keyof ArgType)[]>;
+  public subCommands: Collection<string, SubCommand>;
 
-  public subAliases: Map<string, Array<string>>;
+  public caseInsensitive: boolean;
 
-  public defaultCommand: EternityCommandWSCOptions['defaultCommand'];
+  #subCommandsDict?: Map<string, string>;
 
-  public enableDefault: EternityCommandWSCOptions['enableDefault'];
-
-  public caseInsensitive: EternityCommandWSCOptions['caseInsensitive'];
-
-  #dictionary: Map<string, string>;
-
-  public abstract subCommands: { [key: string]: CommandRun } = {
-    default() { },
-  };
+  public defaultCommand: string | null;
 
   protected constructor(context: PieceContext, options: EternityCommandWSCOptions) {
-    super(context, options);
-    this.requiredArgs = new Map(options.requiredArgs ?? []);
-    this.enableDefault = options.enableDefault ?? false;
-    this.defaultCommand = options.defaultCommand ?? 'default';
-    this.caseInsensitive = options.caseInsensitive ?? true;
-    this.subAliases = new Map(options.subAliases ?? []);
-    this.#dictionary = this.caseInsensitive ? new CIMap() : new Map();
+    if (options.subCommands) {
+      const flags = new Set(options.strategyOptions?.flags);
 
-    options.subAliases?.forEach(([commandName, aliases]) => {
-      aliases.forEach((alias) => this.#dictionary.set(alias, commandName));
-    });
+      for (const subCommand of options.subCommands) {
+        if (typeof subCommand !== 'string') {
+          subCommand.flags?.forEach((flag) => flags.add(flag));
+
+          const { requiredArgs = [] } = subCommand;
+          if (requiredArgs.length > 0) {
+            for (const requiredArg of requiredArgs) {
+              if (typeof requiredArg !== 'string') {
+                requiredArg.orFlags?.forEach((flag) => flags.add(flag));
+              }
+            }
+          }
+        }
+      }
+
+      super(context, { ...options, strategyOptions: { flags: [...flags] } });
+    } else {
+      super(context, options);
+    }
+
+    this.caseInsensitive = options.caseInsensitive ?? true;
+
+    if (options.subCommands) {
+      this.subCommands = new Collection(options.subCommands?.map((subCommand) => {
+        if (typeof subCommand === 'string') {
+          return [subCommand, { name: subCommand }];
+        }
+
+        return [subCommand.name, subCommand];
+      }));
+
+      if (this.caseInsensitive) {
+        const subCommandsEntries = [
+          ...options.subCommands.flatMap((sb): [string, string][] => {
+            let aliases: string[] = [];
+            let name: string;
+            if (typeof sb === 'string') {
+              name = sb;
+            } else {
+              name = sb.name;
+              aliases = sb.aliases ?? [];
+            }
+
+            return [[name, name], ...aliases.map<[string, string]>((alias) => [alias, name])];
+          })];
+
+        this.#subCommandsDict = new CaseInsensitiveMap(subCommandsEntries);
+      }
+    } else {
+      this.subCommands = new Collection();
+    }
+    this.defaultCommand = this.subCommands.find((subCommand) => subCommand?.default)?.name ?? null;
   }
 
   public get client(): EternityClient {
     return super.context.client as EternityClient;
   }
 
-  protected get subCommandsList() {
-    const commandsList = Object.keys(this.subCommands);
-    return this.enableDefault ? commandsList
-      : commandsList.filter((commandName) => commandName !== 'default');
-  }
-
-  public async onLoad() {
-    super.onLoad();
-    this.subCommandsList.forEach((command) => this.#dictionary.set(command, command));
-  }
-
   public async run(message: EternityMessage, args: Args) {
-    const subCommand = await args.pickResult('string')
+    const subCommandName = await args.pickResult('string')
       .then((result) => {
-        if (result.success && this.#dictionary.has(result.value)) {
+        const subCommand = result.success ? this.findSubCommand(result.value) : null;
+        if (subCommand) {
           args.save();
-          return this.#dictionary.get(result.value);
+          return subCommand.name;
         }
+
         args.start();
         return this.defaultCommand;
       });
 
-    // eslint-disable-next-line no-useless-catch
     try {
-      await this.subCommands[subCommand](message, args);
+      await this[subCommandName](message, args);
     } catch (e: unknown) {
       console.error(e);
     }
@@ -88,30 +125,55 @@ export abstract class EternityCommandWSC extends Command {
 
   public async preParse(message: EternityMessage, parameters: string, context: CommandContext) {
     const args = await super.preParse(message, parameters, context);
-    if (this.requiredArgs.size > 0) await this.verifyArgs(args, message);
+    await this.verifyArgs(args, message);
     return args.start();
   }
 
   public async verifyArgs(args: Args, message: EternityMessage) {
-    const subCommand = await args.pickResult('string')
+    const subCommandName = await args.pickResult('string')
       .then((result) => (result.success ? result.value : this.defaultCommand));
 
-    if (this.#dictionary.has(subCommand) || this.enableDefault) {
-      const requiredArgs = this.requiredArgs.get(subCommand) ?? [];
+    const subCommand = this.findSubCommand(subCommandName);
+    if (subCommand) {
+      const requiredArgs = subCommand.requiredArgs ?? [];
 
-      const missingArguments = await async.filterSeries(requiredArgs, async (arg) => (
-        !(await args.pickResult(arg)).success));
+      const missingArguments = (await async.filterSeries(requiredArgs, async (arg) => {
+        const argName = typeof arg === 'string' ? arg : arg.name;
+        const orFlags = (arg as ArgSwitch).orFlags ?? [];
+
+        const argIsPassed = (await args.pickResult(argName)).success;
+
+        if (!argIsPassed && orFlags.length > 0) {
+          return !args.getFlags(...orFlags);
+        }
+
+        return !argIsPassed;
+      })).map((arg) => (typeof arg === 'string' ? arg : arg.name));
 
       if (missingArguments.length > 0) {
         message.channel.sendTranslated('missingArgument', [{ args: missingArguments }]);
-        throw this.error('missingArgument',
-          `The argument(s) ${list(missingArguments, 'and')} was missing.`);
+        throw this.error(
+          'missingArgument',
+          `The argument(s) ${list(missingArguments, 'and')} was missing.`,
+        );
       }
     } else {
-      message.channel.sendTranslated('missingSubCommand', [{ args: this.subCommandsList }]);
-      throw this.error('missingSubCommand',
-        `The subcommand ${list(this.subCommandsList, 'or')} was missing.`);
+      const subCommandNames = this.subCommands.map(({ name }) => name);
+
+      message.channel.sendTranslated('missingSubCommand', [{ args: subCommandNames }]);
+      throw this.error(
+        'missingSubCommand',
+        `The subcommand ${list(subCommandNames, 'or')} was missing.`,
+      );
     }
     return args.start();
+  }
+
+  public findSubCommand(subCommandName: string) {
+    if (this.caseInsensitive) {
+      return this.subCommands.get(this.#subCommandsDict.get(subCommandName));
+    }
+
+    return this.subCommands.get(subCommandName);
   }
 }
