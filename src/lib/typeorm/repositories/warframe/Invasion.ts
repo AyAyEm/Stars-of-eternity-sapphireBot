@@ -1,12 +1,13 @@
 import { EntityRepository } from 'typeorm';
 
 import { BaseRepository } from '#structures';
-import { Invasion } from '#models';
+import { WarframeInvasion } from '#models';
+import { strToMs } from '#lib/utils';
 
 import type { InvasionData } from '#lib/types/Warframe';
 
-@EntityRepository(Invasion)
-export class InvasionRepository extends BaseRepository<Invasion> {
+@EntityRepository(WarframeInvasion)
+export class WarframeInvasionRepo extends BaseRepository<WarframeInvasion> {
   public async findLatest() {
     return this.createQueryBuilder('invasion')
       .orderBy('invasion.activation', 'DESC')
@@ -16,7 +17,7 @@ export class InvasionRepository extends BaseRepository<Invasion> {
   public async insert(invasions: InvasionData[]) {
     return this.createQueryBuilder('invasion')
       .insert()
-      .values(invasions.map(({ activation, id }) => ({ activation, apiId: id })))
+      .values(invasions.map(({ activation, id }) => ({ activation: `${strToMs(activation)}`, apiId: id })))
       .execute();
   }
 }

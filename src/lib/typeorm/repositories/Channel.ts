@@ -1,20 +1,20 @@
 import { EntityRepository, getConnection } from 'typeorm';
 
+import { GuildChannel } from 'discord.js';
+
 import { BaseRepository } from '#structures';
 import { Channel } from '#models';
-import { GuildRepository } from './Guild';
-
-import type { EternityTextChannel } from '#lib';
+import { GuildRepo } from './Guild';
 
 @EntityRepository(Channel)
-export class ChannelRepository extends BaseRepository<Channel> {
-  public async findOrInsert(discordChannel: EternityTextChannel, onlyId?: boolean) {
+export class ChannelRepo extends BaseRepository<Channel> {
+  public async findOrInsert(discordChannel: GuildChannel, onlyId?: boolean) {
     return getConnection().transaction(async (entityManager) => {
-      const channelsRepo = entityManager.getCustomRepository(ChannelRepository);
+      const channelsRepo = entityManager.getCustomRepository(ChannelRepo);
       let channel = await channelsRepo.find(discordChannel, onlyId);
 
       if (!channel) {
-        const guildRepo = entityManager.getCustomRepository(GuildRepository);
+        const guildRepo = entityManager.getCustomRepository(GuildRepo);
         const guild = await guildRepo.findOrInsert(discordChannel.guild, true);
 
         await entityManager.createQueryBuilder()
@@ -30,7 +30,7 @@ export class ChannelRepository extends BaseRepository<Channel> {
     });
   }
 
-  public async find(discordChannel: EternityTextChannel, onlyId?: boolean) {
+  public async find(discordChannel: GuildChannel, onlyId?: boolean) {
     if (onlyId) {
       return this.findQuery(discordChannel)
         .select('channel.id')
@@ -40,7 +40,7 @@ export class ChannelRepository extends BaseRepository<Channel> {
     return this.findQuery(discordChannel).getOne();
   }
 
-  public findQuery(discordChannel: EternityTextChannel) {
+  public findQuery(discordChannel: GuildChannel) {
     return this.createQueryBuilder('channel')
       .where('channel.id = :channelId', { channelId: discordChannel.id });
   }

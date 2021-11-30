@@ -1,22 +1,23 @@
 import { EntityRepository } from 'typeorm';
 
 import { BaseRepository } from '#structures';
-import { Fissure } from '#models';
+import { WarframeFissure } from '#models';
+import { strToMs } from '#utils';
 
-import type { Fissure as WarframeFissure } from '#lib/types/Warframe';
+import type { Fissure } from '#lib/types/Warframe';
 
-@EntityRepository(Fissure)
-export class FissureRepository extends BaseRepository<Fissure> {
+@EntityRepository(WarframeFissure)
+export class WarframeFissureRepo extends BaseRepository<Fissure> {
   public async findLatest() {
     return this.createQueryBuilder('fissure')
       .orderBy('fissure.activation', 'DESC')
       .getOne();
   }
 
-  public async insert(fissures: WarframeFissure[]) {
+  public async insert(fissures: Fissure[]) {
     return this.createQueryBuilder('fissure')
       .insert()
-      .values(fissures.map(({ activation, id }) => ({ activation, apiId: id })))
+      .values(fissures.map(({ activation, id }) => ({ activation: `${strToMs(activation)}`, apiId: id })))
       .execute();
   }
 }

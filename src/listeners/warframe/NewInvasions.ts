@@ -1,21 +1,20 @@
 import { MessageEmbed } from 'discord.js';
 import { ApplyOptions } from '@sapphire/decorators';
+import { Listener, ListenerOptions } from '@sapphire/framework';
 import { getCustomRepository } from 'typeorm';
 
 import type { TextChannel } from 'discord.js';
-import type { EventOptions } from '@sapphire/framework';
 
-import { EternityEvent } from '#lib';
 import { CaseInsensitiveSet } from '#lib/structures';
-import { InvasionTrackerRepository } from '#repositories';
-import { Warframe } from '#utils/Constants';
+import { WarframeInvasionTrackerRepo } from '#repositories';
+import { Warframe } from '#utils';
 
 import type { InvasionData, Reward } from '#lib/types/Warframe';
 
-@ApplyOptions<EventOptions>({ event: 'warframeNewInvasions' })
-export default class extends EternityEvent<'warframeNewInvasions'> {
+@ApplyOptions<ListenerOptions>({ event: 'warframeNewInvasions' })
+export default class extends Listener {
   public async run(invasions: InvasionData[]) {
-    const InvasionTrackerRepo = getCustomRepository(InvasionTrackerRepository);
+    const InvasionTrackerRepo = getCustomRepository(WarframeInvasionTrackerRepo);
 
     const invasionTrackers = await InvasionTrackerRepo.createQueryBuilder('invasionTracker')
       .where('invasionTracker.enabled = :enabled', { enabled: true })
@@ -39,11 +38,11 @@ export default class extends EternityEvent<'warframeNewInvasions'> {
             const items = invasion.rewardTypes.filter((itemName) => itemNames.has(itemName));
 
             const embeds = this.makeEmbeds(invasion, items);
-            const discordChannel = await this.client.channels.fetch(channelId) as TextChannel;
-            await Promise.all(embeds.map((embed) => discordChannel.send(embed)));
+            const discordChannel = await this.container.client.channels.fetch(channelId) as TextChannel;
+            await discordChannel.send({ embeds: embeds });
           }));
       }
-    })().catch((e) => this.client.console.error(e));
+    })().catch((e) => this.container.client.logger.error(e));
 
     invasionTrackers.on('data', handler);
   }
@@ -56,7 +55,7 @@ export default class extends EternityEvent<'warframeNewInvasions'> {
         .setTitle(`${reward.itemString}`)
         .setThumbnail(reward.thumbnail)
         .setTimestamp()
-        .setColor(factionsStyle.get(factions[0])?.color || 'white')
+        .setColor(factionsStyle.get(factions[0])?.color || 'WHITE')
         .setAuthor(`${invasion.node} ${invasion.desc}`, factionsStyle.get(factions[0])?.tumb)
         .setFooter(`${factions[0]} x ${factions[1]}`, factionsStyle.get(factions[1])?.tumb);
     }

@@ -1,10 +1,10 @@
-import { timezone } from '@root/config';
 import moment from 'moment-timezone';
 import _ from 'lodash';
 
-import { EternityMessageEmbed } from '@lib';
+import { timezone } from '#root/config';
+import { EternityMessageEmbed } from '#lib';
 
-import type { Fissure } from '@lib/types/Warframe';
+import type { Fissure } from '#lib/types/Warframe';
 
 // Fissures: Lith, Meso, Neo, Axi and Requiem
 const fissureIcons = [

@@ -1,44 +1,24 @@
-import '@sapphire/plugin-i18next/register';
-
 import { SapphireClient } from '@sapphire/framework';
-import { mergeDefault } from '@sapphire/utilities';
-import { ClientOptions } from 'discord.js';
-import { i18nClientOptions } from '@utils/I18n';
 
-import { createConnection, Connection } from 'typeorm';
-
-import { config as connectionConfig } from './typeorm/connection';
+import { clientOptions } from '#root/config';
 import { TaskStore } from './structures';
-import { Items } from './eternity/warframe';
-
-import './Extenders';
 
 export class EternityClient extends SapphireClient {
-  public tasks = new TaskStore();
-
-  public connection!: Connection;
+  public tasks: TaskStore;
 
   public fetchPrefix = () => '/';
 
-  public fetchLanguage = () => 'pt-BR';
-
-  public warframe = {
-    items: new Items(),
-  };
-
-  public console = console;
+  public ready = new Promise<void>((resolve) => this.once('ready', () => resolve()));
 
   /**
    * Returns a promise that resolves when the client is ready.
    */
-  public ready = new Promise<void>((resolve) => this.once('ready', () => resolve()));
 
-  constructor(options?: ClientOptions) {
-    // @ts-expect-error Type instantiation is excessively deep and possibly infinite. ts(2589)
-    super(mergeDefault(i18nClientOptions, { ...options, caseInsensitiveCommands: true }));
+  public constructor() {
+    super(clientOptions);
 
-    this.stores.register(this.tasks)
-      .registerUserDirectories();
+    this.tasks = new TaskStore();
+    this.stores.register(this.tasks).registerPath();
   }
 
   /**
@@ -46,15 +26,5 @@ export class EternityClient extends SapphireClient {
    */
   public get invite() {
     return `https://discord.com/oauth2/authorize?client_id=${this.id}&scope=bot`;
-  }
-
-  public async login(token?: string) {
-    this.connection = await createConnection({
-      ...connectionConfig,
-      migrations: null,
-      subscribers: null,
-    });
-
-    return super.login(token);
   }
 }

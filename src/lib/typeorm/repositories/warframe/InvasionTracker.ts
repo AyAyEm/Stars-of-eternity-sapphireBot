@@ -1,28 +1,26 @@
 import { EntityRepository, getConnection } from 'typeorm';
 
+import { GuildChannel } from 'discord.js';
+
 import { BaseRepository } from '#structures';
-import { InvasionTracker } from '#models';
+import { WarframeInvasionTracker, WarframeItem } from '#models';
+import { ChannelRepo } from '#repositories/Channel';
 
-import { ChannelRepository } from '#repositories/Channel';
-
-import type { EternityTextChannel } from '#lib';
-import type { Item } from '#models';
-
-@EntityRepository(InvasionTracker)
-export class InvasionTrackerRepository extends BaseRepository<InvasionTracker> {
-  public async findOrInsert(discordChannel: EternityTextChannel, onlyId?: boolean) {
+@EntityRepository(WarframeInvasionTracker)
+export class WarframeInvasionTrackerRepo extends BaseRepository<WarframeInvasionTracker> {
+  public async findOrInsert(discordChannel: GuildChannel, onlyId?: boolean) {
     return getConnection().transaction(async (entityManager) => {
-      const invasionTrackerRepo = entityManager.getCustomRepository(InvasionTrackerRepository);
-      let invasionTracker: InvasionTracker = await invasionTrackerRepo
+      const invasionTrackerRepo = entityManager.getCustomRepository(WarframeInvasionTrackerRepo);
+      let invasionTracker: WarframeInvasionTracker = await invasionTrackerRepo
         .findByChannel(discordChannel, onlyId);
 
       if (!invasionTracker) {
-        const channelRepo = entityManager.getCustomRepository(ChannelRepository);
+        const channelRepo = entityManager.getCustomRepository(ChannelRepo);
         const channel = await channelRepo.findOrInsert(discordChannel);
 
         await entityManager.createQueryBuilder()
           .insert()
-          .into(InvasionTracker)
+          .into(WarframeInvasionTracker)
           .values([{ channel }])
           .execute();
 
@@ -33,7 +31,7 @@ export class InvasionTrackerRepository extends BaseRepository<InvasionTracker> {
     });
   }
 
-  public async findByChannel(discordChannel: EternityTextChannel, onlyId = false) {
+  public async findByChannel(discordChannel: GuildChannel, onlyId = false) {
     const query = await this.findByChannelQuery(discordChannel);
 
     if (onlyId) {
@@ -45,19 +43,19 @@ export class InvasionTrackerRepository extends BaseRepository<InvasionTracker> {
     return query.getOne();
   }
 
-  public async findByChannelQuery(discordChannel: EternityTextChannel) {
+  public async findByChannelQuery(discordChannel: GuildChannel) {
     return this.createQueryBuilder('invasionTracker')
       .leftJoinAndSelect('invasionTracker.channel', 'channel')
       .where('channel.id = :channelId', { channelId: discordChannel.id });
   }
 
-  public async findItemsByChannel(discordChannel: EternityTextChannel) {
+  public async findItemsByChannel(discordChannel: GuildChannel) {
     const invasionTracker = await this.findByChannel(discordChannel, true);
 
     return (await this
       .createQueryBuilder()
-      .relation(InvasionTracker, 'items')
+      .relation(WarframeInvasionTracker, 'items')
       .of(invasionTracker)
-      .loadMany<Item>()) ?? [];
+      .loadMany<WarframeItem>()) ?? [];
   }
 }

@@ -1,12 +1,14 @@
 import _ from 'lodash';
 
+import { ColorResolvable } from 'discord.js';
+
 import { Page, InitPagedEmbed } from '#decorators';
 import { EternityMessageEmbed } from '#lib';
 import { BaseItemPagedEmbed } from './BaseItem';
 
 @InitPagedEmbed()
 export class ModPagedEmbed extends BaseItemPagedEmbed {
-  public rarityColorMap = new Map([
+  public rarityColorMap = new Map<string, ColorResolvable>([
     ['Common', '#876f4e'],
     ['Uncommon', '#fefefe'],
     ['Rare', '#dec67c'],
@@ -25,29 +27,29 @@ export class ModPagedEmbed extends BaseItemPagedEmbed {
   }
 
   @Page({ emoji: '📋' })
-  public mainInfo() {
+  public async mainInfo() {
     const { tradable, levelStats, transmutable } = this.item;
 
     const embed = this.baseEmbed();
 
     embed.addFields([
-      { name: this.t('fields:tradable'), value: tradable ? '✅' : '❌', inline: true },
-      { name: this.t('fields:transmutable'), value: transmutable ? '✅' : '❌', inline: true },
+      { name: await this.t('fields:tradable'), value: tradable ? '✅' : '❌', inline: true },
+      { name: await this.t('fields:transmutable'), value: transmutable ? '✅' : '❌', inline: true },
       { ...EternityMessageEmbed.blankField, inline: true },
     ]);
 
     if (levelStats) {
       const percentageRegex = /[+-]?\d+%/;
-      const statsFields = levelStats[levelStats.length - 1].stats.map((stat, index) => {
+      const statsFields = await Promise.all(levelStats[levelStats.length - 1].stats.map(async (stat, index) => {
         const minStat = levelStats[0].stats[index].match(percentageRegex)?.[0];
         const maxStat = stat.match(percentageRegex)?.[0];
 
         return [
-          { name: this.t('fields:stat'), value: stat, inline: true },
-          { name: this.t('fields:minMax'), value: `${minStat}/${maxStat}`, inline: true },
+          { name: await this.t('fields:stat'), value: stat, inline: true },
+          { name: await this.t('fields:minMax'), value: `${minStat}/${maxStat}`, inline: true },
           { ...EternityMessageEmbed.blankField, inline: true },
         ];
-      });
+      }));
 
       embed.addFields(statsFields.flat());
     }
@@ -56,15 +58,15 @@ export class ModPagedEmbed extends BaseItemPagedEmbed {
   }
 
   @Page({ emoji: '♻' })
-  public dropsPage() {
+  public async dropsPage() {
     const { drops } = this.item;
     if (!drops) return null;
 
     const embed = this.baseEmbed();
 
-    _(drops)
+    await Promise.all(_(drops)
       .groupBy('type')
-      .forEach((dropsList, group) => {
+      .map(async (dropsList, group) => {
         const [
           locationsString,
           percentagesString,
@@ -76,11 +78,11 @@ export class ModPagedEmbed extends BaseItemPagedEmbed {
         ), ['', '']);
 
         embed.addFields([
-          { name: this.t(`mod:groups:${group}`, group), value: locationsString, inline: true },
-          { name: this.t('fields:chance'), value: percentagesString, inline: true },
+          { name: await this.t(`mod:groups:${group}`, { group }), value: locationsString, inline: true },
+          { name: await this.t('fields:chance'), value: percentagesString, inline: true },
           { ...EternityMessageEmbed.blankField, inline: true },
         ]);
-      });
+      }).value());
 
     return embed;
   }

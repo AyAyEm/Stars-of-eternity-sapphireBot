@@ -1,15 +1,15 @@
 import { EntityRepository, getConnection } from 'typeorm';
 
+import { Guild as DiscordGuild } from 'discord.js';
+
 import { BaseRepository } from '#structures';
 import { Guild } from '#models';
 
-import type { EternityGuild } from '#lib';
-
 @EntityRepository(Guild)
-export class GuildRepository extends BaseRepository<Guild> {
-  public async findOrInsert(discordGuild: EternityGuild, onlyId: boolean) {
+export class GuildRepo extends BaseRepository<Guild> {
+  public async findOrInsert(discordGuild: DiscordGuild, onlyId: boolean) {
     return getConnection().transaction(async (entityManager) => {
-      const guildsRepo = entityManager.getCustomRepository(GuildRepository);
+      const guildsRepo = entityManager.getCustomRepository(GuildRepo);
       let guild: Guild = await guildsRepo.find(discordGuild, onlyId);
 
       if (!guild) {
@@ -26,7 +26,7 @@ export class GuildRepository extends BaseRepository<Guild> {
     });
   }
 
-  public async find(discordGuild: EternityGuild, onlyId?: boolean) {
+  public async find(discordGuild: DiscordGuild, onlyId?: boolean) {
     if (onlyId) {
       return this.findQuery(discordGuild)
         .select('guild.id')
@@ -36,7 +36,7 @@ export class GuildRepository extends BaseRepository<Guild> {
     return this.findQuery(discordGuild).getOne();
   }
 
-  public findQuery(discordGuild: EternityGuild) {
+  public findQuery(discordGuild: DiscordGuild) {
     return this.createQueryBuilder('guild')
       .where('guild.id = :guildId', { guildId: discordGuild.id });
   }

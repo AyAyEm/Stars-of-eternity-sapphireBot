@@ -10,10 +10,14 @@ export class SchemaCreation1625784978957 implements MigrationInterface {
   }
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await Promise.all(await this.schemaRun((schema) => queryRunner.createSchema(schema, true)));
+    if (queryRunner.manager.connection.options.type === 'postgres') {
+      await Promise.all(await this.schemaRun((schema) => queryRunner.createSchema(schema, true)));
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await Promise.all(await this.schemaRun((schema) => queryRunner.dropSchema(schema, true)));
+    if (queryRunner.manager.connection.options.type === 'postgres') {
+      await Promise.all(await this.schemaRun((schema) => queryRunner.dropSchema(schema, true)));
+    }
   }
 }

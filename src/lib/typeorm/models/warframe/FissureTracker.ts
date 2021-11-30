@@ -12,9 +12,9 @@ import { EternityBaseEntity } from '#structures';
 import { Message } from '#models/Message';
 import { Channel } from '#models/Channel';
 
-@Entity({ schema: 'warframe' })
+@Entity()
 @Unique(['tier', 'channel'])
-export class FissureTracker extends EternityBaseEntity {
+export class WarframeFissureTracker extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 

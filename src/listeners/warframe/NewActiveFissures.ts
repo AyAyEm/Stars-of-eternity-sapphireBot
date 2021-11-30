@@ -1,19 +1,18 @@
+import { Listener } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { getCustomRepository } from 'typeorm';
 
-import type { EventOptions } from '@sapphire/framework';
+import type { TextChannel } from 'discord.js';
 
-import { EternityEvent } from '#lib';
 import { fissuresEmbed } from '#lib/embeds/warframe/FissureTracker';
-import { FissureTrackerRepository } from '#repositories';
+import { WarframeFissureTrackerRepo } from '#repositories';
 
-import type { EternityTextChannel } from '#lib';
 import type { Fissure as WarframeFissure } from '#lib/types/Warframe';
 
-@ApplyOptions<EventOptions>({ event: 'warframeNewActiveFissures' })
-export default class extends EternityEvent<'warframeNewActiveFissures'> {
+@ApplyOptions<Listener.Options>({ event: 'warframeNewActiveFissures' })
+export default class extends Listener {
   public async run(fissures: WarframeFissure[]) {
-    const fissureTrackerRepo = getCustomRepository(FissureTrackerRepository);
+    const fissureTrackerRepo = getCustomRepository(WarframeFissureTrackerRepo);
 
     const fissureTrackers = await fissureTrackerRepo.createQueryBuilder('fissureTracker')
       .where('fissureTracker.enabled = :enabled', { enabled: true })
@@ -30,13 +29,12 @@ export default class extends EternityEvent<'warframeNewActiveFissures'> {
       const embed = fissuresEmbeds.get(fissureTracker.tier);
       if (!embed) return;
 
-      const channel = await this.client.channels
-        .fetch(fissureTracker.channel.id) as EternityTextChannel;
+      const channel = await this.container.client.channels.fetch(fissureTracker.channel.id) as TextChannel; 
 
       const message = await channel.messages.fetch(fissureTracker.message.id);
 
-      await message.edit(embed);
-    })().catch((e) => this.client.console.error(e));
+      await message.edit({ embeds: [embed] });
+    })().catch((e) => this.container.client.logger.error(e));
 
     fissureTrackers.on('data', handler);
   }

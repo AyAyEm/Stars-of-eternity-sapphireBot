@@ -1,5 +1,12 @@
+import { HexColorString } from 'discord.js';
+
 export namespace Warframe {
-  export const factionsStyle = new Map([
+  interface MetaFaction {
+    tumb: string;
+    color: HexColorString;
+  }
+
+  export const factionsStyle = new Map<string, MetaFaction>([
     ['Grineer', { tumb: 'https://i.imgur.com/Yh9Ncdv.png', color: '#6c0607' }],
     ['Corpus', { tumb: 'https://i.imgur.com/Aa4BfIH.png', color: '#0000de' }],
     ['Infested', { tumb: 'https://i.imgur.com/n9THxDE.png', color: '#1a931e' }],
@@ -73,3 +80,18 @@ export const rivenDisposition = [
 ];
 
 export const numberEmojis = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
+
+export const enum EternityFormatters {
+  AndList = 'andList',
+  OrList = 'orList',
+  Permissions = 'permissions',
+}
+
+export const enum Time {
+  Millisecond = 1,
+  Second = 1000,
+  Minute = 1000 * 60,
+  Hour = 1000 * 60 * 60,
+  Day = 1000 * 60 * 60 * 24,
+  Year = 1000 * 60 * 60 * 24 * 365,
+}

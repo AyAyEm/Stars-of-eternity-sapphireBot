@@ -1,19 +1,19 @@
 import { EntityRepository, getConnection } from 'typeorm';
 
+import { TextChannel } from 'discord.js';
+
 import { BaseRepository } from '#structures';
-import { FissureTracker } from '#models';
-import { ChannelRepository } from '#repositories/Channel';
-import { MessageRepository } from '#repositories/Message';
+import { WarframeFissureTracker } from '#models';
+import { ChannelRepo } from '#repositories/Channel';
+import { MessageRepo } from '#repositories/Message';
 import { placeHolder } from '#utils';
 
-import type { EternityTextChannel, EternityMessage } from '#lib';
-
-@EntityRepository(FissureTracker)
-export class FissureTrackerRepository extends BaseRepository<FissureTracker> {
+@EntityRepository(WarframeFissureTracker)
+export class WarframeFissureTrackerRepo extends BaseRepository<WarframeFissureTracker> {
   private tiers = Array.from({ length: 5 }, (_, i) => i + 1);
 
-  public async findOrInsertAll(discordChannel: EternityTextChannel, onlyId?: boolean) {
-    const fissureTrackers: FissureTracker[] = [];
+  public async findOrInsertAll(discordChannel: TextChannel, onlyId?: boolean) {
+    const fissureTrackers: WarframeFissureTracker[] = [];
     for (const tier of this.tiers) {
       // eslint-disable-next-line no-await-in-loop
       fissureTrackers.push(await this.findOrInsert(discordChannel, tier, onlyId));
@@ -22,18 +22,18 @@ export class FissureTrackerRepository extends BaseRepository<FissureTracker> {
     return fissureTrackers;
   }
 
-  public async findOrInsert(discordChannel: EternityTextChannel, tier: number, onlyId?: boolean) {
+  public async findOrInsert(discordChannel: TextChannel, tier: number, onlyId?: boolean) {
     return getConnection().transaction(async (entityManager) => {
-      const fissureTrackerRepo = entityManager.getCustomRepository(FissureTrackerRepository);
+      const fissureTrackerRepo = entityManager.getCustomRepository(WarframeFissureTrackerRepo);
 
       let fissure = await fissureTrackerRepo.find(discordChannel, tier, onlyId);
       if (!fissure) {
-        const channelRepo = entityManager.getCustomRepository(ChannelRepository);
-        const messageRepo = entityManager.getCustomRepository(MessageRepository);
+        const channelRepo = entityManager.getCustomRepository(ChannelRepo);
+        const messageRepo = entityManager.getCustomRepository(MessageRepo);
 
         const channel = await channelRepo.findOrInsert(discordChannel, true);
 
-        const discordMessage = await discordChannel.send(placeHolder()) as EternityMessage;
+        const discordMessage = await discordChannel.send({ embeds: [placeHolder()] });
         await messageRepo.insert(discordMessage, entityManager);
         const message = await messageRepo.find(discordMessage, true);
 
@@ -49,11 +49,11 @@ export class FissureTrackerRepository extends BaseRepository<FissureTracker> {
     });
   }
 
-  public async findAll(discordChannel: EternityTextChannel, onlyId?: boolean) {
+  public async findAll(discordChannel: TextChannel, onlyId?: boolean) {
     return Promise.all(this.tiers.map((tier) => this.find(discordChannel, tier, onlyId)));
   }
 
-  public async find(discordChannel: EternityTextChannel, tier: number, onlyId?: boolean) {
+  public async find(discordChannel: TextChannel, tier: number, onlyId?: boolean) {
     if (onlyId) {
       return this.findQuery(discordChannel, tier)
         .select('fissureTracker.id')
@@ -63,14 +63,14 @@ export class FissureTrackerRepository extends BaseRepository<FissureTracker> {
     return this.findQuery(discordChannel, tier).getOne();
   }
 
-  public findQuery(discordChannel: EternityTextChannel, tier: number) {
+  public findQuery(discordChannel: TextChannel, tier: number) {
     return this.createQueryBuilder('fissureTracker')
       .leftJoin('fissureTracker.channel', 'channel')
       .where('channel.id = :channelId', { channelId: discordChannel.id })
       .andWhere('fissureTracker.tier = :tier', { tier });
   }
 
-  public async delete(fissureTrackers: FissureTracker[]) {
+  public async delete(fissureTrackers: WarframeFissureTracker[]) {
     return this.createQueryBuilder()
       .delete()
       .where('fissure_tracker.id IN (:...fissureIds)', { fissureIds: fissureTrackers.map(({ id }) => id) })

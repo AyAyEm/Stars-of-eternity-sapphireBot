@@ -10,16 +10,16 @@ import {
 
 import { Channel } from '#models/Channel';
 import { EternityBaseEntity } from '#structures';
-import { Item } from './Item';
+import { WarframeItem } from './Item';
 
-@Entity({ schema: 'warframe' })
-export class InvasionTracker extends EternityBaseEntity {
+@Entity()
+export class WarframeInvasionTracker extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @ManyToMany(() => Item)
+  @ManyToMany(() => WarframeItem)
   @JoinTable({ name: 'invasion_tracker_item' })
-  public items: Item[];
+  public items: WarframeItem[];
 
   @OneToOne(() => Channel, { nullable: false })
   @JoinColumn()

@@ -1,32 +1,30 @@
-import i18n from 'i18next';
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import async from 'async';
 import { ApplyOptions } from '@sapphire/decorators';
+import { resolveKey } from '@sapphire/plugin-i18next';
+import { SubCommandPluginCommand } from '@sapphire/plugin-subcommands';
 import { getCustomRepository } from 'typeorm';
 
 import type { Args } from '@sapphire/framework';
+import type { Guild, Message } from 'discord.js';
 
-import { EternityCommandWSC, EternityMessageEmbed } from '#lib';
-import { RoleReactionRepository } from '#repositories';
+import { EternityMessageEmbed } from '#lib';
+import { RoleReactionRepo } from '#repositories';
 
-import type {
-  EternityCommandWSCOptions,
-  EternityMessage,
-  EternityGuild,
-} from '#lib';
-
-@ApplyOptions<EternityCommandWSCOptions>({
+@ApplyOptions<SubCommandPluginCommand.Options>({
   preconditions: ['GuildOnly', 'OwnerOnly'],
   subCommands: [
     'create',
     'renew',
-    { name: 'delete', requiredArgs: ['message'], aliases: ['remove'] },
-    { name: 'add', requiredArgs: ['emoji', 'role'] },
+    'delete',
+    'add',
   ],
   enabled: false,
 })
-export default class extends EternityCommandWSC {
+export default class extends SubCommandPluginCommand {
   private async mapToEmbed(
-    guild: EternityGuild,
+    guild: Guild,
     roleEmoji: Map<string, string>,
     title?: string,
   ) {
@@ -49,23 +47,23 @@ export default class extends EternityCommandWSC {
     return embed;
   }
 
-  private get firstEmbed() {
-    return new EternityMessageEmbed().setTitle(i18n.t('commands/RoleReaction:firstEmbed'));
-  }
+  // private async firstEmbed() {
+  //   return new EternityMessageEmbed().setTitle(await resolveKey(this.container.client, 'commands/RoleReaction:firstEmbed'));
+  // }
 
   private get roleReactionRepo() {
-    return getCustomRepository(RoleReactionRepository);
+    return getCustomRepository(RoleReactionRepo);
   }
 
-  public async create(msg: EternityMessage, args: Args) {
+  public async create(msg: Message, args: Args) {
   }
 
-  public async delete(msg: EternityMessage, args: Args) {
+  public async delete(msg: Message, args: Args) {
   }
 
-  public async add(msg: EternityMessage, args: Args) {
+  public async add(msg: Message, args: Args) {
   }
 
-  public async renew(msg: EternityMessage, args: Args) {
+  public async renew(msg: Message, args: Args) {
   }
 }

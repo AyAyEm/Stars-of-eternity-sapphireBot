@@ -2,19 +2,19 @@
 import { EntityRepository, getCustomRepository, getConnection } from 'typeorm';
 
 import type { EntityManager } from 'typeorm';
+import type { Message } from 'discord.js';
 
 import { BaseRepository } from '#structures';
 import { RoleReaction } from '#models';
-import { RoleRepository } from './Role';
-import { MessageRepository } from './Message';
+import { RoleRepo } from './Role';
+import { MessageRepo } from './Message';
 
-import type { EternityMessage } from '#lib/extensions';
 
 @EntityRepository(RoleReaction)
-export class RoleReactionRepository extends BaseRepository<RoleReaction> {
+export class RoleReactionRepo extends BaseRepository<RoleReaction> {
   public async findOrInsert(insertOptions: RoleReactionRepository.InsertOptions, onlyId?: boolean) {
     return getConnection().transaction(async (manager) => {
-      const roleReactionRepo = manager.getCustomRepository(RoleReactionRepository);
+      const roleReactionRepo = manager.getCustomRepository(RoleReactionRepo);
 
       let roleReaction = await roleReactionRepo.findByMessage(insertOptions.discordMessage, onlyId);
       if (!roleReaction) {
@@ -33,11 +33,11 @@ export class RoleReactionRepository extends BaseRepository<RoleReaction> {
 
     const roleReactions = [...roleReaction.entries()];
     const toInsert = await Promise.all(roleReactions.map(async ([discordRoleId, reaction]) => {
-      const roleRepo = getRepo(RoleRepository);
+      const roleRepo = getRepo(RoleRepo);
       const discordRole = await discordMessage.guild.roles.fetch(discordRoleId);
       const role = await roleRepo.findOrInsert(discordRole, true);
 
-      const messageRepo = getRepo(MessageRepository);
+      const messageRepo = getRepo(MessageRepo);
       const message = await messageRepo.findOrInsert(discordMessage, true);
 
       return { role, message, emoji: reaction };
@@ -49,7 +49,7 @@ export class RoleReactionRepository extends BaseRepository<RoleReaction> {
       .execute();
   }
 
-  public async findByMessage(discordMessage: EternityMessage, onlyId?: boolean) {
+  public async findByMessage(discordMessage: Message, onlyId?: boolean) {
     if (onlyId) {
       return this.findByMessageQuery(discordMessage)
         .select('roleReaction.id')
@@ -59,7 +59,7 @@ export class RoleReactionRepository extends BaseRepository<RoleReaction> {
     return this.findByMessageQuery(discordMessage).getMany();
   }
 
-  public findByMessageQuery(discordMessage: EternityMessage) {
+  public findByMessageQuery(discordMessage: Message) {
     return this.createQueryBuilder('roleReaction')
       .leftJoinAndSelect('roleReaction.role', 'role')
       .leftJoinAndSelect('roleReaction.emoji', 'emoji')
@@ -70,7 +70,7 @@ export class RoleReactionRepository extends BaseRepository<RoleReaction> {
 
 export namespace RoleReactionRepository {
   export interface InsertOptions {
-    discordMessage: EternityMessage;
+    discordMessage: Message;
     roleReaction: Map<string, string>;
   }
 }

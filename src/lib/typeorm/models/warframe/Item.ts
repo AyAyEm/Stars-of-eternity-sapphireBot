@@ -2,7 +2,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  Index,
   ManyToMany,
   JoinTable,
 } from 'typeorm';
@@ -11,12 +10,11 @@ import { EternityBaseEntity } from '#structures';
 import { Guild } from '#models/Guild';
 import { User } from '#models/User';
 
-@Entity({ schema: 'warframe' })
-export class Item extends EternityBaseEntity {
+@Entity()
+export class WarframeItem extends EternityBaseEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @Index()
   @Column({ type: 'varchar', length: 250, nullable: false, unique: true })
   public name: string;
 

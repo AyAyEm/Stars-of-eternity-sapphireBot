@@ -1,31 +1,33 @@
 import { capitalize } from 'lodash';
-import { ApplyOptions } from '@sapphire/decorators';
 import { getCustomRepository } from 'typeorm';
+import { ApplyOptions } from '@sapphire/decorators';
+import { replyLocalized } from '@sapphire/plugin-i18next';
+import { SubCommandPluginCommand, SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 
-import { EternityCommandWSC } from '#lib';
-import { FissureTrackerRepository } from '#repositories';
-import { deleteMsgs } from '#utils';
+import type { Message, TextChannel } from 'discord.js';
 
-import type { EternityCommandWSCOptions, EternityMessage, EternityTextChannel } from '#lib';
+import { WarframeFissureTrackerRepo } from '#repositories';
+import { deleteMsgs, wait } from '#utils';
 
-@ApplyOptions<EternityCommandWSCOptions>({
+@ApplyOptions<SubCommandPluginCommandOptions>({
   preconditions: ['GuildOnly'],
   subCommands: ['enable', 'disable', 'reset'],
 })
-export default class extends EternityCommandWSC {
+export default class extends SubCommandPluginCommand {
   private get fissureTrackerRepo() {
-    return getCustomRepository(FissureTrackerRepository);
+    return getCustomRepository(WarframeFissureTrackerRepo);
   }
 
-  private async setEnabled(msg: EternityMessage, value: boolean) {
+  private async setEnabled(msg: Message, value: boolean) {
     const { fissureTrackerRepo } = this;
-    const fissureTrackers = await fissureTrackerRepo.findOrInsertAll(msg.channel);
+    const fissureTrackers = await fissureTrackerRepo.findOrInsertAll(msg.channel as TextChannel);
     const toUpdateTrackers = fissureTrackers.filter(({ enabled }) => (value ? !enabled : enabled));
 
     const action = value ? 'enable' : 'disable';
     if (toUpdateTrackers.length <= 0) {
-      const reply = msg.replyTranslated(`commands/Relics:${action}:already${capitalize(action)}d`);
-      await deleteMsgs([reply, msg], { timeout: 15000 });
+      const reply =  replyLocalized(msg, `commands/Relics:${action}:already${capitalize(action)}d`);
+      await wait(15000);
+      await deleteMsgs([reply, msg]);
       return;
     }
 
@@ -38,20 +40,22 @@ export default class extends EternityCommandWSC {
       )
       .execute();
 
-    const reply = await msg.replyTranslated(`commands/Relics:${action}:success`);
+      
+    const reply = await replyLocalized(msg, `commands/Relics:${action}:success`);
 
-    await deleteMsgs([reply, msg], { timeout: 15000 });
+    await wait(15000);
+    await deleteMsgs([reply, msg]);
   }
 
-  public async enable(msg: EternityMessage) {
+  public async enable(msg: Message) {
     await this.setEnabled(msg, true);
   }
 
-  public async disable(msg: EternityMessage) {
+  public async disable(msg: Message) {
     await this.setEnabled(msg, false);
   }
 
-  public async reset(msg: EternityMessage) {
+  public async reset(msg: Message) {
     const fissureTrackers = await this.fissureTrackerRepo
       .createQueryBuilder('fissure')
       .leftJoinAndSelect('fissure.message', 'message')
@@ -62,8 +66,8 @@ export default class extends EternityCommandWSC {
     const { fissureTrackerRepo } = this;
     if (fissureTrackers.length > 0) {
       const messagesDeletion = Promise.all(fissureTrackers.map(async (fissureTracker) => {
-        const channel = await this.client.channels
-          .fetch(fissureTracker.channel.id) as EternityTextChannel;
+        const channel = await msg.client.channels
+          .fetch(fissureTracker.channel.id) as TextChannel;
 
         const message = await channel.messages
           .fetch(fissureTracker.message.id).catch(() => null);
@@ -75,7 +79,8 @@ export default class extends EternityCommandWSC {
       await messagesDeletion;
     }
 
-    await fissureTrackerRepo.findOrInsertAll(msg.channel, true);
-    await deleteMsgs([msg.replyTranslated('commands/Relics:reset:success'), msg], { timeout: 15000 });
+    await fissureTrackerRepo.findOrInsertAll(msg.channel as TextChannel, true);
+    await wait(15000);
+    await deleteMsgs([replyLocalized(msg, 'commands/Relics:reset:success'), msg]);
   }
 }

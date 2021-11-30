@@ -3,7 +3,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import axios from 'axios';
 
 import { Task, TaskOptions } from '#lib/structures';
-import { InvasionRepository } from '#repositories';
+import { WarframeInvasionRepo } from '#repositories';
 
 import type { InvasionData } from '#lib/types/Warframe';
 
@@ -11,13 +11,9 @@ import type { InvasionData } from '#lib/types/Warframe';
 export default class InvasionTracker extends Task {
   public invasionUrl = 'https://api.warframestat.us/pc/invasions';
 
-  public get invasionRepo() {
-    return getCustomRepository(InvasionRepository);
-  }
-
   public async run() {
     axios.get(this.invasionUrl).then(async ({ data: invasionsData }: { data: InvasionData[] }) => {
-      const { invasionRepo } = this;
+      const invasionRepo = getCustomRepository(WarframeInvasionRepo);
       const { activation: latestActivation = '0' } = (await invasionRepo.findLatest()) ?? {};
 
       const getTime = (timestamp: string) => new Date(timestamp).getTime();
@@ -29,12 +25,12 @@ export default class InvasionTracker extends Task {
       if (newInvasions.length > 0) {
         await invasionRepo.insert(newInvasions);
 
-        this.client.emit('warframeNewInvasions', newInvasions);
+        this.container.client.emit('warframeNewInvasions', newInvasions);
       }
     })
       .catch((err) => {
         if (err.message.includes('Request failed')) return;
-        this.client.console.error(err);
+        this.container.client.logger.error(err);
       });
   }
 }

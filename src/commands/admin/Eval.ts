@@ -1,21 +1,25 @@
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, Message } from 'discord.js';
 import { inspect } from 'util';
 
-import { EternityCommand, EternityMessage } from '@lib';
 import { CommandOptions, Args } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
+
+import { EternityCommand } from '#lib';
 
 @ApplyOptions<CommandOptions>({
   preconditions: ['OwnerOnly'],
 })
 export default class extends EternityCommand {
-  public async run(msg: EternityMessage, args: Args) {
+  public async messageRun(msg: Message, args: Args) {
     const embed = new MessageEmbed()
       .setFooter(msg.author.tag, msg.author.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
 
     const query = await args.rest('string');
 
-    const code = (lang: string, c) => (`\`\`\`${lang}\n${String(c).slice(0, 1000) + (c.length >= 1000 ? '...' : '')}\n\`\`\``).replace(this.client.token, '*'.repeat(this.client.token.length));
+    function code(lang: string, c) {
+      return (`\`\`\`${lang}\n${String(c).slice(0, 1000) + (c.length >= 1000 ? '...' : '')}\n\`\`\``)
+        .replace(this.container.client.token, '*'.repeat(this.container.client.token.length));
+    }
 
     if (!query) msg.channel.send('Please, write something so I can evaluate!');
     else {
@@ -37,7 +41,7 @@ export default class extends EternityCommand {
           .addField('Error', code('js', error))
           .setColor('RED');
       } finally {
-        msg.channel.send(embed).catch((error) => {
+        msg.channel.send({ embeds: [embed] }).catch((error) => {
           msg.channel.send(`There was an error while displaying the eval result! ${error.message}`);
         });
       }

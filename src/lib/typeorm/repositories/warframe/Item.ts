@@ -1,21 +1,21 @@
 import { EntityRepository, getConnection } from 'typeorm';
 
-import type { Item as WarframeItem } from 'warframe-items';
+import type { Item } from 'warframe-items';
 
 import { BaseRepository } from '#structures';
-import { Item } from '#models';
+import { WarframeItem } from '#models';
 
-@EntityRepository(Item)
-export class ItemRepository extends BaseRepository<Item> {
-  public async findOrInsert(warframeItem: WarframeItem, onlyId?: boolean) {
+@EntityRepository(WarframeItem)
+export class WarframeItemRepo extends BaseRepository<Item> {
+  public async findOrInsert(warframeItem: Item, onlyId?: boolean) {
     return getConnection().transaction(async (entityManager) => {
-      const itemRepo = entityManager.getCustomRepository(ItemRepository);
+      const itemRepo = entityManager.getCustomRepository(WarframeItemRepo);
       let item = await itemRepo.find(warframeItem, onlyId);
 
       if (!item) {
         await itemRepo.createQueryBuilder('item')
           .insert()
-          .into(Item)
+          .into(WarframeItem)
           .values({ name: warframeItem.name })
           .execute();
 
@@ -26,7 +26,7 @@ export class ItemRepository extends BaseRepository<Item> {
     });
   }
 
-  public async find(warframeItem: WarframeItem, onlyId?: boolean) {
+  public async find(warframeItem: Item, onlyId?: boolean) {
     if (onlyId) {
       return this.findQuery(warframeItem)
         .select('item.id')
@@ -36,7 +36,7 @@ export class ItemRepository extends BaseRepository<Item> {
     return this.findQuery(warframeItem).getOne();
   }
 
-  public findQuery(warframeItem: WarframeItem) {
+  public findQuery(warframeItem: Item) {
     return this.createQueryBuilder('item')
       .where('item.name = :itemName', { itemName: warframeItem.name });
   }

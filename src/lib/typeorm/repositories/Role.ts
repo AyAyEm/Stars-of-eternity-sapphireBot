@@ -3,21 +3,19 @@ import { EntityRepository, getConnection } from 'typeorm';
 import type { Role as DiscordRole } from 'discord.js';
 
 import { BaseRepository } from '#structures';
-import { GuildRepository } from './Guild';
+import { GuildRepo } from './Guild';
 import { Role } from '#models';
 
-import type { EternityGuild } from '#lib/extensions';
-
 @EntityRepository(Role)
-export class RoleRepository extends BaseRepository<Role> {
+export class RoleRepo extends BaseRepository<Role> {
   public async findOrInsert(discordRole: DiscordRole, onlyId?: boolean) {
     return getConnection().transaction(async (entityManager) => {
-      const roleRepo = entityManager.getCustomRepository(RoleRepository);
+      const roleRepo = entityManager.getCustomRepository(RoleRepo);
 
       let role = await roleRepo.find(discordRole, onlyId);
       if (!role) {
-        const guildRepo = entityManager.getCustomRepository(GuildRepository);
-        const guild = await guildRepo.findOrInsert(discordRole.guild as EternityGuild, true);
+        const guildRepo = entityManager.getCustomRepository(GuildRepo);
+        const guild = await guildRepo.findOrInsert(discordRole.guild, true);
 
         await roleRepo.createQueryBuilder('role')
           .insert()

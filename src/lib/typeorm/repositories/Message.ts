@@ -1,22 +1,21 @@
 import { EntityRepository, getConnection, getCustomRepository } from 'typeorm';
 
 import type { EntityManager } from 'typeorm';
+import type { Message as DiscordMessage, TextChannel } from 'discord.js';
 
 import { BaseRepository } from '#structures';
-import { ChannelRepository } from '#repositories/Channel';
+import { ChannelRepo } from '#repositories/Channel';
 import { Message } from '#models';
 
-import type { EternityMessage } from '#lib';
-
 @EntityRepository(Message)
-export class MessageRepository extends BaseRepository<Message> {
-  public async findOrInsert(discordMessage: EternityMessage, onlyId?: boolean) {
+export class MessageRepo extends BaseRepository<Message> {
+  public async findOrInsert(discordMessage: DiscordMessage, onlyId?: boolean) {
     return getConnection().transaction(async (entityManager) => {
-      const messageRepo = entityManager.getCustomRepository(MessageRepository);
+      const messageRepo = entityManager.getCustomRepository(MessageRepo);
 
       let message = await messageRepo.find(discordMessage, onlyId);
       if (!message) {
-        console.log(await this.insert(discordMessage, entityManager));
+        await this.insert(discordMessage, entityManager);
 
         message = await messageRepo.find(discordMessage, onlyId);
       }
@@ -25,19 +24,19 @@ export class MessageRepository extends BaseRepository<Message> {
     });
   }
 
-  public async insert(discordMessage: EternityMessage, manager?: EntityManager) {
+  public async insert(discordMessage: DiscordMessage, manager?: EntityManager) {
     const channelRepo = manager
-      ? manager.getCustomRepository(ChannelRepository)
-      : getCustomRepository(ChannelRepository);
+      ? manager.getCustomRepository(ChannelRepo)
+      : getCustomRepository(ChannelRepo);
 
-    const channel = await channelRepo.findOrInsert(discordMessage.channel, true);
+    const channel = await channelRepo.findOrInsert(discordMessage.channel as TextChannel, true);
     return this.createQueryBuilder('message')
       .insert()
       .values({ channel, id: discordMessage.id })
       .execute();
   }
 
-  public async find(discordMessage: EternityMessage, onlyId?: boolean) {
+  public async find(discordMessage: DiscordMessage, onlyId?: boolean) {
     if (onlyId) {
       return this.findQuery(discordMessage)
         .select('message.id')
@@ -47,7 +46,7 @@ export class MessageRepository extends BaseRepository<Message> {
     return this.findQuery(discordMessage).getOne();
   }
 
-  public findQuery(discordMessage: EternityMessage) {
+  public findQuery(discordMessage: DiscordMessage) {
     return this.createQueryBuilder('message')
       .where('message.id = :messageId', { messageId: discordMessage.id });
   }
