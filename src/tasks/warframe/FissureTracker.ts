@@ -1,9 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { getCustomRepository } from 'typeorm';
 import axios from 'axios';
 
 import { Task, TaskOptions } from '#lib/structures';
-import { WarframeFissureRepo } from '#repositories';
 
 import type { Fissure } from '#lib/types/Warframe';
 
@@ -12,10 +10,10 @@ export default class extends Task {
   public fissuresUrl = 'https://api.warframestat.us/pc/fissures';
 
   public async run() {
-    const fissureRepo = getCustomRepository(WarframeFissureRepo);
-    axios.get(this.fissuresUrl).then(async ({ data: fissuresData }: { data: Fissure[] }) => {
-      const { activation: latestActivation = '0' } = (await fissureRepo.findLatest()) ?? {};
+    const { redisClient } = this.container;
+    let latestActivation = await redisClient.get('latestWarframeFissureActivation');
 
+    axios.get(this.fissuresUrl).then(async ({ data: fissuresData }: { data: Fissure[] }) => {
       const getTime = (timestamp: string) => new Date(timestamp).getTime();
 
       const activeFissures = fissuresData.filter(({ active }) => active);
@@ -23,9 +21,11 @@ export default class extends Task {
         getTime(activation) > getTime(latestActivation)));
 
       if (newFissures.length > 0) {
-        await fissureRepo.insert(newFissures);
-
         this.container.client.emit('warframeNewActiveFissures', newFissures);
+        
+        latestActivation = newFissures.reduce((acc, { activation }) => (
+          getTime(activation) > getTime(acc) ? activation : acc), latestActivation);
+        this.container.redisClient.set('latestWarframeFissureActivation', latestActivation);
       }
     })
       .catch((err) => {

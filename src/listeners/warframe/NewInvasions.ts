@@ -1,12 +1,12 @@
 import { MessageEmbed } from 'discord.js';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Listener, ListenerOptions } from '@sapphire/framework';
-import { getCustomRepository } from 'typeorm';
+import { DocumentType, getModelForClass } from '@typegoose/typegoose';
 
 import type { TextChannel } from 'discord.js';
 
 import { CaseInsensitiveSet } from '#lib/structures';
-import { WarframeInvasionTrackerRepo } from '#repositories';
+import { InvasionTracker, Item } from '#schemas';
 import { Warframe } from '#utils';
 
 import type { InvasionData, Reward } from '#lib/types/Warframe';
@@ -14,37 +14,26 @@ import type { InvasionData, Reward } from '#lib/types/Warframe';
 @ApplyOptions<ListenerOptions>({ event: 'warframeNewInvasions' })
 export default class extends Listener {
   public async run(invasions: InvasionData[]) {
-    const InvasionTrackerRepo = getCustomRepository(WarframeInvasionTrackerRepo);
+    await getModelForClass(InvasionTracker)
+      .find({ enabled: true })
+      .populate('items')
+      .cursor()
+      .eachAsync(async (invasionTracker: DocumentType<InvasionTracker>) => {
+        if (invasionTracker.items.length > 0) {
+          const itemNames = new CaseInsensitiveSet(invasionTracker.items.map(({ name }: Item) => name));
 
-    const invasionTrackers = await InvasionTrackerRepo.createQueryBuilder('invasionTracker')
-      .where('invasionTracker.enabled = :enabled', { enabled: true })
-      .stream();
+          const channelId = invasionTracker.channel;
+          await Promise.all(invasions
+            .filter(({ rewardTypes }) => rewardTypes.find((itemName) => itemNames.has(itemName)))
+            .map(async (invasion) => {
+              const items = invasion.rewardTypes.filter((itemName) => itemNames.has(itemName));
 
-    const handler = (data: { invasionTracker_id: number }) => (async () => {
-      const invasionTracker = await InvasionTrackerRepo
-        .createQueryBuilder('invasionTracker')
-        .leftJoinAndSelect('invasionTracker.items', 'items')
-        .leftJoinAndSelect('invasionTracker.channel', 'channel')
-        .where('invasionTracker.id = :invasionTrackerId', { invasionTrackerId: data.invasionTracker_id })
-        .getOne();
-
-      if (invasionTracker.items.length > 0) {
-        const itemNames = new CaseInsensitiveSet(invasionTracker.items.map(({ name }) => name));
-
-        const channelId = invasionTracker.channel.id;
-        await Promise.all(invasions
-          .filter(({ rewardTypes }) => rewardTypes.find((itemName) => itemNames.has(itemName)))
-          .map(async (invasion) => {
-            const items = invasion.rewardTypes.filter((itemName) => itemNames.has(itemName));
-
-            const embeds = this.makeEmbeds(invasion, items);
-            const discordChannel = await this.container.client.channels.fetch(channelId) as TextChannel;
-            await discordChannel.send({ embeds: embeds });
-          }));
-      }
-    })().catch((e) => this.container.client.logger.error(e));
-
-    invasionTrackers.on('data', handler);
+              const embeds = this.makeEmbeds(invasion, items);
+              const discordChannel = await this.container.client.channels.fetch(channelId) as TextChannel;
+              await discordChannel.send({ embeds: embeds });
+            }));
+        }
+      }).catch((e) => this.container.client.logger.error(e));
   }
 
   private makeEmbeds(invasion: InvasionData, matchedItems: string[]): MessageEmbed[] {

@@ -10,7 +10,6 @@ import type { Args } from '@sapphire/framework';
 import type { Guild, Message } from 'discord.js';
 
 import { EternityMessageEmbed } from '#lib';
-import { RoleReactionRepo } from '#repositories';
 
 @ApplyOptions<SubCommandPluginCommand.Options>({
   preconditions: ['GuildOnly', 'OwnerOnly'],
@@ -50,10 +49,6 @@ export default class extends SubCommandPluginCommand {
   // private async firstEmbed() {
   //   return new EternityMessageEmbed().setTitle(await resolveKey(this.container.client, 'commands/RoleReaction:firstEmbed'));
   // }
-
-  private get roleReactionRepo() {
-    return getCustomRepository(RoleReactionRepo);
-  }
 
   public async create(msg: Message, args: Args) {
   }

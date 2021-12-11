@@ -21,8 +21,8 @@
       "#models/*": ["./lib/typeorm/models/*"],
       "#structures": ["./lib/structures"],
       "#structures/*": ["./lib/structures/*"],
-      "#repositories": ["./lib/typeorm/repositories"],
-      "#repositories/*": ["./lib/typeorm/repositories/*"],
+      "#schemas": ["./lib/mongodb/schemas"],
+      "#schemas/*": ["./lib/mongodb/schemas/*"],
       "#decorators": ["./lib/decorators"],
       "#decorators/*": ["./lib/decorators/*"]
     }

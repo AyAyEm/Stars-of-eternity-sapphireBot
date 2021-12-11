@@ -1,4 +1,6 @@
-import type { Connection } from 'typeorm';
+import type { createClient } from 'redis';
+import type { Mongoose } from 'mongoose';
+
 import type { Items } from '#lib/eternity/warframe';
 
 interface WarframeOptions {
@@ -8,8 +10,9 @@ interface WarframeOptions {
 declare module '@sapphire/pieces' {
   interface Container {
     warframe: WarframeOptions;
-    connection: Connection;
     ready: Promise<void>;
+    redisClient: ReturnType<typeof createClient>;
+    mongoClient: Mongoose;
   }
 }
 

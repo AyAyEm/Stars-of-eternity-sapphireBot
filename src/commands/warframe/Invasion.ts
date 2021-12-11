@@ -2,16 +2,16 @@ import { capitalize } from 'lodash';
 import { replyLocalized, resolveKey, Target } from '@sapphire/plugin-i18next';
 import { SubCommandPluginCommand, SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import { ApplyOptions } from '@sapphire/decorators';
-import { getCustomRepository, getConnection } from 'typeorm';
+import { getModelForClass } from '@typegoose/typegoose';
 
-import type { Message, TextChannel } from 'discord.js';
+import type { Message } from 'discord.js';
 import type { Args } from '@sapphire/framework';
 import type { Item as WarframeItem } from 'warframe-items';
 
 import { EternityMessageEmbed } from '#lib';
 import { itemNames } from '#utils';
 import { CaseInsensitiveMap } from '#structures/CaseInsensitiveMap';
-import { WarframeInvasionTracker, WarframeInvasionTrackerRepo, WarframeItemRepo } from '#lib/typeorm';
+import { InvasionTracker, Item as ItemSchema } from '#schemas';
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   preconditions: ['GuildOnly'],
@@ -80,17 +80,20 @@ export default class extends SubCommandPluginCommand {
   public itemsDict = new CaseInsensitiveMap<string, WarframeItem>(itemNames.all.map((item) => (
     [item.toLowerCase(), { name: item } as WarframeItem])));
 
-  public get invasionTrackerRepo(): WarframeInvasionTrackerRepo {
-    return getCustomRepository(WarframeInvasionTrackerRepo);
-  }
-
-  public get itemRepo(): WarframeItemRepo {
-    return getCustomRepository(WarframeItemRepo);
-  }
-
   public async items(msg: Message, args: Args) {
     if (args.getFlags('list', 'l')) {
-      const items = await this.invasionTrackerRepo.findItemsByChannel(msg.channel as TextChannel);
+      const { items } = (await getModelForClass(InvasionTracker).aggregate<{ items: ItemSchema[] }>([
+        { $match: { channel: msg.channel.id } },
+        {
+          $lookup: {
+            from: 'items',
+            localField: 'items',
+            foreignField: '_id',
+            as: 'items',
+          },
+        },
+        { $project: { 'items.name': 1, _id: 0 } },
+      ]))[0];
 
       if (items.length === 0) {
         await replyLocalized(msg, 'commands/invasion:items:notFound');
@@ -114,21 +117,20 @@ export default class extends SubCommandPluginCommand {
   }
 
   private async setEnabled(msg: Message, value: boolean) {
-    const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel as TextChannel);
+    const result = await getModelForClass(InvasionTracker).updateOne(
+      { channel: msg.channel.id },
+      { $set: { enabled: value } },
+      { upsert: true, new: true },
+    );
 
     const action = value ? 'enable' : 'disable';
-    if (invasionTracker.enabled === value) {
-      await replyLocalized(msg, `commands/invasion:${action}:already${capitalize(action)}d`);
-      return;
+    let reply: Message;
+    if (result.modifiedCount === 0 && result.upsertedCount === 0) {
+      reply = await replyLocalized(msg, `commands/invasion:${action}:already${capitalize(action)}d`);
+    } else {
+      reply = await replyLocalized(msg, `commands/invasion:${action}:success`);
     }
 
-    await this.invasionTrackerRepo.createQueryBuilder()
-      .update(WarframeInvasionTracker)
-      .set({ enabled: value })
-      .where('invasion_tracker.id = :invasionTrackerId', { invasionTrackerId: invasionTracker.id })
-      .execute();
-
-    const reply = await replyLocalized(msg, `commands/invasion:${action}:success`);
     setTimeout(() => reply.delete(), 10000); 
   }
 
@@ -142,21 +144,33 @@ export default class extends SubCommandPluginCommand {
 
   private async updateItems(action: 'add' | 'delete', msg: Message, args: Args) {
     const all = args.getFlags('all');
-
     const toUpdateItems = all ? [...this.itemsDict.keys()] : await args.repeat('warframeItem');
 
-    const storedItems = await this.invasionTrackerRepo.findItemsByChannel(msg.channel as TextChannel);
-    const storedItemsNames = new Map(storedItems.map((warframeItem) => (
-      [warframeItem.name, warframeItem])));
+    const ItemsModel = getModelForClass(ItemSchema);
+    await ItemsModel.bulkWrite(toUpdateItems.map((itemName) => ({
+      updateOne: {
+        filter: { name: itemName },
+        update: {},
+        upsert: true,
+      },
+    })));
 
-    const parsedToUpdateItems = toUpdateItems
-      .map((item) => (this.itemsDict.get(item)))
-      .filter((item) => {
-        const hasItem = storedItemsNames.has(item.name);
-        return action === 'add' ? !hasItem : hasItem;
-      });
+    const items = (await ItemsModel
+      .find({ name: { $in: toUpdateItems } }, { _id: 1, name: 0 })
+      .exec()).map(({ _id }) => _id);
 
-    if (parsedToUpdateItems.length <= 0) {
+    const result = await getModelForClass(InvasionTracker).updateOne(
+      { channel: msg.channel.id },
+      {
+        ...(action === 'add' 
+          ? { $addToSet: { items: { $each: items } } } 
+          : { $pullAll: { items } }),
+        $setOnInsert: { enabled: true },
+      },
+      { upsert: true, new: true },
+    );
+
+    if (result.modifiedCount === 0 && result.upsertedCount === 0) {
       const actionVerb = action === 'add' ? 'Added' : 'Deleted';
 
       replyLocalized(
@@ -167,26 +181,14 @@ export default class extends SubCommandPluginCommand {
         },
       );
       return;
+    } else {
+      replyLocalized(
+        msg,
+        {
+          keys: `commands/invasion:${action}:success${all ? 'All' : ''}`,
+          formatOptions: { items: toUpdateItems }, 
+        },
+      );
     }
-
-    const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel as TextChannel, true);
-    await Promise.all(parsedToUpdateItems.map(async (warframeItem: WarframeItem) => {
-      const item = await this.itemRepo.findOrInsert(warframeItem);
-
-      const query = getConnection()
-        .createQueryBuilder()
-        .relation(WarframeInvasionTracker, 'items')
-        .of(invasionTracker);
-
-      await (action === 'add' ? query.add(item) : query.remove(item));
-    }));
-
-    replyLocalized(
-      msg,
-      {
-        keys: `commands/invasion:${action}:success${all ? 'All' : ''}`,
-        formatOptions: { items: [...parsedToUpdateItems].map(({ name }) => name) }, 
-      },
-    );
   }
 }

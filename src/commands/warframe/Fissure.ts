@@ -1,47 +1,35 @@
+import async from 'async';
 import { capitalize } from 'lodash';
-import { getCustomRepository } from 'typeorm';
 import { ApplyOptions } from '@sapphire/decorators';
 import { replyLocalized } from '@sapphire/plugin-i18next';
 import { SubCommandPluginCommand, SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
+import { getModelForClass } from '@typegoose/typegoose';
 
-import type { Message, TextChannel } from 'discord.js';
+import type { Message } from 'discord.js';
 
-import { WarframeFissureTrackerRepo } from '#repositories';
 import { deleteMsgs, wait } from '#utils';
+import { FissureTracker } from '#schemas';
+import { placeHolder } from '../../lib/utils/placeHolder';
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   preconditions: ['GuildOnly'],
   subCommands: ['enable', 'disable', 'reset'],
 })
 export default class extends SubCommandPluginCommand {
-  private get fissureTrackerRepo() {
-    return getCustomRepository(WarframeFissureTrackerRepo);
-  }
-
   private async setEnabled(msg: Message, value: boolean) {
-    const { fissureTrackerRepo } = this;
-    const fissureTrackers = await fissureTrackerRepo.findOrInsertAll(msg.channel as TextChannel);
-    const toUpdateTrackers = fissureTrackers.filter(({ enabled }) => (value ? !enabled : enabled));
+    const result = await  getModelForClass(FissureTracker).updateOne(
+      { enabled: !value, channel: msg.channel.id }, 
+      { $set: { enabled: value } }, 
+      { upsert: true },
+    );
 
     const action = value ? 'enable' : 'disable';
-    if (toUpdateTrackers.length <= 0) {
-      const reply =  replyLocalized(msg, `commands/Relics:${action}:already${capitalize(action)}d`);
-      await wait(15000);
-      await deleteMsgs([reply, msg]);
-      return;
+    let reply: Message;
+    if (result.modifiedCount === 0 && result.upsertedCount === 0) {
+      reply = await replyLocalized(msg, `commands/Relics:${action}:already${capitalize(action)}d`);
+    } else {
+      reply = await replyLocalized(msg, `commands/Relics:${action}:success`);
     }
-
-    await fissureTrackerRepo.createQueryBuilder('fissureTracker')
-      .update()
-      .set({ enabled: value })
-      .where(
-        'fissure_tracker.id IN (:...trackerIds)',
-        { trackerIds: toUpdateTrackers.map(({ id }) => id) },
-      )
-      .execute();
-
-      
-    const reply = await replyLocalized(msg, `commands/Relics:${action}:success`);
 
     await wait(15000);
     await deleteMsgs([reply, msg]);
@@ -56,31 +44,26 @@ export default class extends SubCommandPluginCommand {
   }
 
   public async reset(msg: Message) {
-    const fissureTrackers = await this.fissureTrackerRepo
-      .createQueryBuilder('fissure')
-      .leftJoinAndSelect('fissure.message', 'message')
-      .leftJoinAndSelect('fissure.channel', 'channel')
-      .where('channel.id = :channelId', { channelId: msg.channel.id })
-      .getMany();
+    const fissureTracker = await getModelForClass(FissureTracker)
+      .findOneAndUpdate(
+        { channel: msg.channel.id }, 
+        { $set: { enabled: true } },
+        { upsert: true, new: true },
+      );
+    const oldMessages = fissureTracker.messages;
+    const messagesDeletion = Promise.all(oldMessages.map((id: string) => (
+      msg.channel.messages.delete(id).catch(() => null))));
 
-    const { fissureTrackerRepo } = this;
-    if (fissureTrackers.length > 0) {
-      const messagesDeletion = Promise.all(fissureTrackers.map(async (fissureTracker) => {
-        const channel = await msg.client.channels
-          .fetch(fissureTracker.channel.id) as TextChannel;
+    const messages: string[] = await async.mapSeries(Array(5), async () => {
+      const message = await msg.channel.send({ embeds: [placeHolder()] });
 
-        const message = await channel.messages
-          .fetch(fissureTracker.message.id).catch(() => null);
+      return message.id;
+    });
+    await fissureTracker.updateOne({ $set: { messages } });
+    await messagesDeletion;
 
-        await message?.delete().catch(() => null);
-      }));
-
-      await fissureTrackerRepo.delete(fissureTrackers);
-      await messagesDeletion;
-    }
-
-    await fissureTrackerRepo.findOrInsertAll(msg.channel as TextChannel, true);
+    const sucessMsg = await replyLocalized(msg, 'commands/Relics:reset:success');
     await wait(15000);
-    await deleteMsgs([replyLocalized(msg, 'commands/Relics:reset:success'), msg]);
+    await deleteMsgs([sucessMsg, msg]);
   }
 }
