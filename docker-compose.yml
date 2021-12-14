@@ -1,11 +1,15 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0.27
-    environment:
-      MYSQL_ROOT_PASSWORD: secure_password
-      MYSQL_DATABASE: starsOfEternity
+  mongo:
+    image: mongo:4.4.10
     ports:
-      - "3306:3306"
+      - "27017:27017"
+    profiles:
+      - "dev"
+    restart: always
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
     restart: always
