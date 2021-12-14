@@ -1,5 +1,6 @@
-import { ApplyOptions } from '@sapphire/decorators';
+import _ from 'lodash';
 import axios from 'axios';
+import { ApplyOptions } from '@sapphire/decorators';
 
 import { Task, TaskOptions } from '#lib/structures';
 
@@ -11,20 +12,25 @@ export default class extends Task {
 
   public async run() {
     const { redisClient } = this.container;
-    let latestActivation = await redisClient.get('latestWarframeFissureActivation');
+    let latestActivation = (await redisClient.get('latestWarframeFissureActivation')) ?? '0';
 
+    console.log(latestActivation);
     axios.get(this.fissuresUrl).then(async ({ data: fissuresData }: { data: Fissure[] }) => {
       const getTime = (timestamp: string) => new Date(timestamp).getTime();
 
       const activeFissures = fissuresData.filter(({ active }) => active);
-      const newFissures = activeFissures.filter(({ activation }) => (
-        getTime(activation) > getTime(latestActivation)));
+      const newFissuresTiers = activeFissures
+        .filter(({ activation }) => getTime(activation) > +latestActivation)
+        .map(({ tier }) => tier);
 
-      if (newFissures.length > 0) {
-        this.container.client.emit('warframeNewActiveFissures', newFissures);
-        
-        latestActivation = newFissures.reduce((acc, { activation }) => (
-          getTime(activation) > getTime(acc) ? activation : acc), latestActivation);
+      if (newFissuresTiers.length > 0) {
+        const toEmitFissures = activeFissures.filter(({ tier }) => newFissuresTiers.includes(tier));
+        this.container.client.emit('warframeNewActiveFissures', toEmitFissures);
+
+        latestActivation = _(toEmitFissures)
+          .map(({ activation }) => getTime(activation))
+          .max()
+          .toString();
         this.container.redisClient.set('latestWarframeFissureActivation', latestActivation);
       }
     })

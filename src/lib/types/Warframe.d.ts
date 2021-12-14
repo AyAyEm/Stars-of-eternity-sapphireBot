@@ -11,13 +11,14 @@ export interface Fissure {
   expired: boolean;
   eta: string;
   missionType: string;
-  tier: string;
+  tier: RelicTiers;
   tierNum: number;
   enemy: string;
   id: string;
   expiry: string;
   activation: string;
   active: boolean;
+  isStorm: boolean;
 }
 
 export interface InvasionData {
