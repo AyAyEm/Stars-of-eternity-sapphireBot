@@ -4,7 +4,6 @@ import async from 'async';
 import { ApplyOptions } from '@sapphire/decorators';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { SubCommandPluginCommand } from '@sapphire/plugin-subcommands';
-import { getCustomRepository } from 'typeorm';
 
 import type { Args } from '@sapphire/framework';
 import type { Guild, Message } from 'discord.js';

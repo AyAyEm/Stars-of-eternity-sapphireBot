@@ -1,5 +1,4 @@
 import type { Emoji } from 'discord.js';
-import type { Connection } from 'typeorm';
 
 import type { Items } from '#lib/eternity/warframe';
 
@@ -17,7 +16,6 @@ interface WarframeOptions {
 declare module '@sapphire/pieces' {
   interface Container {
     warframe: WarframeOptions;
-    connection: Connection;
     ready: Promise<void>;
   }
 }
