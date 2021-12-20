@@ -48,7 +48,7 @@
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
     "mongodb": "^4.2.1",
-    "mongoose": "^6.1.1",
+    "mongoose": "6.0.14",
     "redis": "^4.0.0",
     "reflect-metadata": "^0.1.13",
     "tslib": "^2.3.0",
