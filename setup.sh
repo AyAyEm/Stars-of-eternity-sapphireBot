@@ -7,7 +7,6 @@ secret_insert() {
     read secretValue
     local len=${#secretValue}
     if [ "${len}" -gt "0" ]; then
-        echo ${secretValue}
         docker secret rm ${secretName} &>/dev/null
         printf "${secretValue}" | docker secret create ${secretName} - &>/dev/null
     fi
