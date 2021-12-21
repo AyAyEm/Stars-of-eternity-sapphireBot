@@ -14,7 +14,6 @@ export default class extends Task {
     const { redisClient } = this.container;
     let latestActivation = (await redisClient.get('latestWarframeFissureActivation')) ?? '0';
 
-    console.log(latestActivation);
     axios.get(this.fissuresUrl).then(async ({ data: fissuresData }: { data: Fissure[] }) => {
       const getTime = (timestamp: string) => new Date(timestamp).getTime();
 
