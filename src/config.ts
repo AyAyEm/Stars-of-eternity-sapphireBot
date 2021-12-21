@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import i18next from 'i18next';
 
 import { Intents, ClientOptions } from 'discord.js';
@@ -10,10 +9,29 @@ import { list, EternityFormatters } from '#utils';
 
 export const timezone = 'America/Sao_Paulo';
 
-const env = dotenv.config().parsed;
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+  process.env = { ...process.env, ...require('dotenv').config().parsed };
+}
+
 export const config = {
   ownersIds: ['163751711532515329'],
-  token: env.DISCORD_TOKEN || '',
+  token: process.env.DISCORD_TOKEN ?? '',
+  redisUrl: (() => {
+    const host = process.env.REDIS_HOSTNAME ?? 'localhost';
+    const port = process.env.REDIS_PORT ?? '6379';
+
+    return `redis://${host}:${port}`;
+  })(),
+  mongoUser: process.env.MONGO_USERNAME ?? 'admin',
+  mongoPass: process.env.MONGO_PASSWORD ?? 'password',
+  mongoUrl: (() => {
+    const host = process.env.MONGO_HOSTNAME ?? 'localhost';
+    const port = process.env.MONGO_PORT ?? '27017';
+    const dbName = process.env.MONGO_DB_NAME ?? 'starsOfEternity';
+    const dns = (process.env.MONGO_DNS ?? 'false') === 'true';
+
+    return `mongodb${dns ? '+srv' : ''}://${host}${dns ? '' : `:${port}`}/${dbName}`;
+  })(),
 };
 
 const intents = new Intents();

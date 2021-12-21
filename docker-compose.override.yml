@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  eternity:
+    build:
+      context: .
+      args:
+        - NODE_ENV=development
+    command: npm run dev
+    volumes:
+      - .:/usr/src/app
+      - ./package.json:/usr/src/app/package.json
+      - ./.env:/usr/src/app/.env
+      - notused-node_modules:/usr/src/app/node_modules
+      - notused-dist:/usr/src/app/dist
+    environment:
+      - NODE_ENV=development
+      - MONGO_USERNAME=admin
+      - MONGO_DNS=false
+      - MONGO_PASSWORD=password
+      - MONGO_HOSTNAME=mongo
+      - MONGO_PORT=27017
+      - MONGO_DB_NAME=starsOfEternity
+      - REDIS_HOSTNAME=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mongo
+      - redis
+    profiles:
+      - "build"
+  mongo:
+    image: mongo:4.4.10
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - "27017:27017"
+    restart: always
+  redis:
+    ports:
+      - "6379:6379"
+    restart: always
+
+volumes:
+  mongo-data: null
+  notused-node_modules: null
+  notused-dist: null
