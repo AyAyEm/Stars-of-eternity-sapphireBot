@@ -3,5 +3,7 @@
     "typescript": "ts-node -C ttypescript"
   },
   "typescript.tsdk": "node_modules\\typescript\\lib",
-  "debug.javascript.unmapMissingSources": true
+  "debug.javascript.unmapMissingSources": true,
+  "files.eol": "\n",
+  "editor.tabSize": 2
 }
