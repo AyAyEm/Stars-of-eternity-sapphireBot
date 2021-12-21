@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import async from 'async';
 import { ApplyOptions } from '@sapphire/decorators';
-import { resolveKey } from '@sapphire/plugin-i18next';
 import { SubCommandPluginCommand } from '@sapphire/plugin-subcommands';
 
 import type { Args } from '@sapphire/framework';
