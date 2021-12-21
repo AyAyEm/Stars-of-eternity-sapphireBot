@@ -1,5 +1,5 @@
 import { MessageEmbed } from 'discord.js';
-import { itemNames } from '#utils/constants';
+import { itemNames } from '#utils/Constants';
 
 const {
   commonItems,

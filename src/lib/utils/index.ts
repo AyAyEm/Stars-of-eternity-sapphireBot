@@ -1,5 +1,5 @@
 export * from './BiFilter';
-export * from './constants';
+export * from './Constants';
 export * from './languageFunctions';
 export * from './MultiEntryMap';
 export * from './CaseInsensitiveMap';
