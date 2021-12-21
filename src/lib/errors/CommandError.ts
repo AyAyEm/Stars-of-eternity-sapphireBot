@@ -1,10 +1,11 @@
 import { UserError, CommandErrorPayload } from '@sapphire/framework';
+import { Message } from 'discord.js';
 
-import type { EternityCommand, EternityMessage } from '@lib';
+import type { EternityCommand } from '#lib';
 
 export interface EternityCommandErrorPayload extends CommandErrorPayload {
   piece: EternityCommand;
-  message: EternityMessage;
+  message: Message;
 }
 
 export class CommandError extends UserError {

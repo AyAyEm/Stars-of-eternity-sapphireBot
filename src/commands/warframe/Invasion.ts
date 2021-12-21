@@ -1,183 +1,194 @@
-import i18n from 'i18next';
-
 import { capitalize } from 'lodash';
+import { replyLocalized, resolveKey, Target } from '@sapphire/plugin-i18next';
+import { SubCommandPluginCommand, SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import { ApplyOptions } from '@sapphire/decorators';
-import { getCustomRepository, getConnection } from 'typeorm';
+import { getModelForClass } from '@typegoose/typegoose';
 
+import type { Message } from 'discord.js';
 import type { Args } from '@sapphire/framework';
 import type { Item as WarframeItem } from 'warframe-items';
 
-import { itemNames } from '#lib/utils';
-import { EternityCommandWSC, EternityMessageEmbed } from '#lib';
+import { EternityMessageEmbed } from '#lib';
+import { itemNames } from '#utils';
 import { CaseInsensitiveMap } from '#structures/CaseInsensitiveMap';
-import { InvasionTracker, InvasionTrackerRepository, ItemRepository } from '#lib/typeorm';
+import { InvasionTracker, Item as ItemSchema } from '#schemas';
 
-import type { EternityCommandWSCOptions, EternityMessage } from '#lib';
-
-@ApplyOptions<EternityCommandWSCOptions>({
+@ApplyOptions<SubCommandPluginCommandOptions>({
   preconditions: ['GuildOnly'],
   subCommands: [
-    { name: 'items', flags: ['list', 'l'] },
+    'items',
     'disable',
     'enable',
-    {
-      name: 'add',
-      requiredArgs: [{ name: 'warframeItem', orFlags: ['all'] }],
-    },
-    {
-      name: 'delete',
-      aliases: ['remove'],
-      requiredArgs: [{ name: 'warframeItem', orFlags: ['all'] }],
-    },
+    // {
+    //   name: 'add',
+    //   requiredArgs: [{ name: 'warframeItem', orFlags: ['all'] }],
+    // },
+    'add',
+    // {
+    //   name: 'delete',
+    //   aliases: ['remove'],
+    //   requiredArgs: [{ name: 'warframeItem', orFlags: ['all'] }],
+    // },
+    'delete',
+    { input: 'remove', output: 'delete' },
   ],
-  strategyOptions: {
-    flags: ['all'],
-  },
-  caseInsensitive: true,
+  flags: ['all', 'l', 'list'],
 })
-export default class extends EternityCommandWSC {
-  public possibleItemsEmbed = new EternityMessageEmbed()
-    .addFields(
-      {
-        name: i18n.t('commands/invasion:listItems:commonResources'),
-        value: itemNames.commonItems.join(' | '),
-        inline: false,
-      },
-      {
-        name: i18n.t('commands/invasion:listItems:uncommonResources'),
-        value: itemNames.uncommonItems.join(' | '),
-        inline: false,
-      },
-      {
-        name: i18n.t('commands/invasion:listItems:rareResources'),
-        value: itemNames.rareItems.join(' | '),
-        inline: false,
-      },
-      {
-        name: i18n.t('commands/invasion:listItems:weapons'),
-        value: itemNames.weapons.join(' | '),
-        inline: false,
-      },
-      {
-        name: i18n.t('commands/invasion:listItems:bestItems'),
-        value: itemNames.goodOnes.join(' | '),
-        inline: false,
-      },
-      {
-        name: i18n.t('commands/invasion:listItems:factionItems'),
-        value: itemNames.faction.join(' | '),
-        inline: false,
-      },
-      {
-        name: i18n.t('commands/invasion:listItems:others'),
-        value: itemNames.others.join(' | '),
-        inline: false,
-      },
-    )
-    .setTitle(i18n.t('commands/invasion:listItems:title'));
+export default class extends SubCommandPluginCommand {
+  public async possibleItemsEmbed(target: Target) {
+    return new EternityMessageEmbed()
+      .addFields(
+        {
+          name: await resolveKey(target, 'commands/invasion:listItems:commonResources'),
+          value: itemNames.commonItems.join(' | '),
+          inline: false,
+        },
+        {
+          name: await resolveKey(target, 'commands/invasion:listItems:uncommonResources'),
+          value: itemNames.uncommonItems.join(' | '),
+          inline: false,
+        },
+        {
+          name: await resolveKey(target, 'commands/invasion:listItems:rareResources'),
+          value: itemNames.rareItems.join(' | '),
+          inline: false,
+        },
+        {
+          name: await resolveKey(target, 'commands/invasion:listItems:weapons'),
+          value: itemNames.weapons.join(' | '),
+          inline: false,
+        },
+        {
+          name: await resolveKey(target, 'commands/invasion:listItems:bestItems'),
+          value: itemNames.goodOnes.join(' | '),
+          inline: false,
+        },
+        {
+          name: await resolveKey(target, 'commands/invasion:listItems:factionItems'),
+          value: itemNames.faction.join(' | '),
+          inline: false,
+        },
+        {
+          name: await resolveKey(target, 'commands/invasion:listItems:others'),
+          value: itemNames.others.join(' | '),
+          inline: false,
+        },
+      )
+      .setTitle(await resolveKey(target, 'commands/invasion:listItems:title'));
+  }
 
   public itemsDict = new CaseInsensitiveMap<string, WarframeItem>(itemNames.all.map((item) => (
     [item.toLowerCase(), { name: item } as WarframeItem])));
 
-  public get invasionTrackerRepo(): InvasionTrackerRepository {
-    return getCustomRepository(InvasionTrackerRepository);
-  }
-
-  public get itemRepo(): ItemRepository {
-    return getCustomRepository(ItemRepository);
-  }
-
-  public async items(msg: EternityMessage, args: Args) {
+  public async items(msg: Message, args: Args) {
     if (args.getFlags('list', 'l')) {
-      const items = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
+      const { items } = (await getModelForClass(InvasionTracker).aggregate<{ items: ItemSchema[] }>([
+        { $match: { channel: msg.channel.id } },
+        {
+          $lookup: {
+            from: 'items',
+            localField: 'items',
+            foreignField: '_id',
+            as: 'items',
+          },
+        },
+        { $project: { 'items.name': 1, _id: 0 } },
+      ]))[0];
 
       if (items.length === 0) {
-        await msg.replyTranslated('commands/invasion:items:notFound');
+        await replyLocalized(msg, 'commands/invasion:items:notFound');
       } else {
-        await msg.replyTranslated(
-          'commands/invasion:items:found',
-          [{ items: items.map(({ name }) => name) }],
-        );
+        await replyLocalized(msg, {
+          keys:'commands/invasion:items:found',
+          formatOptions: { items: items.map(({ name }) => name) },
+        });
       }
     } else {
-      await msg.channel.send(this.possibleItemsEmbed);
+      await msg.channel.send({ embeds: [await this.possibleItemsEmbed(msg)] });
     }
   }
 
-  public async disable(msg: EternityMessage) {
+  public async disable(msg: Message) {
     return this.setEnabled(msg, false);
   }
 
-  public async enable(msg: EternityMessage) {
+  public async enable(msg: Message) {
     return this.setEnabled(msg, true);
   }
 
-  private async setEnabled(msg: EternityMessage, value: boolean) {
-    const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel);
+  private async setEnabled(msg: Message, value: boolean) {
+    const result = await getModelForClass(InvasionTracker).updateOne(
+      { channel: msg.channel.id },
+      { $set: { enabled: value } },
+      { upsert: true, new: true },
+    );
 
     const action = value ? 'enable' : 'disable';
-    if (invasionTracker.enabled === value) {
-      await msg.replyTranslated(`commands/invasion:${action}:already${capitalize(action)}d`);
-      return;
+    let reply: Message;
+    if (result.modifiedCount === 0 && result.upsertedCount === 0) {
+      reply = await replyLocalized(msg, `commands/invasion:${action}:already${capitalize(action)}d`);
+    } else {
+      reply = await replyLocalized(msg, `commands/invasion:${action}:success`);
     }
 
-    await this.invasionTrackerRepo.createQueryBuilder()
-      .update(InvasionTracker)
-      .set({ enabled: value })
-      .where('invasion_tracker.id = :invasionTrackerId', { invasionTrackerId: invasionTracker.id })
-      .execute();
-
-    const reply = await msg.replyTranslated(`commands/invasion:${action}:success`);
-    reply.delete({ timeout: 10000 });
+    setTimeout(() => reply.delete(), 10000); 
   }
 
-  public async add(msg: EternityMessage, args: Args) {
+  public async add(msg: Message, args: Args) {
     return this.updateItems('add', msg, args);
   }
 
-  public async delete(msg: EternityMessage, args: Args) {
+  public async delete(msg: Message, args: Args) {
     return this.updateItems('delete', msg, args);
   }
 
-  private async updateItems(action: 'add' | 'delete', msg: EternityMessage, args: Args) {
+  private async updateItems(action: 'add' | 'delete', msg: Message, args: Args) {
     const all = args.getFlags('all');
-
     const toUpdateItems = all ? [...this.itemsDict.keys()] : await args.repeat('warframeItem');
 
-    const storedItems = await this.invasionTrackerRepo.findItemsByChannel(msg.channel);
-    const storedItemsNames = new Map(storedItems.map((warframeItem) => (
-      [warframeItem.name, warframeItem])));
+    const ItemsModel = getModelForClass(ItemSchema);
+    await ItemsModel.bulkWrite(toUpdateItems.map((itemName) => ({
+      updateOne: {
+        filter: { name: itemName },
+        update: {},
+        upsert: true,
+      },
+    })));
 
-    const parsedToUpdateItems = toUpdateItems
-      .map((item) => (this.itemsDict.get(item)))
-      .filter((item) => {
-        const hasItem = storedItemsNames.has(item.name);
-        return action === 'add' ? !hasItem : hasItem;
-      });
+    const items = (await ItemsModel
+      .find({ name: { $in: toUpdateItems } }, { _id: 1, name: 0 })
+      .exec()).map(({ _id }) => _id);
 
-    if (parsedToUpdateItems.length <= 0) {
-      msg.replyTranslated(
-        `commands/invasion:${action}:already${action === 'add' ? 'Added' : 'Deleted'}${all ? 'All' : ''}`,
-        [{ items: toUpdateItems }],
+    const result = await getModelForClass(InvasionTracker).updateOne(
+      { channel: msg.channel.id },
+      {
+        ...(action === 'add' 
+          ? { $addToSet: { items: { $each: items } } } 
+          : { $pullAll: { items } }),
+        $setOnInsert: { enabled: true },
+      },
+      { upsert: true, new: true },
+    );
+
+    if (result.modifiedCount === 0 && result.upsertedCount === 0) {
+      const actionVerb = action === 'add' ? 'Added' : 'Deleted';
+
+      replyLocalized(
+        msg,
+        {
+          keys: `commands/invasion:${action}:already${actionVerb}${all ? 'All' : ''}`,
+          formatOptions: { items: toUpdateItems },
+        },
       );
       return;
+    } else {
+      replyLocalized(
+        msg,
+        {
+          keys: `commands/invasion:${action}:success${all ? 'All' : ''}`,
+          formatOptions: { items: toUpdateItems }, 
+        },
+      );
     }
-
-    const invasionTracker = await this.invasionTrackerRepo.findOrInsert(msg.channel, true);
-    await Promise.all(parsedToUpdateItems.map(async (warframeItem: WarframeItem) => {
-      const item = await this.itemRepo.findOrInsert(warframeItem);
-
-      const query = getConnection()
-        .createQueryBuilder()
-        .relation(InvasionTracker, 'items')
-        .of(invasionTracker);
-
-      await (action === 'add' ? query.add(item) : query.remove(item));
-    }));
-
-    msg.replyTranslated(
-      `commands/invasion:${action}:success${all ? 'All' : ''}`,
-      [{ items: [...parsedToUpdateItems].map(({ name }) => name) }],
-    );
   }
 }

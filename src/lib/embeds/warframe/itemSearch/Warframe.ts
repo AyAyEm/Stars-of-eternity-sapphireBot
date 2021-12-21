@@ -9,24 +9,24 @@ import { BaseItemPagedEmbed } from './BaseItem';
 export class WarframePagedEmbed extends BaseItemPagedEmbed {
   public bpSource = ItemUtilities.blueprintSource(this.item);
 
-  public baseEmbed() {
+  public async baseEmbed() {
     const { name, imageName, masteryReq, category } = this.item;
 
     return new EternityMessageEmbed()
       .setTitle(`${name}`)
       .setThumbnail(`https://cdn.warframestat.us/img/${imageName}`)
-      .addField(this.t('fields:category'), category, false)
-      .setFooter(`${this.t('footer:mastery')} ${masteryReq}`, masteryRankImgs[masteryReq || 0]);
+      .addField(await this.t('fields:category'), category, false)
+      .setFooter(`${await this.t('footer:mastery')} ${masteryReq}`, masteryRankImgs[masteryReq || 0]);
   }
 
   @Page({ emoji: '📋' })
-  public mainInfo() {
+  public async mainInfo() {
     const { components = [] } = this.item;
-    const embed = this.baseEmbed();
+    const embed = await this.baseEmbed();
 
     embed.addField(
-      this.t('fields:status'),
-      this.t('warframe:fields:status', this.item),
+      await this.t('fields:status'),
+      await this.t('warframe:fields:status', this.item),
       false,
     );
 
@@ -40,7 +40,7 @@ export class WarframePagedEmbed extends BaseItemPagedEmbed {
         ? `${bpSource.location} Lab: ${bpSource.lab}`
         : `${bpSource.location}`;
 
-      embed.addField(this.t('fields:blueprint'), blueprintString, false);
+      embed.addField(await this.t('fields:blueprint'), blueprintString, false);
     }
 
     if (componentItems.length > 0) {
@@ -48,27 +48,27 @@ export class WarframePagedEmbed extends BaseItemPagedEmbed {
         .map(({ name, itemCount }) => `${name} **${itemCount}**`)
         .join('\n');
 
-      embed.addField(this.t('fields:components'), componentsString, false);
+      embed.addField(await this.t('fields:components'), componentsString, false);
     }
 
     if (resources.length > 0) {
       const resourcesNames = resources.map(({ name: resourceName, itemCount }) => (
         `${resourceName} **${itemCount}**`));
 
-      embed.addField(this.t('fields:resources'), resourcesNames.join('\n'), false);
+      embed.addField(await this.t('fields:resources'), resourcesNames.join('\n'), false);
     }
 
     return embed;
   }
 
   @Page({ emoji: '♻' })
-  public componentsPage() {
+  public async componentsPage() {
     if (!this.item.components || this.item.components.length === 0) {
       return null;
     }
 
     const { components, category } = this.item;
-    const embed = this.baseEmbed();
+    const embed = await this.baseEmbed();
 
     if (ItemUtilities.isPrime(this.item)) {
       const componentsFields = ItemUtilities.filterForPrimeComponents(components)
@@ -115,7 +115,7 @@ export class WarframePagedEmbed extends BaseItemPagedEmbed {
           .map(({ name, itemCount }) => `${name} **${itemCount}**`)
           .join('\n');
 
-        embed.addField(this.t('fields:resources'), resourcesString, false);
+        embed.addField(await this.t('fields:resources'), resourcesString, false);
       }
     }
 

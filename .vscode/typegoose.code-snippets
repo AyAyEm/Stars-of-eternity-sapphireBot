@@ -1,0 +1,35 @@
+{
+  "Typegoose schema": {
+    "scope": "typescript",
+    "prefix": "schema",
+    "body": [
+      "import { prop } from '@typegoose/typegoose';",
+      "",
+      "export class ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g} {",
+      "  @prop()",
+      "  public ${1:id}: string;$0",
+      "}",
+      ""
+    ]
+  },
+  "Typegoose prop": {
+    "scope": "typescript",
+    "prefix": "prop",
+    "body": ["@prop()", "public $1: $2;$0"]
+  },
+  "Typegoose prop array": {
+    "scope": "typescript",
+    "prefix": "prop:array",
+    "body": ["@prop(() => ${2/(.*)/${1:/pascalcase}/g})", "public $1: $2[];$0"]
+  },
+  "Typegoose prop ref": {
+    "scope": "typescript",
+    "prefix": "prop:ref",
+    "body": ["@prop({ ref: () => ${2/(.*)/${1:/pascalcase}/g}, type: () => String })", "public $1: Ref<$2, string>;$0"]
+  },
+  "Typegoose prop ref array": {
+    "scope": "typescript",
+    "prefix": "prop:ref:array",
+    "body": ["@prop({ ref: () => ${2/(.*)/${1:/pascalcase}/g}, type: () => String })", "public $1: Ref<${2/(.*)/${1:/pascalcase}/g}, string>[];$0"]
+  },
+}

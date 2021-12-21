@@ -1,14 +1,13 @@
 import { Argument, ArgumentContext, PieceContext } from '@sapphire/framework';
+import { Message as DiscordMessage } from 'discord.js';
 
-import type { EternityMessage } from '@lib';
-
-export class Message extends Argument<EternityMessage> {
+export class Message extends Argument<DiscordMessage> {
   public constructor(context: PieceContext) {
     super(context, { name: 'message' });
   }
 
   public async run(parameter: string, context: ArgumentContext) {
-    const message = await context.message.channel.messages.fetch(parameter) as EternityMessage;
+    const message = await context.message.channel.messages.fetch(parameter);
     if (!message) {
       return this.error({
         parameter,

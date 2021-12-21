@@ -1,37 +1,40 @@
-import type { EternityVoiceChannel } from '@lib';
+import { getVoiceConnection, VoiceConnectionStatus, joinVoiceChannel } from '@discordjs/voice';
+
+import type { VoiceChannel } from 'discord.js';
+
+import { channelWithMostMembers } from '#utils';
 
 let executing = false;
-export function toJoinChannel(channel: EternityVoiceChannel) {
+export function toJoinChannel(channel: VoiceChannel) {
   if (executing) return;
   executing = true;
 
   const { guild } = channel;
-  const clientConnections = channel.client.voice?.connections;
-  const botVoiceConnection = clientConnections?.array().length === 0
-    ? null
-    : clientConnections
-      ?.filter((voiceConnection) => voiceConnection.channel.guild.id === guild.id)
-      .first();
-  const botChannel = botVoiceConnection ? botVoiceConnection.channel : null;
-  const channelWithMostUsers = guild.channelWithMostMembers;
-  if (channelWithMostUsers.members.size <= 0) {
-    if (botChannel) botChannel.leave();
+
+  const clientConnection = getVoiceConnection(channel.guild.id);
+  const mostMembersChannel = channelWithMostMembers(guild);
+  if (mostMembersChannel.members.size <= 0) {
+    getVoiceConnection(guild.id).destroy();
     executing = false;
     return;
   }
 
-  if (!botChannel) {
-    channelWithMostUsers.join();
+  if (clientConnection?.state.status !== VoiceConnectionStatus.Ready) {
+    joinVoiceChannel({ 
+      channelId: mostMembersChannel.id,
+      guildId: guild.id, 
+      adapterCreator: channel.guild.voiceAdapterCreator, 
+    });
     executing = false;
     return;
   }
 
-  if (channelWithMostUsers.id === botChannel.id) {
-    executing = false;
-    return;
-  }
+  // if (mostMembersChannel.id === clientConnection.state.id) {
+  //   executing = false;
+  //   return;
+  // }
 
-  botVoiceConnection?.emit('endRecording');
-  channelWithMostUsers.join();
+  // botVoiceConnection?.emit('endRecording');
+  // channelWithMostUsers.join();
   executing = false;
 }

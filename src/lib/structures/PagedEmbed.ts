@@ -1,10 +1,14 @@
-/* eslint-disable max-classes-per-file */
-import type { CollectorFilter } from 'discord.js';
+import { multiReact } from '#utils';
 
-import { EternityMessageEmbed } from '#lib/extensions';
-
-import type { EternityClient } from '#lib/EternityClient';
-import type { EternityTextChannel, EternityMessage } from '#lib/extensions';
+import type {
+  CollectorFilter, 
+  TextChannel, 
+  MessageEmbed, 
+  MessageReaction, 
+  Message,
+  User, 
+} from 'discord.js';
+import type { SapphireClient } from '@sapphire/framework';
 
 export interface IPage {
   name: string;
@@ -12,33 +16,33 @@ export interface IPage {
 }
 
 export interface PagedEmbedContext {
-  channel: EternityTextChannel;
-  client: EternityClient;
+  channel: TextChannel;
+  client: SapphireClient;
 }
 
 export interface EmbedPage extends IPage {
-  embed: EternityMessageEmbed;
+  embed: MessageEmbed;
 }
 
 export interface PagedEmbedOptions {
   pages?: IPage[];
   time?: number;
   idle?: number;
-  filter?: CollectorFilter;
+  filter?: CollectorFilter<[MessageReaction, User]>;
 }
 
 export class PagedEmbed {
   public readonly pages: IPage[];
 
-  public readonly client: EternityClient;
+  public readonly client: SapphireClient;
 
-  public channel: EternityTextChannel;
+  public channel: TextChannel;
 
   public timerOptions: { time: number, idle: number };
 
   public EmbedPages?: EmbedPage[];
 
-  public filter: CollectorFilter;
+  public filter: CollectorFilter<[MessageReaction, User]>;
 
   public constructor(context: PagedEmbedContext, options: PagedEmbedOptions = {}) {
     this.channel = context.channel;
@@ -52,29 +56,29 @@ export class PagedEmbed {
     this.filter = options.filter ?? (() => true);
   }
 
-  public makeEmbeds(): EmbedPage[] {
-    return this.pages
-      .map((page) => ({ ...page, embed: this[page.name]() }))
+  public async makeEmbeds(): Promise<EmbedPage[]> {
+    return (await Promise.all(this.pages
+      .map(async (page) => ({ ...page, embed: await this[page.name]() }))))
       .filter(({ embed }) => embed);
   }
 
-  public async send(toEditMessage?: EternityMessage) {
-    this.EmbedPages = this.makeEmbeds();
+  public async send(toEditMessage?: Message) {
+    this.EmbedPages = await this.makeEmbeds();
 
     const firstPageEmbed = this.EmbedPages[0].embed;
     const msg = toEditMessage
-      ? await toEditMessage.edit(firstPageEmbed) as EternityMessage
-      : await this.channel.send(firstPageEmbed) as EternityMessage;
+      ? await toEditMessage.edit({ embeds: [firstPageEmbed] })
+      : await this.channel.send({ embeds: [firstPageEmbed] });
 
     const collector = msg
-      .createReactionCollector(this.filter, { ...this.timerOptions, dispose: true });
+      .createReactionCollector({ filter: this.filter, ...this.timerOptions, dispose: true });
 
     collector.on('collect', (reaction, user) => {
       if (user.bot) return;
 
       if (reaction.emoji.name !== '❌') {
         const page = this.EmbedPages.find((p) => p.emoji === reaction.emoji.name);
-        if (page) msg.edit(page.embed);
+        if (page) msg.edit({ embeds: [page.embed] });
 
         collector.resetTimer(this.timerOptions);
         reaction.users.remove(user);
@@ -82,7 +86,7 @@ export class PagedEmbed {
         collector.stop('User decided to end it');
       }
     });
-    await msg.multiReact([...this.EmbedPages.map(({ emoji }) => emoji), '❌']);
+    await multiReact(msg, [...this.EmbedPages.map(({ emoji }) => emoji), '❌']);
 
     collector.on('end', () => collector.message.reactions.removeAll().catch(() => null));
   }

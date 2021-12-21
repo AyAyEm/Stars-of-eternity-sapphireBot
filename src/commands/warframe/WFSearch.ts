@@ -1,16 +1,16 @@
-import i18n from 'i18next';
 import async from 'async';
 import FuzzySet from 'fuzzyset.js';
+import { container } from '@sapphire/framework';
+import { replyLocalized, resolveKey } from '@sapphire/plugin-i18next';
 import { ApplyOptions } from '@sapphire/decorators';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, CollectorFilter, Message, User, TextChannel } from 'discord.js';
 
 import type { Args } from '@sapphire/framework';
-import type { CollectorFilter } from 'discord.js';
 import type { Item, Category } from 'warframe-items';
 
 import { WarframePagedEmbed, WeaponPagedEmbed, ModPagedEmbed } from '#embeds/warframe/itemSearch';
-import { numberEmojis, MultiEntryMap } from '#utils';
-import { EternityCommand, EternityMessage, EternityCommandOptions } from '#lib';
+import { numberEmojis, MultiEntryMap, multiReact } from '#utils';
+import { EternityCommand, EternityCommandOptions } from '#lib';
 
 import type { BaseItemPagedEmbed } from '#embeds/warframe/itemSearch/BaseItem';
 
@@ -21,8 +21,6 @@ type ItemCategory = Category | 'Arch-Gun' | 'Arch-Melee';
   preconditions: ['GuildOnly'],
 })
 export default class extends EternityCommand {
-  public items = this.client.warframe.items;
-
   public fuzzySet: FuzzySet;
 
   public categoryDictionary = new MultiEntryMap<ItemCategory, typeof BaseItemPagedEmbed>([
@@ -33,12 +31,12 @@ export default class extends EternityCommand {
 
   public async onLoad() {
     super.onLoad();
-    const uniqueNames = await this.items.getUniqueNames();
+    const uniqueNames = await container.warframe.items.getUniqueNames();
 
     this.fuzzySet = FuzzySet([...uniqueNames.keys()]);
   }
 
-  public async run(msg: EternityMessage, args: Args) {
+  public async messageRun(msg: Message, args: Args) {
     const { channel } = msg;
     const { fuzzySet } = this;
 
@@ -46,26 +44,25 @@ export default class extends EternityCommand {
     const matchedItems: { item: Item, score: number }[] = await async.map(
       fuzzySet.get(itemName).slice(0, 3),
       async ([score, name]) => {
-        const item = await this.items.get(name);
+        const item = await container.warframe.items.get(name);
         return { item, score };
       },
     );
 
     let warframeItem = matchedItems[0].item;
-    let noMatchMessage: EternityMessage | null = null;
+    let noMatchMessage: Message | null = null;
     if ((matchedItems[0].score || 0) < 0.7) {
       const matchItemsString = matchedItems
         .map(({ item }, index: number) => `${numberEmojis[index + 1]} ${item.name} ${item.category}`);
 
       const noMatchEmbed = new MessageEmbed()
-        .setTitle(i18n.t('commands/WFSearch:itemNotFound'))
-        .setDescription(i18n.t('commands/WFSearch:selectOneOf', { items: matchItemsString.join('\n\n') }));
+        .setTitle(await resolveKey(msg, 'commands/WFSearch:itemNotFound'))
+        .setDescription(await resolveKey(msg, 'commands/WFSearch:selectOneOf', { items: matchItemsString.join('\n\n') }));
 
-      noMatchMessage = (await channel.send(noMatchEmbed)) as EternityMessage;
-      const collector = noMatchMessage
-        .createReactionCollector(() => true, { time: 15000 });
+      noMatchMessage = (await channel.send({ embeds: [noMatchEmbed] })) as Message;
+      const collector = noMatchMessage.createReactionCollector({ time: 15000 });
 
-      const reactions = noMatchMessage.multiReact([...numberEmojis.slice(1, 4), '❌']);
+      const reactions = multiReact(noMatchMessage, [...numberEmojis.slice(1, 4), '❌']);
 
       let collectedReaction = false;
       collector.on('collect', async (reaction) => {
@@ -86,19 +83,25 @@ export default class extends EternityCommand {
       collector.on('end', (_, endingReason) => {
         if (endingReason === 'time' || endingReason === 'User decided to stop') {
           msg.delete();
-          collector.message.delete({ reason: endingReason });
+          collector.message.delete();
         }
       });
     }
 
     const PagedEmbed = this.categoryDictionary.get(warframeItem.category);
     if (PagedEmbed) {
-      const context = { client: this.client, item: warframeItem, channel: msg.channel };
-      const filter: CollectorFilter = (_, user) => user.id === msg.author.id;
-      const pagedEmbed = new PagedEmbed(context, { filter });
+      const filter: CollectorFilter<[unknown, User]> = (_, user) => user.id === msg.author.id;
+      const pagedEmbed = new PagedEmbed(
+        { 
+          client: this.container.client, 
+          item: warframeItem, 
+          channel: msg.channel as TextChannel, 
+        }, 
+        { filter },
+      );
       pagedEmbed.send(noMatchMessage);
     } else {
-      msg.replyTranslated('commands/WFSearch:invalidQuery');
+      replyLocalized(msg, 'commands/WFSearch:invalidQuery');
     }
   }
 }

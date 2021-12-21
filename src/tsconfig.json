@@ -7,16 +7,6 @@
     "rootDir": ".",
     "baseUrl": "./",
     "paths": {
-      "@root/*": ["./*"],
-      "@config": ["./config"],
-      "@lib": ["./lib"],
-      "@lib/*": ["./lib/*"],
-      "@utils": ["./lib/utils"],
-      "@utils/*": ["./lib/utils/*"],
-      "@embeds": ["./lib/embeds"],
-      "@embeds/*": ["./lib/embeds/*"],
-      "@providers": ["./lib/providers"],
-      "@providers/*": ["./lib/providers/*"],
       "#root/*": ["./*"],
       "#config": ["./config"],
       "#lib": ["./lib"],
@@ -31,8 +21,8 @@
       "#models/*": ["./lib/typeorm/models/*"],
       "#structures": ["./lib/structures"],
       "#structures/*": ["./lib/structures/*"],
-      "#repositories": ["./lib/typeorm/repositories"],
-      "#repositories/*": ["./lib/typeorm/repositories/*"],
+      "#schemas": ["./lib/mongodb/schemas"],
+      "#schemas/*": ["./lib/mongodb/schemas/*"],
       "#decorators": ["./lib/decorators"],
       "#decorators/*": ["./lib/decorators/*"]
     }

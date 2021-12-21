@@ -1,9 +1,7 @@
-import { getCustomRepository } from 'typeorm';
 import { ApplyOptions } from '@sapphire/decorators';
 import axios from 'axios';
 
 import { Task, TaskOptions } from '#lib/structures';
-import { InvasionRepository } from '#repositories';
 
 import type { InvasionData } from '#lib/types/Warframe';
 
@@ -11,15 +9,11 @@ import type { InvasionData } from '#lib/types/Warframe';
 export default class InvasionTracker extends Task {
   public invasionUrl = 'https://api.warframestat.us/pc/invasions';
 
-  public get invasionRepo() {
-    return getCustomRepository(InvasionRepository);
-  }
-
   public async run() {
-    axios.get(this.invasionUrl).then(async ({ data: invasionsData }: { data: InvasionData[] }) => {
-      const { invasionRepo } = this;
-      const { activation: latestActivation = '0' } = (await invasionRepo.findLatest()) ?? {};
+    const { redisClient } = this.container;
+    let latestActivation = await redisClient.get('latestWarframeInvasionActivation');
 
+    axios.get(this.invasionUrl).then(async ({ data: invasionsData }: { data: InvasionData[] }) => {
       const getTime = (timestamp: string) => new Date(timestamp).getTime();
 
       const activeInvasions = invasionsData.filter(({ completed }) => !completed);
@@ -27,14 +21,16 @@ export default class InvasionTracker extends Task {
         getTime(activation) > getTime(latestActivation)));
 
       if (newInvasions.length > 0) {
-        await invasionRepo.insert(newInvasions);
+        this.container.client.emit('warframeNewInvasions', newInvasions);
 
-        this.client.emit('warframeNewInvasions', newInvasions);
+        latestActivation = newInvasions.reduce((acc, { activation }) => (
+          getTime(activation) > getTime(acc) ? activation : acc), latestActivation);
+        this.container.redisClient.set('latestWarframeInvasionActivation', latestActivation);
       }
     })
       .catch((err) => {
         if (err.message.includes('Request failed')) return;
-        this.client.console.error(err);
+        this.container.client.logger.error(err);
       });
   }
 }

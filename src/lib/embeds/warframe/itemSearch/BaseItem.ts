@@ -12,7 +12,7 @@ export interface BaseItemPagedEmbedContext extends PagedEmbedContext {
 export class BaseItemPagedEmbed extends PagedEmbed {
   public item: Item;
 
-  protected t = translationBy('embeds/itemSearch:');
+  protected t = translationBy(this.channel, 'embeds/itemSearch:');
 
   public constructor(context: BaseItemPagedEmbedContext, options?: PagedEmbedOptions) {
     super(context, options);
