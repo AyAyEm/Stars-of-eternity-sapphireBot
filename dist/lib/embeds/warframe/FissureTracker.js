@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fissuresEmbed = void 0;
 const tslib_1 = require("tslib");
-const moment_timezone_1 = (0, tslib_1.__importDefault)(require("moment-timezone"));
 const lodash_1 = (0, tslib_1.__importDefault)(require("lodash"));
 const config_1 = require("../../../config");
 const _lib_1 = require("../..");
+const _utils_1 = require("../../utils");
 // Fissures: Lith, Meso, Neo, Axi and Requiem
 const fissureIcons = [
     'https://i.imgur.com/ZSxJCTI.png',
@@ -33,7 +33,7 @@ function missionFissuresToString(missionFissures) {
 }
 function getMissionsFields(missionFissures) {
     const expirationString = missionFissures.reduce((expirations, { expiry }) => {
-        const expiration = moment_timezone_1.default.tz(expiry, config_1.timezone).format('HH:mm');
+        const expiration = (0, _utils_1.dayjs)(expiry).tz(config_1.timezone).format('HH:mm');
         return `${expirations}*${expiration}*\n`;
     }, '');
     const enemyFactions = missionFissures.reduce((factions, { enemy }) => `${factions}${enemy}\n`, '');

@@ -13,3 +13,4 @@ export * from './wait';
 export * from './strToMs';
 export * from './discord';
 export * from './sapphire';
+export * from './dayjs';

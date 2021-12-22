@@ -16,4 +16,5 @@ const tslib_1 = require("tslib");
 (0, tslib_1.__exportStar)(require("./strToMs"), exports);
 (0, tslib_1.__exportStar)(require("./discord"), exports);
 (0, tslib_1.__exportStar)(require("./sapphire"), exports);
+(0, tslib_1.__exportStar)(require("./dayjs"), exports);
 //# sourceMappingURL=index.js.map
