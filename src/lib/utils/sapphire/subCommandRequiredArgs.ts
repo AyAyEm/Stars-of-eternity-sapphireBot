@@ -4,7 +4,7 @@ import { Args, Command, CommandOptions, ArgType } from '@sapphire/framework';
 import { sendLocalized } from '@sapphire/plugin-i18next';
 import { SubCommandEntry } from '@sapphire/plugin-subcommands';
 
-import { list } from '../languageFunctions';
+import { list } from '#utils/languageFunctions';
 
 export function subCommandRequiredArgs(command: string, requiredArgs: Array<keyof ArgType>) {
   return async (context: SubCommandEntry.MessageRunContext<Args, Command<Args, CommandOptions>>) => {
