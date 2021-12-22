@@ -1,4 +1,4 @@
-import { promises as fs } from 'graceful-fs';
+import fs from 'fs-extra';
 
 (async () => {
   if (process.argv.length < 3) throw new Error('Wrong usage: rm (path)');
