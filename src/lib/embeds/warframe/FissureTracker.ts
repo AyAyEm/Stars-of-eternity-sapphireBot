@@ -1,8 +1,8 @@
-import moment from 'moment-timezone';
 import _ from 'lodash';
 
 import { timezone } from '#root/config';
 import { EternityMessageEmbed } from '#lib';
+import { dayjs } from '#utils';
 
 import type { Fissure } from '#lib/types/Warframe';
 
@@ -36,7 +36,7 @@ function missionFissuresToString(missionFissures: Fissure[]) {
 
 function getMissionsFields(missionFissures: Fissure[]) {
   const expirationString = missionFissures.reduce((expirations, { expiry }) => {
-    const expiration = moment.tz(expiry, timezone).format('HH:mm');
+    const expiration = dayjs(expiry).tz(timezone).format('HH:mm');
     return `${expirations}*${expiration}*\n`;
   }, '');
 
