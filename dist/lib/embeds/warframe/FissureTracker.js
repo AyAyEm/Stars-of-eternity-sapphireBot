@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fissuresEmbed = void 0;
 const tslib_1 = require("tslib");
+const moment_timezone_1 = (0, tslib_1.__importDefault)(require("moment-timezone"));
+const lodash_1 = (0, tslib_1.__importDefault)(require("lodash"));
 const config_1 = require("../../../config");
-const moment_timezone_1 = tslib_1.__importDefault(require("moment-timezone"));
-const lodash_1 = tslib_1.__importDefault(require("lodash"));
 const _lib_1 = require("../..");
 // Fissures: Lith, Meso, Neo, Axi and Requiem
 const fissureIcons = [
@@ -14,8 +14,14 @@ const fissureIcons = [
     'https://i.imgur.com/sk2WIeA.png',
     'https://i.imgur.com/CNdPs70.png',
 ];
-const fissureTiers = new Map(['Lith', 'Meso', 'Neo', 'Axi', 'Requiem']
-    .map((tier, index) => [tier, { index, icon: fissureIcons[index] }]));
+var FissureTiers;
+(function (FissureTiers) {
+    FissureTiers[FissureTiers["Lith"] = 0] = "Lith";
+    FissureTiers[FissureTiers["Meso"] = 1] = "Meso";
+    FissureTiers[FissureTiers["Neo"] = 2] = "Neo";
+    FissureTiers[FissureTiers["Axi"] = 3] = "Axi";
+    FissureTiers[FissureTiers["Requiem"] = 4] = "Requiem";
+})(FissureTiers || (FissureTiers = {}));
 function fissureToString({ node }) {
     const [mission, map] = [node.split(' ')[0], node.split(' ').slice(1).join(' ')];
     // const expirationString = moment.tz(expiry, timezone).format('HH:mm');
@@ -32,7 +38,7 @@ function getMissionsFields(missionFissures) {
     }, '');
     const enemyFactions = missionFissures.reduce((factions, { enemy }) => `${factions}${enemy}\n`, '');
     return [{
-            name: `${missionFissures[0].missionType}`,
+            name: `${missionFissures[0].isStorm ? 'Railjack ' : ''}${missionFissures[0].missionType}`,
             value: missionFissuresToString(missionFissures),
             inline: true,
         }, {
@@ -47,17 +53,14 @@ function getMissionsFields(missionFissures) {
 }
 function fissuresEmbed(fissures) {
     const fissuresMap = new Map([...Object.entries((lodash_1.default.groupBy(fissures, 'tier')))]
-        .sort(([tierA], [tierB]) => {
-        const { index: A = 0 } = fissureTiers.get(tierA) || {};
-        const { index: B = 0 } = fissureTiers.get(tierB) || {};
-        return B - A;
-    }));
+        .sort(([tierA], [tierB]) => FissureTiers[tierB] - FissureTiers[tierA]));
     const embedsMap = new Map();
     fissuresMap.forEach((tierFissures, tier) => {
-        const { icon, index: tierNumber } = fissureTiers.get(tier) || {};
+        const tierNumber = FissureTiers[tier];
+        const icon = fissureIcons[tierNumber];
         const missionsTypes = lodash_1.default.uniqBy(tierFissures, 'missionType')
             .reduce((types, { missionType }, index, uniqFissures) => (`${types} ${missionType}${index === uniqFissures.length - 1 ? '' : ','}`), '');
-        const groupedByType = lodash_1.default.groupBy(tierFissures, 'missionType');
+        const groupedByType = lodash_1.default.groupBy(tierFissures, ({ missionType, isStorm = false }) => (`${missionType}${isStorm ? 'Storm' : ''}`));
         const fields = Object.values(groupedByType)
             .flatMap(([...missionFissures]) => getMissionsFields(missionFissures));
         const embed = new _lib_1.EternityMessageEmbed()

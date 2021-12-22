@@ -13,10 +13,10 @@ class Task extends EternityBasePiece_1.EternityBasePiece {
         this.once = options.once ?? false;
     }
     async onLoad() {
-        this.client.ready.then(() => {
+        this.container.client.ready.then(() => {
             this.run();
             if (!this.once) {
-                this._interval = this.client.setInterval(() => {
+                this._interval = setInterval(() => {
                     this.run();
                 }, this.time);
             }
@@ -24,7 +24,7 @@ class Task extends EternityBasePiece_1.EternityBasePiece {
     }
     onUnload() {
         if (this._interval) {
-            this.client.clearInterval(this._interval);
+            clearInterval(this._interval);
             this._interval = null;
         }
     }

@@ -1,0 +1,1 @@
+{"version":3,"file":"Error.js","sourceRoot":"","sources":["../../../src/listeners/sapphire/Error.ts"],"names":[],"mappings":";;;AAAA,mDAAuD;AACvD,qDAAoD;AAGpD,gBAAA,KAAqB,SAAQ,oBAAQ;IAC5B,KAAK,CAAC,GAAG,CAAC,GAAU;QACzB,IAAI,CAAC,SAAS,CAAC,MAAM,CAAC,MAAM,CAAC,KAAK,CAAC,GAAG,CAAC,CAAC;IAC1C,CAAC;CACF,CAAA;AAJD;IADC,IAAA,yBAAY,EAAmB,EAAE,KAAK,EAAE,kBAAM,CAAC,KAAK,EAAE,CAAC;aAKvD"}

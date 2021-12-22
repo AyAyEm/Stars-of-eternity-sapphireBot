@@ -2,12 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Items = void 0;
 const tslib_1 = require("tslib");
-const lodash_1 = tslib_1.__importDefault(require("lodash"));
-const axios_1 = tslib_1.__importDefault(require("axios"));
-const fs_extra_1 = tslib_1.__importDefault(require("fs-extra"));
-const path_1 = tslib_1.__importDefault(require("path"));
-const JSONStream_1 = tslib_1.__importDefault(require("JSONStream"));
-const event_stream_1 = tslib_1.__importDefault(require("event-stream"));
+const lodash_1 = (0, tslib_1.__importDefault)(require("lodash"));
+const axios_1 = (0, tslib_1.__importDefault)(require("axios"));
+const fs_extra_1 = (0, tslib_1.__importDefault)(require("fs-extra"));
+const path_1 = (0, tslib_1.__importDefault)(require("path"));
+const JSONStream_1 = (0, tslib_1.__importDefault)(require("JSONStream"));
+const event_stream_1 = (0, tslib_1.__importDefault)(require("event-stream"));
 class Items {
     dir = 'data/warframe-items';
     source = 'https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/All.json';

@@ -1,1 +1,0 @@
-{"version":3,"file":"MessageReactionAdd.js","sourceRoot":"","sources":["../../../src/events/discord/MessageReactionAdd.ts"],"names":[],"mappings":";;;AAAA,oCAAqC;AACrC,mDAA6C;AAC7C,qDAAoD;AAMpD,gBAAA,KAAqB,SAAQ,oBAA2C;IAC/D,KAAK,CAAC,GAAG,CAAC,eAAgC,EAAE,IAAU,IAAI,CAAC;CACnE,CAAA;AAFD;IADC,yBAAY,CAAe,EAAE,KAAK,EAAE,kBAAM,CAAC,qBAAqB,EAAE,CAAC;aAGnE"}

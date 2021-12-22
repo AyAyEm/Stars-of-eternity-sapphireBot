@@ -1,35 +1,33 @@
-import type { CollectorFilter } from 'discord.js';
-import { EternityMessageEmbed } from "../extensions";
-import type { EternityClient } from "../EternityClient";
-import type { EternityTextChannel, EternityMessage } from "../extensions";
+import type { CollectorFilter, TextChannel, MessageEmbed, MessageReaction, Message, User } from 'discord.js';
+import type { SapphireClient } from '@sapphire/framework';
 export interface IPage {
     name: string;
     emoji: string;
 }
 export interface PagedEmbedContext {
-    channel: EternityTextChannel;
-    client: EternityClient;
+    channel: TextChannel;
+    client: SapphireClient;
 }
 export interface EmbedPage extends IPage {
-    embed: EternityMessageEmbed;
+    embed: MessageEmbed;
 }
 export interface PagedEmbedOptions {
     pages?: IPage[];
     time?: number;
     idle?: number;
-    filter?: CollectorFilter;
+    filter?: CollectorFilter<[MessageReaction, User]>;
 }
 export declare class PagedEmbed {
     readonly pages: IPage[];
-    readonly client: EternityClient;
-    channel: EternityTextChannel;
+    readonly client: SapphireClient;
+    channel: TextChannel;
     timerOptions: {
         time: number;
         idle: number;
     };
     EmbedPages?: EmbedPage[];
-    filter: CollectorFilter;
+    filter: CollectorFilter<[MessageReaction, User]>;
     constructor(context: PagedEmbedContext, options?: PagedEmbedOptions);
-    makeEmbeds(): EmbedPage[];
-    send(toEditMessage?: EternityMessage): Promise<void>;
+    makeEmbeds(): Promise<EmbedPage[]>;
+    send(toEditMessage?: Message): Promise<void>;
 }

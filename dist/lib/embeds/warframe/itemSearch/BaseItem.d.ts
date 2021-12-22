@@ -6,9 +6,6 @@ export interface BaseItemPagedEmbedContext extends PagedEmbedContext {
 }
 export declare class BaseItemPagedEmbed extends PagedEmbed {
     item: Item;
-    protected t: {
-        (key: string, defaultValue: string, options?: import("i18next").TOptions<import("i18next").StringMap> | import("i18next").TOptions<import("i18next").StringMap>[]): string;
-        (key: string, options?: import("i18next").TOptions<import("i18next").StringMap> | import("i18next").TOptions<import("i18next").StringMap>[]): string;
-    };
+    protected t: <O extends import("@sapphire/utilities").NonNullObject>(key: string, formatOptions?: O) => Promise<string>;
     constructor(context: BaseItemPagedEmbedContext, options?: PagedEmbedOptions);
 }

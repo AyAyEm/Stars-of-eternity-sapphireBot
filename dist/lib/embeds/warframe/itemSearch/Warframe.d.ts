@@ -6,7 +6,7 @@ export declare class WarframePagedEmbed extends BaseItemPagedEmbed {
         location: string;
         id: number;
     };
-    baseEmbed(): EternityMessageEmbed;
-    mainInfo(): EternityMessageEmbed;
-    componentsPage(): EternityMessageEmbed;
+    baseEmbed(): Promise<EternityMessageEmbed>;
+    mainInfo(): Promise<EternityMessageEmbed>;
+    componentsPage(): Promise<EternityMessageEmbed>;
 }

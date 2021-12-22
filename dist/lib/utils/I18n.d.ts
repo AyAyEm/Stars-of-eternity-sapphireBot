@@ -1,18 +1,3 @@
-import '@sapphire/plugin-i18next/register-discordjs';
-import type { TOptions, StringMap } from 'i18next';
-export declare const i18nClientOptions: {
-    i18n: {
-        defaultName: string;
-        defaultLanguageDirectory: string;
-        i18next: {
-            fallbackNS: string;
-            interpolation: {
-                format: (value: unknown, format?: string, lang?: string) => string;
-            };
-        };
-    };
-};
-export declare function translationBy(preKey: string): {
-    (key: string, defaultValue: string, options?: TOptions<StringMap> | TOptions<StringMap>[]): string;
-    (key: string, options?: TOptions<StringMap> | TOptions<StringMap>[]): string;
-};
+import { Target } from '@sapphire/plugin-i18next';
+import { NonNullObject } from '@sapphire/utilities';
+export declare function translationBy(target: Target, preKey: string): <O extends NonNullObject>(key: string, formatOptions?: O) => Promise<string>;

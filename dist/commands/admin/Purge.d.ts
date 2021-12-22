@@ -1,5 +1,6 @@
-import { EternityCommand, EternityMessage } from "../../lib";
 import { Args } from '@sapphire/framework';
+import type { Message } from 'discord.js';
+import { EternityCommand } from "../../lib";
 export default class extends EternityCommand {
-    run(msg: EternityMessage, args: Args): Promise<void>;
+    messageRun(msg: Message, args: Args): Promise<void>;
 }

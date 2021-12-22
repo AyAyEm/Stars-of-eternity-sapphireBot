@@ -1,1 +1,0 @@
-{"version":3,"file":"MemberLeftChannel.js","sourceRoot":"","sources":["../../../src/events/eternity/MemberLeftChannel.ts"],"names":[],"mappings":";;;AAAA,oCAAqC;AACrC,iDAA8C;AAC9C,qDAAoD;AAMpD,gBAAA,KAAqB,SAAQ,oBAAkC;IACtD,KAAK,CAAC,GAAG,CAAC,OAA6B;QAC5C,wBAAa,CAAC,OAAO,CAAC,CAAC;IACzB,CAAC;CACF,CAAA;AAJD;IADC,yBAAY,CAAe,EAAE,KAAK,EAAE,mBAAmB,EAAE,OAAO,EAAE,KAAK,EAAE,CAAC;aAK1E"}

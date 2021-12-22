@@ -1,1 +1,1 @@
-{"version":3,"file":"EternityBasePiece.js","sourceRoot":"","sources":["../../../src/lib/structures/EternityBasePiece.ts"],"names":[],"mappings":";;;AAAA,mDAA4C;AAI5C,MAAa,iBAAkB,SAAQ,iBAAK;IAC1C,IAAI,MAAM;QACR,OAAO,KAAK,CAAC,OAAO,CAAC,MAAwB,CAAC;IAChD,CAAC;CACF;AAJD,8CAIC"}
+{"version":3,"file":"EternityBasePiece.js","sourceRoot":"","sources":["../../../src/lib/structures/EternityBasePiece.ts"],"names":[],"mappings":";;;AAAA,mDAA4C;AAE5C,MAAa,iBAAkB,SAAQ,iBAAK;CAAG;AAA/C,8CAA+C"}

@@ -1,19 +1,18 @@
+import { Target } from '@sapphire/plugin-i18next';
+import { SubCommandPluginCommand } from '@sapphire/plugin-subcommands';
+import type { Message } from 'discord.js';
 import type { Args } from '@sapphire/framework';
 import type { Item as WarframeItem } from 'warframe-items';
-import { EternityCommandWSC, EternityMessageEmbed } from "../../lib";
+import { EternityMessageEmbed } from "../../lib";
 import { CaseInsensitiveMap } from "../../lib/structures/CaseInsensitiveMap";
-import { InvasionTrackerRepository, ItemRepository } from "../../lib/typeorm";
-import type { EternityMessage } from "../../lib";
-export default class extends EternityCommandWSC {
-    possibleItemsEmbed: EternityMessageEmbed;
+export default class extends SubCommandPluginCommand {
+    possibleItemsEmbed(target: Target): Promise<EternityMessageEmbed>;
     itemsDict: CaseInsensitiveMap<string, WarframeItem>;
-    get invasionTrackerRepo(): InvasionTrackerRepository;
-    get itemRepo(): ItemRepository;
-    items(msg: EternityMessage, args: Args): Promise<void>;
-    disable(msg: EternityMessage): Promise<void>;
-    enable(msg: EternityMessage): Promise<void>;
+    items(msg: Message, args: Args): Promise<void>;
+    disable(msg: Message): Promise<void>;
+    enable(msg: Message): Promise<void>;
     private setEnabled;
-    add(msg: EternityMessage, args: Args): Promise<void>;
-    delete(msg: EternityMessage, args: Args): Promise<void>;
+    add(msg: Message, args: Args): Promise<void>;
+    delete(msg: Message, args: Args): Promise<void>;
     private updateItems;
 }

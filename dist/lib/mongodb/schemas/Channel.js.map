@@ -1,0 +1,1 @@
+{"version":3,"file":"Channel.js","sourceRoot":"","sources":["../../../../src/lib/mongodb/schemas/Channel.ts"],"names":[],"mappings":";;;;AAAA,oDAAiD;AAEjD,uCAAoC;AAEpC,MAAa,OAAO;IAEX,GAAG,CAAS;IAGZ,QAAQ,CAAyB;CACzC;AAJC;IADC,IAAA,gBAAI,GAAE;;oCACY;AAGnB;IADC,IAAA,gBAAI,EAAC,EAAE,GAAG,EAAE,GAAG,EAAE,CAAC,iBAAO,EAAE,IAAI,EAAE,MAAM,EAAE,CAAC;;yCACH;AAL1C,0BAMC"}

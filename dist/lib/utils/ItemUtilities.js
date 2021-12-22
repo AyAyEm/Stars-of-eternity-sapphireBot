@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemUtilities = void 0;
 const tslib_1 = require("tslib");
-const lodash_1 = tslib_1.__importDefault(require("lodash"));
+const lodash_1 = (0, tslib_1.__importDefault)(require("lodash"));
 var ItemUtilities;
 (function (ItemUtilities) {
     const blueprintsSource = new Map([

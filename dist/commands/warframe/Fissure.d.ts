@@ -1,9 +1,8 @@
-import { EternityCommandWSC } from "../../lib";
-import type { EternityMessage } from "../../lib";
-export default class extends EternityCommandWSC {
-    private get fissureTrackerRepo();
+import { SubCommandPluginCommand } from '@sapphire/plugin-subcommands';
+import type { Message } from 'discord.js';
+export default class extends SubCommandPluginCommand {
     private setEnabled;
-    enable(msg: EternityMessage): Promise<void>;
-    disable(msg: EternityMessage): Promise<void>;
-    reset(msg: EternityMessage): Promise<void>;
+    enable(msg: Message): Promise<void>;
+    disable(msg: Message): Promise<void>;
+    reset(msg: Message): Promise<void>;
 }

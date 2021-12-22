@@ -1,6 +1,6 @@
 import { Argument, ArgumentContext, PieceContext } from '@sapphire/framework';
-import type { EternityMessage } from "../../lib";
-export declare class Message extends Argument<EternityMessage> {
+import { Message as DiscordMessage } from 'discord.js';
+export declare class Message extends Argument<DiscordMessage> {
     constructor(context: PieceContext);
-    run(parameter: string, context: ArgumentContext): Promise<import("@sapphire/framework").Result<EternityMessage, import("@sapphire/framework").UserError>>;
+    run(parameter: string, context: ArgumentContext): Promise<import("@sapphire/framework").Result<DiscordMessage<boolean>, import("@sapphire/framework").UserError>>;
 }

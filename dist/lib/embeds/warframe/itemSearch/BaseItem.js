@@ -5,7 +5,7 @@ const _structures_1 = require("../../../structures");
 const _utils_1 = require("../../../utils");
 class BaseItemPagedEmbed extends _structures_1.PagedEmbed {
     item;
-    t = _utils_1.translationBy('embeds/itemSearch:');
+    t = (0, _utils_1.translationBy)(this.channel, 'embeds/itemSearch:');
     constructor(context, options) {
         super(context, options);
         this.item = context.item;

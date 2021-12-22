@@ -1,12 +1,10 @@
+import { SubCommandPluginCommand } from '@sapphire/plugin-subcommands';
 import type { Args } from '@sapphire/framework';
-import { EternityCommandWSC } from "../../lib";
-import type { EternityMessage } from "../../lib";
-export default class extends EternityCommandWSC {
+import type { Message } from 'discord.js';
+export default class extends SubCommandPluginCommand {
     private mapToEmbed;
-    private get firstEmbed();
-    private get roleReactionRepo();
-    create(msg: EternityMessage, args: Args): Promise<void>;
-    delete(msg: EternityMessage, args: Args): Promise<void>;
-    add(msg: EternityMessage, args: Args): Promise<void>;
-    renew(msg: EternityMessage, args: Args): Promise<void>;
+    create(msg: Message, args: Args): Promise<void>;
+    delete(msg: Message, args: Args): Promise<void>;
+    add(msg: Message, args: Args): Promise<void>;
+    renew(msg: Message, args: Args): Promise<void>;
 }
