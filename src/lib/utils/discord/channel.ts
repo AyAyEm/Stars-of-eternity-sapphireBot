@@ -1,4 +1,4 @@
-import type { TextChannel, VoiceChannel } from 'discord.js';
+import type { Collection, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 
 export interface SendAndDeleteOptions {
   content: string,
@@ -16,6 +16,6 @@ export async function sendAndDelete(channel: TextChannel, options: SendAndDelete
   });
 }
 
-export function onlyMembers(channel: VoiceChannel) {
+export function onlyMembers(channel: VoiceChannel): Collection<string, GuildMember> {
   return channel.members.filter((guildMember) => !guildMember.user.bot);
 }
