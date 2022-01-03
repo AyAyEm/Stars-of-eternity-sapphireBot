@@ -42,7 +42,7 @@ jobs:
       - name: Load image
         run: docker image load --input /tmp/stars-of-eternity-bot/image.tar
       - name: Run linter
-        run: "docker container run -it --rm stars-of-eternity-bot:latest npm run lint"
+        run: "docker container run --rm stars-of-eternity-bot:latest npm run lint"
   publish:
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
