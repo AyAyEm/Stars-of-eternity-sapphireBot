@@ -39,6 +39,7 @@ jobs:
         with:
           context: .
           pull: true
+          load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
       - name: Output build
