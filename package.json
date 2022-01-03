@@ -43,7 +43,7 @@
     "i18next": "^21.5.4",
     "lodash": "^4.17.20",
     "mongodb": "^4.2.1",
-    "mongoose": "6.0.14",
+    "mongoose": "^6.0.14",
     "redis": "^4.0.0",
     "reflect-metadata": "^0.1.13",
     "tslib": "^2.3.0",
