@@ -20,4 +20,4 @@ RUN npm run build
 COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-CMD "pm2-runtime --raw dist/eternity.js"
+CMD [ "pm2-runtime", "--raw", "dist/eternity.js" ]
