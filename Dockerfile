@@ -12,7 +12,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --production=false \
   && npm cache clean --force \
-  && apk del bash git python3 build-base
+  && apk del git python3 build-base
 
 COPY . .
 RUN npm run build
