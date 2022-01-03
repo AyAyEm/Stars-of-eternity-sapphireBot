@@ -34,15 +34,15 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build, push and export
+      - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: .
           pull: true
-          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=docker,dest=/tmp/stars-of-eternity-bot.tar
+      - name: Output build
+        run: docker image save -o /tmp/stars-of-eternity-bot.tar stars-of-eternity-bot:latest
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
