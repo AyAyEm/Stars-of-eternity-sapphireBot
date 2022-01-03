@@ -41,7 +41,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Run linter
-        run: docker container run --rm ${{ env.IMAGE_TAG }} npm run lint
+        run: docker container run --rm ${{ env.IMAGE_TAG }} /bin/bash -c "npm run lint"
   publish:
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
