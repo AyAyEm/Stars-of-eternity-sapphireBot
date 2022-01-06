@@ -49,12 +49,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.IMAGE_TAG }}
-          flavour: latest=true
+          flavour: latest=false
           tags: |
             type=ref,event=pr,prefix=${{ github.head_ref }}-
             type=sha
