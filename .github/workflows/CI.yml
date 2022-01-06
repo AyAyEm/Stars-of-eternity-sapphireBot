@@ -7,58 +7,77 @@ on:
       - main
 
 env:
-  IMAGE_TAG: ghcr.io/${{ secrets.DOCKERHUB_USERNAME }}/stars-of-eternity-bot:${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  IMAGE_TAG: ${{ github.event_name == 'push' && 'ayayem/stars-of-eternity-bot' || 'ghcr.io/ayayem/stars-of-eternity-bot' }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
-        run: |
-          docker image build --pull -t ${{ env.IMAGE_TAG }} .
-          docker image push ${{ env.IMAGE_TAG }}
-  lint:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run linter
-        run: docker container run --rm ${{ env.IMAGE_TAG }} npm run lint
-  publish:
-    if: ${{ github.event_name == 'push' }}
-    runs-on: ubuntu-latest
-    needs: [build, lint]
-    strategy:
-      matrix:
-        node-version: [16.x]
-    steps:
-      - uses: actions/checkout@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ayayem/stars-of-eternity-bot
+          images: ${{ env.IMAGE_TAG }}
+          flavour: latest=false
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=ref,event=pr,prefix=${{ github.head_ref }}#
             type=sha
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: ghcr.io/ayayem/stars-of-eternity-bot:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          push: true
+          outputs: type=docker,dest=/tmp/stars-of-eternity-image.tar
+      - name: Upload image
+        uses: actions/upload-artifact@v2
+        with:
+          name: stars-of-eternity-image
+          path: /tmp/stars-of-eternity-image.tar
+  lint:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download image
+        uses: actions/download-artifact@v2
+        with:
+          name: stars-of-eternity-image
+          path: /tmp
+      - name: Load image
+        run: docker load --input /tmp/stars-of-eternity-image.tar
+      - name: Run linter
+        run: docker container run --rm ${{ env.IMAGE_TAG }} npm run lint
+  publish-latest:
+    runs-on: ubuntu-latest
+    needs: [build, lint]
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Download image
+        uses: actions/download-artifact@v2
+        with:
+          name: stars-of-eternity-image
+          path: /tmp
+      - name: Load image
+        run: docker load --input /tmp/stars-of-eternity-image.tar
       - name: Login to DockerHub
-        uses: docker/login-action@v1 
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name != 'push' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish as latest
+        run: |
+          docker image tag $(docker image ls -q) ${{ env.IMAGE_TAG }}:latest
+          docker image push ${{ env.IMAGE_TAG }}:latest
