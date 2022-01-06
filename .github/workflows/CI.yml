@@ -21,7 +21,6 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.IMAGE_TAG }}
-          flavour: latest=true
           tags: |
             type=ref,event=pr,prefix=${{ github.head_ref }}-
             type=sha
@@ -42,8 +41,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          pull: true
           push: true
+          cache-from: ${{ steps.meta.outputs.tags }}
           tags: ${{ steps.meta.outputs.tags }}
   lint:
     runs-on: ubuntu-latest
