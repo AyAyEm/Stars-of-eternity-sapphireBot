@@ -9,7 +9,7 @@ on:
 env:
   IMAGE: ayayem/stars-of-eternity-bot
   TAG: ${{ github.event_name == 'pull_request' && format('{0}-{1}', github.head_ref, github.event.number) || github.sha }}
-  IMAGE_TAG: ${{ env.IMAGE }}:${{ env.TAG }}
+  IMAGE_TAG: ${{ format('{0}:{1}', env.IMAGE, env.TAG) }}
 
 jobs:
   build:
