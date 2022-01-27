@@ -1,13 +1,12 @@
 {
   "env": {
-    "browser": true,
     "commonjs": true,
     "es2021": true
   },
   "settings": {
-    "import/extensions": [".js", ".jsx", ".ts", ".tsx", ".d.ts"],
+    "import/extensions": [".js", ".ts", ".d.ts"],
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"]
+      "@typescript-eslint/parser": [".ts"]
     },
     "import/resolver": {
       "typescript": {
@@ -21,8 +20,8 @@
   "extends": ["airbnb-typescript/base"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 12,
-    "project": "./src/tsconfig.json",
+    "ecmaVersion": "latest",
+    "project": ["./src/tsconfig.json", "./tsconfig.json"],
     "tsconfigRootDir": "./"
   },
   "plugins": ["@typescript-eslint", "import"],
@@ -35,6 +34,9 @@
         "consistent": true
       }
     ],
+    "function-paren-newline": ["error", "multiline"],
+    "import/extensions": ["error", "never"],
+    "no-restricted-syntax": "off",
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
     "import/prefer-default-export": "off",

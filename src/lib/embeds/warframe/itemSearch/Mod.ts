@@ -1,102 +1,89 @@
-import { EternityMessageEmbed } from '@lib';
 import _ from 'lodash';
 
-import type { Item } from 'warframe-items';
+import { ColorResolvable } from 'discord.js';
 
-const groupsDictionary = new Map([
-  ['Enemy Mod Tables', 'Inimigos'],
-  ['Mission Rewards', 'Recompensa de missão'],
-]);
+import { Page, InitPagedEmbed } from '#decorators';
+import { EternityMessageEmbed } from '#lib';
+import { BaseItemPagedEmbed } from './BaseItem';
 
-const rarityColorMap = new Map([
-  ['Common', '#876f4e'],
-  ['Uncommon', '#fefefe'],
-  ['Rare', '#dec67c'],
-  ['Legendary', '#fffeff'],
-  ['Requiem', 'DARK_RED'],
-]);
+@InitPagedEmbed()
+export class ModPagedEmbed extends BaseItemPagedEmbed {
+  public rarityColorMap = new Map<string, ColorResolvable>([
+    ['Common', '#876f4e'],
+    ['Uncommon', '#fefefe'],
+    ['Rare', '#dec67c'],
+    ['Legendary', '#fffeff'],
+    ['Requiem', 'DARK_RED'],
+  ]);
 
-class ModEmbed {
-  public getBaseEmbed: () => InstanceType<typeof EternityMessageEmbed>;
+  public baseEmbed() {
+    const { name, rarity, polarity, imageName } = this.item;
 
-  constructor(public modItem: Item) {
-    const {
-      name, polarity, rarity, imageName,
-    } = modItem;
-
-    this.getBaseEmbed = () => new EternityMessageEmbed()
+    return new EternityMessageEmbed()
       .setTitle(`Mod: ${name}`)
       .setThumbnail(`https://cdn.warframestat.us/img/${imageName}`)
       .setFooter(`${rarity} ${polarity}`)
-      .setColor(rarityColorMap.get(rarity as string) || 'WHITE');
+      .setColor(this.rarityColorMap.get(rarity as string) || 'WHITE');
   }
 
-  get mainInfoPage() {
-    const { getBaseEmbed, modItem } = this;
-    const {
-      tradable, levelStats, transmutable,
-    } = modItem;
+  @Page({ emoji: '📋' })
+  public async mainInfo() {
+    const { tradable, levelStats, transmutable } = this.item;
 
-    const embedPage = getBaseEmbed().addFields([
-      { name: 'Trocável', value: tradable ? '✅' : '❌', inline: true },
-      { name: 'Transmutável', value: transmutable ? '✅' : '❌', inline: true },
+    const embed = this.baseEmbed();
+
+    embed.addFields([
+      { name: await this.t('fields:tradable'), value: tradable ? '✅' : '❌', inline: true },
+      { name: await this.t('fields:transmutable'), value: transmutable ? '✅' : '❌', inline: true },
       { ...EternityMessageEmbed.blankField, inline: true },
     ]);
 
     if (levelStats) {
-      const statsFields = levelStats[0].stats.map((stat, index) => {
-        const percentageRegex = /[+-]?\d+%/;
-        const minStat = stat.match(percentageRegex)?.[0];
-        const maxStat = levelStats[levelStats.length - 1].stats[index].match(percentageRegex)?.[0];
+      const percentageRegex = /[+-]?\d+%/;
+      const statsFields = await Promise.all(levelStats[levelStats.length - 1].stats.map(async (stat, index) => {
+        const minStat = levelStats[0].stats[index].match(percentageRegex)?.[0];
+        const maxStat = stat.match(percentageRegex)?.[0];
 
         return [
-          { name: 'Atributo', value: stat, inline: true },
-          { name: 'Min/Max', value: `${minStat}/${maxStat}`, inline: true },
+          { name: await this.t('fields:stat'), value: stat, inline: true },
+          { name: await this.t('fields:minMax'), value: `${minStat}/${maxStat}`, inline: true },
           { ...EternityMessageEmbed.blankField, inline: true },
         ];
-      });
+      }));
 
-      embedPage.addFields(statsFields.flat());
+      embed.addFields(statsFields.flat());
     }
-    return embedPage;
+
+    return embed;
   }
 
-  get dropsPage() {
-    const { getBaseEmbed, modItem: { drops } } = this;
-    const embedPage = drops ? getBaseEmbed() : null;
-    if (embedPage) {
-      const dropsGroups = _.groupBy(drops, 'type');
-      _.forEach(dropsGroups, (dropsList, group) => {
+  @Page({ emoji: '♻' })
+  public async dropsPage() {
+    const { drops } = this.item;
+    if (!drops) return null;
+
+    const embed = this.baseEmbed();
+
+    await Promise.all(_(drops)
+      .groupBy('type')
+      .map(async (dropsList, group) => {
         const [
           locationsString,
           percentagesString,
-        ] = dropsList.reduce(([locations, percentages], { location, chance }) => (
+        ] = dropsList.reduce(([locations, percentages], { location, chance = 0 }) => (
           [
             `${locations}${location}\n`,
-            `${percentages}${((chance || 0) * 100).toFixed(2)}%\n`,
+            `${percentages}${_.round(chance * 100, 2)}%\n`,
           ]
         ), ['', '']);
-        const translatedGroup = groupsDictionary.get(group) || group;
 
-        embedPage.addFields([
-          { name: translatedGroup, value: locationsString, inline: true },
-          { name: 'chance', value: percentagesString, inline: true },
+        embed.addFields([
+          { name: await this.t(`mod:groups:${group}`, { group }), value: locationsString, inline: true },
+          { name: await this.t('fields:chance'), value: percentagesString, inline: true },
           { ...EternityMessageEmbed.blankField, inline: true },
         ]);
-      });
-    }
+      }).value());
 
-    return embedPage;
+    return embed;
   }
-}
-
-export function mod(modItem: Item) {
-  const { mainInfoPage, dropsPage } = new ModEmbed(modItem);
-
-  const embedMap = new Map()
-    .set('📋', mainInfoPage);
-
-  if (dropsPage) embedMap.set('♻', dropsPage);
-
-  return embedMap;
 }

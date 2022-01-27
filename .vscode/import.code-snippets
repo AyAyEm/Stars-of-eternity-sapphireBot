@@ -1,0 +1,22 @@
+{
+  "import": {
+    "scope": "typescript",
+    "prefix": "import",
+    "body": "import { $2 } from '$1';$0"
+  },
+  "import local" : {
+    "scope": "typescript",
+    "prefix": "import:local",
+    "body": "import { ${2:$1} } from './$1';$0"
+  },
+  "import type": {
+    "scope": "typescript",
+    "prefix": "import:type",
+    "body": "import type { $2 } from '$1';$0"
+  },
+  "import type local": {
+    "scope": "typescript",
+    "prefix": "import:type:local",
+    "body": "import type { ${2:$1} } from './$1';"
+  }
+}

@@ -1,4 +1,4 @@
-import { Awaited, PieceContext } from '@sapphire/framework';
+import { Awaitable, PieceContext } from '@sapphire/framework';
 import { AliasPieceOptions } from '@sapphire/pieces';
 
 import { EternityBasePiece } from './EternityBasePiece';
@@ -15,7 +15,7 @@ export abstract class Task extends EternityBasePiece {
 
   public once: boolean;
 
-  public abstract run(...args: readonly unknown[]): Awaited<void>;
+  public abstract run(...args: readonly unknown[]): Awaitable<void>;
 
   constructor(context: PieceContext, { name, ...options }: TaskOptions) {
     super(context, { name: (name ?? context.name).toLowerCase(), ...options });
@@ -25,10 +25,10 @@ export abstract class Task extends EternityBasePiece {
   }
 
   public async onLoad(): Promise<void> {
-    this.client.ready.then(() => {
+    this.container.client.ready.then(() => {
       this.run();
       if (!this.once) {
-        this._interval = this.client.setInterval(() => {
+        this._interval = setInterval(() => {
           this.run();
         }, this.time);
       }
@@ -37,7 +37,7 @@ export abstract class Task extends EternityBasePiece {
 
   public onUnload() {
     if (this._interval) {
-      this.client.clearInterval(this._interval);
+      clearInterval(this._interval);
       this._interval = null;
     }
   }

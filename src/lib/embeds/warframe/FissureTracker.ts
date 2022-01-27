@@ -1,10 +1,10 @@
-import { MessageEmbed } from 'discord.js';
-import { timezone } from '@root/config';
-import moment from 'moment-timezone';
 import _ from 'lodash';
 
-import type { EternityMessageEmbed } from '@lib';
-import type { Fissure, RelicTiers } from '@lib/types/Warframe';
+import { timezone } from '#root/config';
+import { EternityMessageEmbed } from '#lib';
+import { dayjs } from '#utils';
+
+import type { Fissure } from '#lib/types/Warframe';
 
 // Fissures: Lith, Meso, Neo, Axi and Requiem
 const fissureIcons = [
@@ -15,8 +15,13 @@ const fissureIcons = [
   'https://i.imgur.com/CNdPs70.png',
 ];
 
-const fissureTiers = new Map(['Lith', 'Meso', 'Neo', 'Axi', 'Requiem']
-  .map((tier, index) => [tier, { index, icon: fissureIcons[index] }]));
+enum FissureTiers {
+  Lith,
+  Meso,
+  Neo,
+  Axi,
+  Requiem,
+}
 
 function fissureToString({ node }: Fissure) {
   const [mission, map] = [node.split(' ')[0], node.split(' ').slice(1).join(' ')];
@@ -31,14 +36,14 @@ function missionFissuresToString(missionFissures: Fissure[]) {
 
 function getMissionsFields(missionFissures: Fissure[]) {
   const expirationString = missionFissures.reduce((expirations, { expiry }) => {
-    const expiration = moment.tz(expiry, timezone).format('HH:mm');
+    const expiration = dayjs(expiry).tz(timezone).format('HH:mm');
     return `${expirations}*${expiration}*\n`;
   }, '');
 
   const enemyFactions = missionFissures.reduce((factions, { enemy }) => `${factions}${enemy}\n`, '');
 
   return [{
-    name: `${missionFissures[0].missionType}`,
+    name: `${missionFissures[0].isStorm ? 'Railjack ' : ''}${missionFissures[0].missionType}`,
     value: missionFissuresToString(missionFissures),
     inline: true,
   }, {
@@ -52,30 +57,26 @@ function getMissionsFields(missionFissures: Fissure[]) {
   }];
 }
 
-export function fissuresEmbed(fissures: Fissure[]): Map<RelicTiers, EternityMessageEmbed> {
-  const fissuresMap = new Map(
-    [...Object.entries((_.groupBy(fissures, 'tier')))]
-      .sort(([tierA], [tierB]) => {
-        const { index: A = 0 } = fissureTiers.get(tierA) || {};
-        const { index: B = 0 } = fissureTiers.get(tierB) || {};
-        return B - A;
-      }),
-  );
+export function fissuresEmbed(fissures: Fissure[]): Map<number, EternityMessageEmbed> {
+  const fissuresMap = new Map([...Object.entries((_.groupBy(fissures, 'tier')))]
+    .sort(([tierA], [tierB]) => FissureTiers[tierB] - FissureTiers[tierA]));
 
-  const embedsMap = new Map();
+  const embedsMap: Map<number, EternityMessageEmbed> = new Map();
 
   fissuresMap.forEach((tierFissures, tier) => {
-    const { icon } = fissureTiers.get(tier) || {};
+    const tierNumber: number = FissureTiers[tier];
+    const icon = fissureIcons[tierNumber];
 
     const missionsTypes = _.uniqBy(tierFissures, 'missionType')
       .reduce((types, { missionType }, index, uniqFissures) => (
         `${types} ${missionType}${index === uniqFissures.length - 1 ? '' : ','}`), '');
 
-    const groupedByType = _.groupBy(tierFissures, 'missionType');
+    const groupedByType = _.groupBy(tierFissures, ({ missionType, isStorm = false }) => (
+      `${missionType}${isStorm ? 'Storm' : ''}`));
     const fields = Object.values(groupedByType)
       .flatMap(([...missionFissures]) => getMissionsFields(missionFissures));
 
-    const embed = new MessageEmbed()
+    const embed = new EternityMessageEmbed()
       .setTitle(`${tier} fendas ativas: ${tierFissures.length}`)
       .setAuthor(missionsTypes)
       .setDescription('')
@@ -84,8 +85,9 @@ export function fissuresEmbed(fissures: Fissure[]): Map<RelicTiers, EternityMess
       .setFooter('Horário de São Paulo')
       .addFields(...fields);
 
-    embedsMap.set(tier, embed);
+    embedsMap.set(tierNumber + 1, embed);
   });
+
   return embedsMap;
 }
 

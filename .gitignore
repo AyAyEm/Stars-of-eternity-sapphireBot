@@ -6,11 +6,11 @@ node_modules/
 
 # build files
 dist/
+src/lib/typeorm/migrations/generated
 tsconfig.tsbuildinfo
 
 # sensitive data
 .env
-src/config.ts
 
 # generated data
 data/

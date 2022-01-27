@@ -1,40 +1,24 @@
-import './Extenders';
-
 import { SapphireClient } from '@sapphire/framework';
-import { mergeDefault } from '@sapphire/utilities';
-import { ClientOptions } from 'discord.js';
-import { clientOptions } from '@utils/I18n';
 
-import { Mongoose } from './providers';
+import { clientOptions } from '#root/config';
 import { TaskStore } from './structures';
-import { Items } from './eternity/warframe';
 
 export class EternityClient extends SapphireClient {
-  public tasks = new TaskStore(this);
-
-  public provider: Mongoose = new Mongoose();
+  public tasks: TaskStore;
 
   public fetchPrefix = () => '/';
 
-  public fetchLanguage = () => 'pt-BR';
-
-  public warframe = {
-    items: new Items(),
-  };
-
-  public console = console;
+  public ready = new Promise<void>((resolve) => this.once('ready', () => resolve()));
 
   /**
    * Returns a promise that resolves when the client is ready.
    */
-  public ready = new Promise<void>((resolve) => this.once('ready', () => resolve()));
 
-  constructor(options?: ClientOptions) {
-    // @ts-expect-error Type instantiation is excessively deep and possibly infinite. ts(2589)
-    super(mergeDefault(clientOptions, { ...options, caseInsensitiveCommands: true }));
+  public constructor() {
+    super(clientOptions);
 
-    this.registerStore(this.tasks)
-      .registerUserDirectories();
+    this.tasks = new TaskStore();
+    this.stores.register(this.tasks).registerPath();
   }
 
   /**

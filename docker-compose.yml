@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:6.2-alpine
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data: null

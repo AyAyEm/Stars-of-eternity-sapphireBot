@@ -1,4 +1,13 @@
 {
-  "succesfullEnabled": "Tracker de relíquias habilitados com sucesso neste canal!",
-  "succesfullDisabled": "Tracker de relíquias desabilitados com sucesso neste canal!"
+  "enable": {
+    "success": "Tracker de relíquias habilitados com sucesso neste canal!",
+    "alreadyEnabled": "Tracker de relíquias já está habilitado para este canal!"
+  },
+  "disable": {
+    "success": "Tracker de relíquias desabilitados com sucesso neste canal!",
+    "alreadyDisabled": "Tracker de relíquias já está desabilitado para este canal!"
+  },
+  "reset": {
+    "success": "Tracker de relíquias resetado com sucesso!"
+  }
 }

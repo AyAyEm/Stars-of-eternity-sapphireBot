@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ESNEXT",
-    "lib": [],
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
+    "lib": [],
     "composite": true,
     "sourceMap": true,
     "declaration": true,
@@ -12,22 +12,10 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "resolveJsonModule": true,
-    "baseUrl": "./src",
-    "paths": {
-      "@root/*": ["./*"],
-      "@config": ["./config"],
-      "@lib": ["./lib"],
-      "@lib/*": ["./lib/*"],
-      "@utils": ["./lib/utils"],
-      "@utils/*": ["./lib/utils/*"],
-      "@embeds": ["./lib/embeds"],
-      "@embeds/*": ["./lib/embeds/*"],
-      "@providers": ["./lib/providers"],
-      "@providers/*": ["./lib/providers/*"]
-    }
-  },
-  "include": [
-    "src",
-    "src/languages/**/*.json"
-  ]
+    "importHelpers": true,
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ]
+  }
 }

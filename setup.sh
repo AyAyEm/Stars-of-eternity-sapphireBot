@@ -1,12 +1,22 @@
-echo "Insert discord token"
-read DISCORD_TOKEN
-echo
-echo "Insert mongo db connection string"
-read MONGO_CONNECTION_STRING
+#!/bin/bash
 
-echo "DISCORD_TOKEN=$DISCORD_TOKEN" >> .env
-echo "MONGO_CONNECTION_STRING=$MONGO_CONNECTION_STRING" >> .env
+secret_insert() {
+    local secretName="$1"
+    echo "Insert ${secretName/-/ }: "
+    local secretValue
+    read secretValue
+    local len=${#secretValue}
+    if [ "${len}" -gt "0" ]; then
+        docker secret rm ${secretName} &>/dev/null
+        printf "${secretValue}" | docker secret create ${secretName} - &>/dev/null
+    fi
+}
 
-npm install -g pm2
-npm install --production
-pm2 start
+secret_insert "discord-token"
+secret_insert "mongo-hostname"
+secret_insert "mongo-user"
+secret_insert "mongo-password"
+
+docker stack rm eternity &>/dev/null
+sleep 5s
+docker stack deploy -c ./docker-compose.yml -c ./docker-compose.prod.yml eternity

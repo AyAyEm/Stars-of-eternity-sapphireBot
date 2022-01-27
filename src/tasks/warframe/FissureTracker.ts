@@ -1,35 +1,41 @@
-import { Task, TaskOptions } from '@lib/structures';
-import { ApplyOptions } from '@sapphire/decorators';
+import _ from 'lodash';
 import axios from 'axios';
+import { ApplyOptions } from '@sapphire/decorators';
 
-import type { Fissure } from '@lib/types/Warframe';
+import { Task, TaskOptions } from '#lib/structures';
 
-@ApplyOptions<TaskOptions>({ time: 10000 })
+import type { Fissure } from '#lib/types/Warframe';
+
+@ApplyOptions<TaskOptions>({ time: 60000 })
 export default class extends Task {
-  public document = new this.client.provider.Trackers({ id: { tracker: 'fissure' } });
-
   public fissuresUrl = 'https://api.warframestat.us/pc/fissures';
 
   public async run() {
+    const { redisClient } = this.container;
+    let latestActivation = (await redisClient.get('latestWarframeFissureActivation')) ?? '0';
+
     axios.get(this.fissuresUrl).then(async ({ data: fissuresData }: { data: Fissure[] }) => {
-      if (process.env.NODE_ENV !== 'production') await this.document.reload();
+      const getTime = (timestamp: string) => new Date(timestamp).getTime();
 
       const activeFissures = fissuresData.filter(({ active }) => active);
+      const newFissuresTiers = activeFissures
+        .filter(({ activation }) => getTime(activation) > +latestActivation)
+        .map(({ tier }) => tier);
 
-      const fissuresIds = await this.document.get<string[]>('data.cacheIds', []);
+      if (newFissuresTiers.length > 0) {
+        const toEmitFissures = activeFissures.filter(({ tier }) => newFissuresTiers.includes(tier));
+        this.container.client.emit('warframeNewActiveFissures', toEmitFissures);
 
-      const newFissures = activeFissures.filter((fissure) => !fissuresIds.includes(fissure.id));
-      if (newFissures.length > 0) {
-        // this.client.emit('warframeNewFissures', newFissures);
-        this.client.emit('warframeNewActiveFissures', activeFissures);
-
-        const updatedFissureIds = fissuresData.map(({ id }) => id);
-        await this.document.set('data.cacheIds', updatedFissureIds);
+        latestActivation = _(toEmitFissures)
+          .map(({ activation }) => getTime(activation))
+          .max()
+          .toString();
+        this.container.redisClient.set('latestWarframeFissureActivation', latestActivation);
       }
     })
       .catch((err) => {
         if (err.message.includes('Request failed')) return;
-        console.error(err);
+        this.container.client.logger.error(err);
       });
   }
 }

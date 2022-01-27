@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  eternity:
+    image: ayayem/stars-of-eternity-bot:latest
+    environment:
+      - NODE_ENV=production
+      - DISCORD_TOKEN_FILE=/run/secrets/discord-token
+      - MONGO_USERNAME_FILE=/run/secrets/mongo-user
+      - MONGO_PASSWORD_FILE=/run/secrets/mongo-password
+      - MONGO_HOSTNAME_FILE=/run/secrets/mongo-hostname
+      - MONGO_PORT=27017
+      - MONGO_DNS=true
+      - MONGO_DATABASE_NAME=starsOfEternity
+      - REDIS_HOSTNAME=redis
+      - REDIS_PORT=6379
+    secrets:
+      - discord-token
+      - mongo-user
+      - mongo-password
+      - mongo-hostname
+    depends_on:
+      - redis
+    deploy:
+      replicas: 1
+  redis:
+    deploy:
+      replicas: 1
+
+secrets:
+  mongo-user:
+    external: true
+  mongo-password:
+    external: true
+  mongo-hostname:
+    external: true
+  discord-token:
+    external: true

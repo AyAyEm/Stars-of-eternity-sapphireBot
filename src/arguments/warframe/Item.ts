@@ -18,13 +18,13 @@ export class Item extends Argument {
     'kubrowegg', 'traces', 'other', 'credits',
   ]);
 
-  public async run(argument: string) {
-    const item = argument.toLowerCase();
+  public async run(parameter: string) {
+    const item = parameter.toLowerCase();
     if (this.possibleItems.has(item)) return this.ok(item);
-    return this.error(
-      argument,
-      'ArgumentInvalidItem',
-      'Argument passed cannot be resolved to a warframe item',
-    );
+    return this.error({
+      parameter,
+      identifier: 'ArgumentInvalidItem',
+      message: 'Argument passed cannot be resolved to a warframe item',
+    });
   }
 }
