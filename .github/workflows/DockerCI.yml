@@ -2,6 +2,8 @@ name: Docker CI
 
 on:
   push:
+    tags-ignore:
+      - '**'
 
 env:
   IMAGE: ghcr.io/${{ github.actor }}/stars-of-eternity-bot
